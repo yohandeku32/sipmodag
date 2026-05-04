@@ -13,11 +13,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg-base: #faf7f2;
+      --bg-soft: #f4eee6;
+      --bg-card: rgba(255, 255, 255, 0.72);
+      --bg-card-strong: rgba(255, 255, 255, 0.88);
+      --text-main: #1f1b19;
+      --text-soft: #6d625a;
+      --primary: #7a1f2b;
+      --primary-dark: #5c1621;
+      --primary-soft: rgba(122, 31, 43, 0.08);
+      --accent: #c8a97e;
+      --line: rgba(122, 31, 43, 0.12);
+      --line-soft: rgba(92, 22, 33, 0.08);
+      --shadow-sm: 0 10px 30px rgba(70, 34, 22, 0.08);
+      --shadow-md: 0 18px 40px rgba(70, 34, 22, 0.12);
+      --shadow-lg: 0 24px 60px rgba(70, 34, 22, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #FAF7F2;
-      color: #1a1a1a;
-      box-sizing: border-box;
+      background: var(--bg-base);
+      color: var(--text-main);
+      margin: 0;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
 
     .font-serif-display {
@@ -26,38 +54,143 @@
     }
 
     /* === LOGO PLACEHOLDER ===
-       Untuk mengganti logo: ganti elemen <div id="logo-mark"> dengan tag <img>
+       Untuk mengganti logo:
+       ganti isi div id="logo-mark" dengan tag <img>
        Contoh:
-       <img src="URL_LOGO_ANDA" alt="Logo" class="w-full h-full object-contain">
+       <img src="logo.png" alt="Logo Instansi" class="w-full h-full object-contain">
     */
 
     .grain-bg {
+      background-color: var(--bg-base);
       background-image:
-        radial-gradient(circle at 20% 20%, rgba(190, 80, 90, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(180, 140, 90, 0.08) 0%, transparent 50%);
+        radial-gradient(circle at 12% 18%, rgba(122, 31, 43, 0.14) 0%, transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(200, 169, 126, 0.18) 0%, transparent 26%),
+        radial-gradient(circle at 78% 78%, rgba(122, 31, 43, 0.07) 0%, transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.60) 0%, rgba(250,247,242,0.88) 42%, rgba(244,238,230,0.96) 100%),
+        radial-gradient(rgba(122, 31, 43, 0.04) 0.8px, transparent 0.8px);
+      background-size:
+        auto,
+        auto,
+        auto,
+        auto,
+        24px 24px;
+      background-position:
+        center,
+        center,
+        center,
+        center,
+        0 0;
     }
 
     .decorative-line {
-      background-image: linear-gradient(90deg, transparent, #c8a97e 20%, #c8a97e 80%, transparent);
+      background-image: linear-gradient(90deg, transparent, var(--accent) 20%, var(--accent) 80%, transparent);
       height: 1px;
+      opacity: 0.95;
     }
 
-    .category-card {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    .site-header {
+      border-bottom: 1px solid rgba(122, 31, 43, 0.08);
+      box-shadow: 0 6px 20px rgba(80, 36, 25, 0.04);
+      backdrop-filter: blur(14px) saturate(135%);
+      -webkit-backdrop-filter: blur(14px) saturate(135%);
     }
 
-    .category-card:hover {
-      transform: translateY(-4px);
+    #logo-mark,
+    #footer-logo-mark {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+
+    #logo-mark::after,
+    #footer-logo-mark::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.20), transparent 55%);
+      pointer-events: none;
+    }
+
+    #header-acronym,
+    #footer-acronym {
+      letter-spacing: -0.02em;
+    }
+
+    #header-instansi,
+    #footer-instansi {
+      color: #8d8178;
+    }
+
+    #hero-acronym {
+      letter-spacing: -0.05em;
+      text-shadow: 0 10px 20px rgba(122, 31, 43, 0.06);
+    }
+
+    #hero-fullname {
+      max-width: 24ch;
+      line-height: 1.2;
+    }
+
+    #hero-description-text {
+      color: var(--text-soft);
+    }
+
+    .tag-pill {
+      background: linear-gradient(135deg, rgba(122, 31, 43, 0.12), rgba(200, 169, 126, 0.12));
+      color: var(--primary);
+      border: 1px solid rgba(122, 31, 43, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #842534 0%, #7a1f2b 52%, #651723 100%);
+      color: #ffffff;
+      border: 1px solid rgba(122, 31, 43, 0.28);
+      box-shadow: 0 14px 30px -12px rgba(122, 31, 43, 0.45);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6f1b28 0%, #5c1621 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px -12px rgba(122, 31, 43, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      border: 1.5px solid rgba(31, 27, 25, 0.14);
+      background: rgba(255,255,255,0.58);
+      color: var(--text-main);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #1a1a1a;
+      color: #FAF7F2;
+      border-color: #1a1a1a;
     }
 
     .feature-num {
       font-family: 'Fraunces', serif;
       font-weight: 900;
+      line-height: 1;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .fade-up {
@@ -69,73 +202,149 @@
     .delay-3 { animation-delay: 0.3s; }
     .delay-4 { animation-delay: 0.4s; }
 
-    .btn-primary {
-      background: #7a1f2b;
+    .section-panel {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(145deg, rgba(122, 31, 43, 0.08), rgba(255,255,255,0.55)),
+        rgba(255,255,255,0.45);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .section-panel::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(200,169,126,0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .feature-card {
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,255,255,0.84));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
       transition: all 0.3s ease;
     }
 
-    .btn-primary:hover {
-      background: #5c1621;
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px -8px rgba(122, 31, 43, 0.4);
+    .feature-card:hover {
+      background: rgba(255,255,255,0.98);
     }
 
-    .btn-secondary {
-      border: 1.5px solid #1a1a1a;
-      transition: all 0.3s ease;
+    .feature-icon {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
     }
 
-    .btn-secondary:hover {
-      background: #1a1a1a;
-      color: #FAF7F2;
+    .category-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.82));
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
     }
 
-    .tag-pill {
-      background: rgba(122, 31, 43, 0.08);
-      color: #7a1f2b;
+    .category-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -20px -20px auto;
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(122,31,43,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .category-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(122, 31, 43, 0.22);
+    }
+
+    .cta-block {
+      background:
+        linear-gradient(145deg, rgba(122, 31, 43, 0.06), rgba(255,255,255,0.8));
+    }
+
+    #final-cta {
+      box-shadow: 0 18px 36px -12px rgba(122, 31, 43, 0.45);
+    }
+
+    .site-footer {
+      background: linear-gradient(180deg, rgba(20,18,17,1), rgba(28,24,22,1));
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(122, 31, 43, 0.22);
+      outline-offset: 3px;
+      border-radius: 999px;
+    }
+
+    @media (max-width: 768px) {
+      #hero-acronym {
+        line-height: 0.98;
+      }
+
+      #hero-fullname {
+        max-width: 100%;
+      }
+
+      .grain-bg {
+        background-size:
+          auto,
+          auto,
+          auto,
+          auto,
+          20px 20px;
+      }
     }
   </style>
 </head>
 
 <body class="h-full">
-  <div class="w-full h-full overflow-auto grain-bg">
+  <div class="w-full min-h-full overflow-auto grain-bg">
 
-    <!-- === HEADER / NAVIGATION === -->
-    <header class="w-full border-b border-stone-200/60 bg-[#FAF7F2]/80 backdrop-blur-md sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-6 lg:px-10 py-5 flex items-center justify-between">
+    <!-- HEADER -->
+    <header class="site-header w-full bg-[#FAF7F2]/80 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-6 lg:px-10 py-5 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <!-- === LOGO INSTANSI === Ganti div di bawah dengan <img> untuk logo custom -->
           <div id="logo-mark" class="w-11 h-11 rounded-full bg-gradient-to-br from-[#7a1f2b] to-[#a03342] flex items-center justify-center shadow-sm">
             <i data-lucide="file-check-2" class="w-5 h-5 text-white"></i>
           </div>
-
           <div class="leading-tight">
             <div id="header-acronym" class="font-serif-display font-bold text-lg text-stone-900 tracking-tight">
               SIPMODAG
             </div>
-            <div id="header-instansi" class="text-[10px] text-stone-500 uppercase tracking-wider">
+            <div id="header-instansi" class="text-[10px] uppercase tracking-wider">
               Dinas P3AP2KB Prov. NTT
             </div>
           </div>
         </div>
 
         <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-700">
-          <a href="#fitur" class="hover:text-[#7a1f2b] transition">Tujuan</a>
+          <a href="#fitur" class="hover:text-[#7a1f2b] transition">Fitur</a>
           <a href="#kategori" class="hover:text-[#7a1f2b] transition">Kategori</a>
+          <a href="#tujuan" class="hover:text-[#7a1f2b] transition">Tujuan</a>
         </nav>
 
-        <a id="nav-cta"
-           href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="btn-primary text-white text-sm font-medium px-5 py-2.5 rounded-full hidden sm:inline-flex items-center gap-2">
+        <a
+          id="nav-cta"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary text-white text-sm font-medium px-5 py-2.5 rounded-full hidden sm:inline-flex items-center gap-2"
+        >
           <i data-lucide="upload-cloud" class="w-4 h-4"></i>
           <span id="nav-cta-text">Upload Dokumen</span>
         </a>
       </div>
     </header>
 
-    <!-- === HERO SECTION === -->
+    <!-- HERO -->
     <section class="w-full max-w-7xl mx-auto px-6 lg:px-10 pt-16 pb-24 lg:pt-24 lg:pb-32">
       <div class="grid lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-12 fade-up">
@@ -151,38 +360,42 @@
             </span>
           </h1>
 
-          <p id="hero-description-text" class="text-lg text-stone-600 leading-relaxed max-w-xl mb-10">
-            Platform terpusat untuk mengelola, mengarsipkan, dan memonitor dokumen analisis gender secara terstruktur dan transparan di lingkungan Dinas P3AP2KB Provinsi NTT.
+          <p id="hero-description-text" class="text-lg leading-relaxed max-w-2xl mb-10">
+            Platform terpusat untuk mengelola, mengarsipkan, dan memonitor dokumen analisis gender secara terstruktur dan transparan di lingkungan Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk dan Keluarga Berencana Provinsi Nusa Tenggara Timur.
           </p>
 
           <div class="flex flex-wrap gap-4">
-            <a id="hero-cta-primary"
-               href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="btn-primary text-white font-medium px-7 py-3.5 rounded-full inline-flex items-center gap-2.5">
+            <a
+              id="hero-cta-primary"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-primary text-white font-medium px-7 py-3.5 rounded-full inline-flex items-center gap-2.5"
+            >
               <i data-lucide="file-plus-2" class="w-5 h-5"></i>
               <span id="hero-cta-primary-text">Upload via Google Form</span>
             </a>
 
-            <a href="#fitur"
-               class="btn-secondary text-stone-900 font-medium px-7 py-3.5 rounded-full inline-flex items-center gap-2.5">
+            <a
+              href="#fitur"
+              class="btn-secondary text-stone-900 font-medium px-7 py-3.5 rounded-full inline-flex items-center gap-2.5"
+            >
               <span id="hero-cta-secondary-text">Pelajari Lebih Lanjut</span>
               <i data-lucide="arrow-down" class="w-4 h-4"></i>
             </a>
           </div>
 
-          <div class="flex items-center gap-8 mt-14 pt-8 border-t border-stone-200">
+          <div class="flex flex-wrap items-center gap-8 mt-14 pt-8 border-t border-stone-200">
             <div>
               <div class="font-serif-display font-bold text-3xl text-[#7a1f2b]">4</div>
               <div class="text-xs text-stone-500 uppercase tracking-wider mt-1">Kategori Dokumen</div>
             </div>
-            <div class="w-px h-10 bg-stone-300"></div>
+            <div class="hidden md:block w-px h-10 bg-stone-300"></div>
             <div>
               <div class="font-serif-display font-bold text-3xl text-[#7a1f2b]">100%</div>
               <div class="text-xs text-stone-500 uppercase tracking-wider mt-1">Digital &amp; Terstruktur</div>
             </div>
-            <div class="w-px h-10 bg-stone-300"></div>
+            <div class="hidden md:block w-px h-10 bg-stone-300"></div>
             <div>
               <div class="font-serif-display font-bold text-3xl text-[#7a1f2b]">24/7</div>
               <div class="text-xs text-stone-500 uppercase tracking-wider mt-1">Akses Monitoring</div>
@@ -192,23 +405,23 @@
       </div>
     </section>
 
-    <!-- === FITUR UTAMA === -->
+    <!-- FITUR -->
     <section id="fitur" class="w-full max-w-7xl mx-auto px-6 lg:px-10 py-24 lg:py-32">
-      <div class="max-w-3xl mb-16 bg-gradient-to-br from-[#7a1f2b]/8 to-amber-100/5 rounded-3xl p-10 lg:p-14 border border-[#7a1f2b]/10">
+      <div class="section-panel max-w-3xl mb-16 rounded-3xl p-10 lg:p-14 border border-[#7a1f2b]/10">
         <div class="text-xs uppercase tracking-[0.2em] text-[#7a1f2b] font-semibold mb-4">
-          —Tujuan
+          — Fitur Utama
         </div>
         <h2 id="features-title-text" class="font-serif-display font-bold text-4xl lg:text-5xl text-stone-900 leading-tight">
-          Dirancang untuk <em>efisiensi</em> pengelolaan dan monitoring.
+          Dirancang untuk <em>efisiensi</em> pengelolaan dokumen.
         </h2>
       </div>
 
       <div class="grid md:grid-cols-2 gap-px bg-stone-200 rounded-2xl overflow-hidden border border-stone-200">
-        <div class="bg-[#FAF7F2] p-10 hover:bg-white transition">
+        <div class="feature-card p-10">
           <div class="flex items-start gap-5">
             <div class="feature-num text-5xl text-[#7a1f2b]/20 leading-none">01</div>
             <div>
-              <div class="w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
+              <div class="feature-icon w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
                 <i data-lucide="upload-cloud" class="w-5 h-5 text-[#7a1f2b]"></i>
               </div>
               <h3 id="feature-1-title-text" class="font-serif-display font-bold text-xl text-stone-900 mb-2">Upload Dokumen</h3>
@@ -219,11 +432,11 @@
           </div>
         </div>
 
-        <div class="bg-[#FAF7F2] p-10 hover:bg-white transition">
+        <div class="feature-card p-10">
           <div class="flex items-start gap-5">
             <div class="feature-num text-5xl text-[#7a1f2b]/20 leading-none">02</div>
             <div>
-              <div class="w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
+              <div class="feature-icon w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
                 <i data-lucide="folder-tree" class="w-5 h-5 text-[#7a1f2b]"></i>
               </div>
               <h3 id="feature-2-title-text" class="font-serif-display font-bold text-xl text-stone-900 mb-2">Pengarsipan Terstruktur</h3>
@@ -234,11 +447,11 @@
           </div>
         </div>
 
-        <div class="bg-[#FAF7F2] p-10 hover:bg-white transition">
+        <div class="feature-card p-10">
           <div class="flex items-start gap-5">
             <div class="feature-num text-5xl text-[#7a1f2b]/20 leading-none">03</div>
             <div>
-              <div class="w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
+              <div class="feature-icon w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
                 <i data-lucide="activity" class="w-5 h-5 text-[#7a1f2b]"></i>
               </div>
               <h3 id="feature-3-title-text" class="font-serif-display font-bold text-xl text-stone-900 mb-2">Monitoring &amp; Pelacakan</h3>
@@ -249,11 +462,11 @@
           </div>
         </div>
 
-        <div class="bg-[#FAF7F2] p-10 hover:bg-white transition">
+        <div class="feature-card p-10">
           <div class="flex items-start gap-5">
             <div class="feature-num text-5xl text-[#7a1f2b]/20 leading-none">04</div>
             <div>
-              <div class="w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
+              <div class="feature-icon w-11 h-11 rounded-xl bg-[#7a1f2b]/10 flex items-center justify-center mb-4">
                 <i data-lucide="link-2" class="w-5 h-5 text-[#7a1f2b]"></i>
               </div>
               <h3 id="feature-4-title-text" class="font-serif-display font-bold text-xl text-stone-900 mb-2">Integrasi Google Form</h3>
@@ -266,7 +479,7 @@
       </div>
     </section>
 
-    <!-- === KATEGORI DOKUMEN === -->
+    <!-- KATEGORI -->
     <section id="kategori" class="w-full bg-gradient-to-b from-[#FAF7F2] to-stone-100 py-24 lg:py-32">
       <div class="max-w-7xl mx-auto px-6 lg:px-10">
         <div class="text-center max-w-3xl mx-auto mb-16">
@@ -280,7 +493,7 @@
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-          <div class="category-card bg-white rounded-2xl p-7 border border-stone-200/80 hover:border-[#7a1f2b]/30 hover:shadow-xl">
+          <div class="category-card rounded-2xl p-7 border border-stone-200/80">
             <div class="flex items-center justify-between mb-6">
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-100 to-rose-50 flex items-center justify-center">
                 <i data-lucide="git-fork" class="w-6 h-6 text-rose-700"></i>
@@ -288,10 +501,13 @@
               <span class="font-serif-display font-bold text-xs text-stone-400 tracking-widest">01</span>
             </div>
             <div class="font-serif-display font-bold text-2xl text-stone-900 mb-1">GAP</div>
-            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b]">Gender Analysis Pathway</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b] mb-3">Gender Analysis Pathway</div>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Alur analisis untuk mengidentifikasi kesenjangan gender dalam program atau kegiatan.
+            </p>
           </div>
 
-          <div class="category-card bg-white rounded-2xl p-7 border border-stone-200/80 hover:border-[#7a1f2b]/30 hover:shadow-xl">
+          <div class="category-card rounded-2xl p-7 border border-stone-200/80">
             <div class="flex items-center justify-between mb-6">
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
                 <i data-lucide="landmark" class="w-6 h-6 text-amber-700"></i>
@@ -299,10 +515,13 @@
               <span class="font-serif-display font-bold text-xs text-stone-400 tracking-widest">02</span>
             </div>
             <div class="font-serif-display font-bold text-2xl text-stone-900 mb-1">GBS</div>
-            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b]">Gender Budget Statement</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b] mb-3">Gender Budget Statement</div>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Pernyataan anggaran responsif gender sebagai dukungan terhadap perencanaan dan penganggaran.
+            </p>
           </div>
 
-          <div class="category-card bg-white rounded-2xl p-7 border border-stone-200/80 hover:border-[#7a1f2b]/30 hover:shadow-xl">
+          <div class="category-card rounded-2xl p-7 border border-stone-200/80">
             <div class="flex items-center justify-between mb-6">
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
                 <i data-lucide="clipboard-list" class="w-6 h-6 text-blue-700"></i>
@@ -310,10 +529,13 @@
               <span class="font-serif-display font-bold text-xs text-stone-400 tracking-widest">03</span>
             </div>
             <div class="font-serif-display font-bold text-2xl text-stone-900 mb-1">KAK</div>
-            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b]">Kerangka Acuan Kegiatan</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b] mb-3">Kerangka Acuan Kegiatan</div>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Dokumen perencanaan kegiatan yang memuat tujuan, ruang lingkup, dan keluaran utama.
+            </p>
           </div>
 
-          <div class="category-card bg-white rounded-2xl p-7 border border-stone-200/80 hover:border-[#7a1f2b]/30 hover:shadow-xl">
+          <div class="category-card rounded-2xl p-7 border border-stone-200/80">
             <div class="flex items-center justify-between mb-6">
               <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
                 <i data-lucide="users" class="w-6 h-6 text-purple-700"></i>
@@ -321,44 +543,105 @@
               <span class="font-serif-display font-bold text-xs text-stone-400 tracking-widest">04</span>
             </div>
             <div class="font-serif-display font-bold text-2xl text-stone-900 mb-1">SK Tim</div>
-            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b]">Focal Point</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-[#7a1f2b] mb-3">Focal Point</div>
+            <p class="text-sm text-stone-600 leading-relaxed">
+              Surat keputusan penetapan tim focal point untuk mendukung pelaksanaan pengarusutamaan gender.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- === CTA FINAL === -->
-    <section class="w-full max-w-4xl mx-auto px-6 lg:px-10 pb-24 text-center">
-      <div class="decorative-line w-24 mx-auto mb-8"></div>
-      <h3 class="font-serif-display font-bold text-3xl lg:text-4xl text-stone-900 mb-4">
-        Siap mengunggah dokumen?
-      </h3>
-      <p class="text-stone-600 mb-8">
-        Gunakan tombol di bawah untuk mengakses formulir upload resmi.
-      </p>
+    <!-- TUJUAN -->
+    <section id="tujuan" class="w-full max-w-7xl mx-auto px-6 lg:px-10 py-24 lg:py-32">
+      <div class="relative overflow-hidden rounded-3xl p-10 lg:p-16 bg-gradient-to-br from-[#7a1f2b] via-[#832836] to-[#5c1621] text-white shadow-[0_24px_60px_rgba(92,22,33,0.28)]">
+        <div class="absolute top-0 right-0 w-72 h-72 rounded-full bg-amber-300/10 blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-white/10 blur-3xl -translate-x-1/3 translate-y-1/3"></div>
 
-      <a id="final-cta"
-         href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-         target="_blank"
-         rel="noopener noreferrer"
-         class="btn-primary text-white font-medium px-8 py-4 rounded-full inline-flex items-center gap-3">
-        <i data-lucide="file-plus-2" class="w-5 h-5"></i>
-        <span id="final-cta-text">Upload via Google Form</span>
-        <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-      </a>
+        <div class="relative grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <div class="text-xs uppercase tracking-[0.2em] text-amber-200 font-semibold mb-4">
+              — Tujuan Sistem
+            </div>
+            <h2 class="font-serif-display font-bold text-4xl lg:text-5xl leading-tight mb-6">
+              Mempermudah pengelolaan yang efektif, transparan, dan terorganisir.
+            </h2>
+            <p class="text-rose-50/90 text-lg leading-relaxed">
+              SIPMODAG mendukung pengelolaan dan monitoring dokumen analisis gender agar proses penyimpanan, pencarian, pemantauan, dan evaluasi berjalan lebih efisien di lingkungan Dinas P3AP2KB Provinsi NTT.
+            </p>
+          </div>
+
+          <div class="grid gap-4">
+            <div class="flex items-center gap-4 bg-white/8 rounded-2xl p-4 backdrop-blur-sm">
+              <div class="w-10 h-10 rounded-full bg-white/12 flex items-center justify-center">
+                <i data-lucide="check" class="w-5 h-5 text-amber-200"></i>
+              </div>
+              <span class="font-medium">Pengelolaan dokumen lebih efektif</span>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white/8 rounded-2xl p-4 backdrop-blur-sm">
+              <div class="w-10 h-10 rounded-full bg-white/12 flex items-center justify-center">
+                <i data-lucide="check" class="w-5 h-5 text-amber-200"></i>
+              </div>
+              <span class="font-medium">Pencarian dan arsip lebih terstruktur</span>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white/8 rounded-2xl p-4 backdrop-blur-sm">
+              <div class="w-10 h-10 rounded-full bg-white/12 flex items-center justify-center">
+                <i data-lucide="check" class="w-5 h-5 text-amber-200"></i>
+              </div>
+              <span class="font-medium">Monitoring dokumen lebih transparan</span>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white/8 rounded-2xl p-4 backdrop-blur-sm">
+              <div class="w-10 h-10 rounded-full bg-white/12 flex items-center justify-center">
+                <i data-lucide="check" class="w-5 h-5 text-amber-200"></i>
+              </div>
+              <span class="font-medium">Mendukung evaluasi dan tindak lanjut</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- === FOOTER === -->
-    <footer class="w-full bg-stone-900 text-stone-400 py-12">
+    <!-- CTA AKHIR -->
+    <section class="w-full max-w-4xl mx-auto px-6 lg:px-10 pb-24 text-center">
+      <div class="cta-block rounded-3xl border border-[#7a1f2b]/10 px-8 py-12 md:px-12">
+        <div class="decorative-line w-24 mx-auto mb-8"></div>
+        <h3 class="font-serif-display font-bold text-3xl lg:text-4xl text-stone-900 mb-4">
+          Siap mengunggah dokumen?
+        </h3>
+        <p class="text-stone-600 mb-8 max-w-2xl mx-auto">
+          Gunakan tombol di bawah untuk mengakses formulir upload resmi dan mulai mengelola dokumen analisis gender secara lebih terstruktur.
+        </p>
+
+        <a
+          id="final-cta"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary text-white font-medium px-8 py-4 rounded-full inline-flex items-center gap-3"
+        >
+          <i data-lucide="file-plus-2" class="w-5 h-5"></i>
+          <span id="final-cta-text">Upload via Google Form</span>
+          <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer w-full text-stone-400 py-12">
       <div class="max-w-7xl mx-auto px-6 lg:px-10">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#7a1f2b] to-[#a03342] flex items-center justify-center">
+            <div id="footer-logo-mark" class="w-9 h-9 rounded-full bg-gradient-to-br from-[#7a1f2b] to-[#a03342] flex items-center justify-center">
               <i data-lucide="file-check-2" class="w-4 h-4 text-white"></i>
             </div>
             <div class="leading-tight">
-              <div id="footer-acronym" class="font-serif-display font-bold text-white">SIPMODAG</div>
-              <div id="footer-instansi" class="text-[10px] text-stone-500 uppercase tracking-wider">
+              <div id="footer-acronym" class="font-serif-display font-bold text-white">
+                SIPMODAG
+              </div>
+              <div id="footer-instansi" class="text-[10px] uppercase tracking-wider">
                 Dinas P3AP2KB Prov. NTT
               </div>
             </div>
@@ -374,6 +657,7 @@
 
   <script>
     lucide.createIcons();
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         const href = this.getAttribute('href');
