@@ -13,87 +13,286 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #FAF7F2;
-      color: #1a1a1a;
-      box-sizing: border-box;
-    }
+  body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #FAF7F2;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    .font-serif-display {
-      font-family: 'Fraunces', serif;
-      font-optical-sizing: auto;
-    }
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 
-    /* === LOGO PLACEHOLDER ===
-       Untuk mengganti logo: ganti elemen <div id="logo-mark"> dengan tag <img>
-       Contoh:
-       <img src="URL_LOGO_ANDA" alt="Logo" class="w-full h-full object-contain">
-    */
+html {
+  scroll-behavior: smooth;
+}
 
-    .grain-bg {
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(190, 80, 90, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(180, 140, 90, 0.08) 0%, transparent 50%);
-    }
+.font-serif-display {
+  font-family: 'Fraunces', serif;
+  font-optical-sizing: auto;
+}
 
-    .decorative-line {
-      background-image: linear-gradient(90deg, transparent, #c8a97e 20%, #c8a97e 80%, transparent);
-      height: 1px;
-    }
+.grain-bg {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(190, 80, 90, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(180, 140, 90, 0.08) 0%, transparent 50%);
+}
 
-    .category-card {
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+.decorative-line {
+  background-image: linear-gradient(90deg, transparent, #c8a97e 20%, #c8a97e 80%, transparent);
+  height: 1px;
+}
 
-    .category-card:hover {
-      transform: translateY(-4px);
-    }
+.category-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .feature-num {
-      font-family: 'Fraunces', serif;
-      font-weight: 900;
-    }
+.category-card:hover {
+  transform: translateY(-4px);
+}
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.feature-num {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+}
 
-    .fade-up {
-      animation: fadeUp 0.8s ease-out both;
-    }
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
+.fade-up {
+  animation: fadeUp 0.8s ease-out both;
+}
 
-    .btn-primary {
-      background: #7a1f2b;
-      transition: all 0.3s ease;
-    }
+.delay-1 {
+  animation-delay: 0.1s;
+}
 
-    .btn-primary:hover {
-      background: #5c1621;
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px -8px rgba(122, 31, 43, 0.4);
-    }
+.delay-2 {
+  animation-delay: 0.2s;
+}
 
-    .btn-secondary {
-      border: 1.5px solid #1a1a1a;
-      transition: all 0.3s ease;
-    }
+.delay-3 {
+  animation-delay: 0.3s;
+}
 
-    .btn-secondary:hover {
-      background: #1a1a1a;
-      color: #FAF7F2;
-    }
+.delay-4 {
+  animation-delay: 0.4s;
+}
 
-    .tag-pill {
-      background: rgba(122, 31, 43, 0.08);
-      color: #7a1f2b;
-    }
+.btn-primary {
+  background: #7a1f2b;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #5c1621;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -8px rgba(122, 31, 43, 0.4);
+}
+
+.btn-secondary {
+  border: 1.5px solid #1a1a1a;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #1a1a1a;
+  color: #FAF7F2;
+}
+
+.tag-pill {
+  background: rgba(122, 31, 43, 0.08);
+  color: #7a1f2b;
+}
+
+/* Header */
+header {
+  transition: all 0.3s ease;
+}
+
+header a {
+  text-decoration: none;
+}
+
+header nav a {
+  position: relative;
+}
+
+header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 1.5px;
+  background: #7a1f2b;
+  transition: width 0.3s ease;
+}
+
+header nav a:hover::after {
+  width: 100%;
+}
+
+/* Logo */
+#logo-mark {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#logo-mark:hover {
+  transform: rotate(-4deg) scale(1.04);
+  box-shadow: 0 10px 24px rgba(122, 31, 43, 0.22);
+}
+
+/* Hero */
+#hero-acronym {
+  text-wrap: balance;
+}
+
+#hero-fullname {
+  max-width: 900px;
+}
+
+#hero-description-text {
+  text-wrap: pretty;
+}
+
+/* Statistik hero */
+.border-t .font-serif-display {
+  line-height: 1;
+}
+
+/* Feature cards */
+#fitur .bg-\[\#FAF7F2\] {
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+#fitur .bg-\[\#FAF7F2\]:hover {
+  transform: translateY(-2px);
+}
+
+#fitur h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Category section */
+.category-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(122, 31, 43, 0.04), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.category-card:hover::before {
+  opacity: 1;
+}
+
+.category-card .font-serif-display {
+  letter-spacing: -0.02em;
+}
+
+/* CTA final */
+#final-cta,
+#hero-cta-primary,
+#nav-cta {
+  text-decoration: none;
+}
+
+#final-cta:hover i:last-child,
+#hero-cta-primary:hover i,
+#nav-cta:hover i {
+  transform: translateY(-1px);
+}
+
+#final-cta i,
+#hero-cta-primary i,
+#nav-cta i {
+  transition: transform 0.25s ease;
+}
+
+/* Footer */
+footer {
+  margin-top: 0;
+}
+
+footer .font-serif-display {
+  letter-spacing: -0.01em;
+}
+
+/* Lucide icon consistency */
+[data-lucide] {
+  stroke-width: 2;
+  vertical-align: middle;
+}
+
+/* Focus accessibility */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(122, 31, 43, 0.28);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* Responsive improvements */
+@media (max-width: 1024px) {
+  #hero-acronym {
+    font-size: 3.5rem;
+  }
+
+  #hero-fullname {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #hero-description-text {
+    font-size: 1rem;
+  }
+
+  .feature-num {
+    font-size: 2.5rem;
+  }
+
+  #features-title-text,
+  #categories-title-text {
+    line-height: 1.15;
+  }
+}
+
+@media (max-width: 640px) {
+  #hero-acronym {
+    font-size: 2.75rem;
+  }
+
+  #hero-fullname {
+    font-size: 1.3rem;
+    margin-top: 0.75rem;
+  }
+
+  #footer-text-content {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
   </style>
 </head>
 
