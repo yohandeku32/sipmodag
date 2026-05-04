@@ -1,554 +1,371 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SIPMODAG — Sistem Pengelolaan & Monitoring Dokumen Analisis Gender</title>
-  <meta
-    name="description"
-    content="SIPMODAG adalah Sistem Pengelolaan & Monitoring Dokumen Analisis Gender milik Dinas P3AP2KB Provinsi NTT untuk pengarsipan digital responsif gender."
-  />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIPMODAG - Pengarsipan Minimalis</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'display': ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        'pure': '#FAFAFA',
+                        'ink': '#0A0A0A',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
+    <style>
+        body { 
+            background-color: #FAFAFA; 
+            color: #0A0A0A;
+        }
 
-  <!-- Tailwind CSS v3.4.17 -->
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            cream: "#FAF7F2",
-            ink: "#1a1a1a",
-            brand: "#7a1f2b",
-            brandDark: "#621823",
-            brandSoft: "#a14b58",
-          },
-          fontFamily: {
-            sans: ["Plus Jakarta Sans", "sans-serif"],
-            display: ["Fraunces", "serif"],
-          },
-          boxShadow: {
-            soft: "0 10px 30px rgba(122, 31, 43, 0.10)",
-            lift: "0 14px 40px rgba(122, 31, 43, 0.16)",
-          },
-          backgroundImage: {
-            grain:
-              "radial-gradient(circle at 20% 20%, rgba(122,31,43,.08), transparent 28%), radial-gradient(circle at 80% 0%, rgba(122,31,43,.05), transparent 24%), radial-gradient(circle at 50% 100%, rgba(90,70,50,.06), transparent 28%)",
-          },
-        },
-      },
-    };
-  </script>
+        /* Subtle grid background for minimal tech feel */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        }
 
-  <style>
-    :root {
-      color-scheme: light;
-    }
+        .icon-3d {
+            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.08));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .minimal-card:hover .icon-3d {
+            transform: scale(1.1) rotate(-5deg);
+        }
 
-    html {
-      scroll-behavior: smooth;
-    }
+        .minimal-button {
+            transition: all 0.2s ease;
+        }
+        .minimal-button:active {
+            transform: scale(0.96);
+        }
 
-    body {
-      font-family: "Plus Jakarta Sans", sans-serif;
-      background-color: #faf7f2;
-      color: #1a1a1a;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(122,31,43,.08), transparent 28%),
-        radial-gradient(circle at 80% 0%, rgba(122,31,43,.05), transparent 24%),
-        radial-gradient(circle at 50% 100%, rgba(90,70,50,.06), transparent 28%);
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.08;
-      background-image:
-        linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
-      background-size: 4px 4px, 4px 4px;
-      mix-blend-mode: multiply;
-    }
-
-    .text-balance {
-      text-wrap: balance;
-    }
-
-    .text-pretty {
-      text-wrap: pretty;
-    }
-
-    .focus-ring:focus-visible {
-      outline: 3px solid rgba(122, 31, 43, 0.35);
-      outline-offset: 3px;
-      border-radius: 999px;
-    }
-
-    .focus-ring-soft:focus-visible {
-      outline: 3px solid rgba(122, 31, 43, 0.35);
-      outline-offset: 4px;
-      border-radius: 1rem;
-    }
-
-    .nav-link {
-      position: relative;
-    }
-
-    .nav-link::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -6px;
-      width: 100%;
-      height: 2px;
-      background: #7a1f2b;
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform .28s ease;
-    }
-
-    .nav-link:hover::after,
-    .nav-link:focus-visible::after {
-      transform: scaleX(1);
-    }
-
-    .logo-badge {
-      transition: transform .35s ease, box-shadow .35s ease;
-    }
-
-    .logo-badge:hover,
-    .logo-badge:focus-visible {
-      transform: rotate(-8deg) scale(1.06);
-      box-shadow: 0 14px 36px rgba(122, 31, 43, 0.22);
-    }
-
-    .lift-card {
-      transition:
-        transform .28s ease,
-        box-shadow .28s ease,
-        border-color .28s ease,
-        background-color .28s ease;
-    }
-
-    .lift-card:hover,
-    .lift-card:focus-within {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 40px rgba(122, 31, 43, 0.14);
-      border-color: #7a1f2b;
-    }
-
-    .btn-shadow {
-      transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease, border-color .25s ease, color .25s ease;
-    }
-
-    .btn-shadow:hover,
-    .btn-shadow:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(122, 31, 43, 0.18);
-    }
-
-    .fade-up {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity .7s ease, transform .7s ease;
-      transition-delay: var(--delay, 0ms);
-    }
-
-    .fade-up.in-view {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .section-anchor {
-      scroll-margin-top: 104px;
-    }
-  </style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body class="font-sans text-ink antialiased selection:bg-brand selection:text-white">
-  <div class="relative isolate">
-    <!-- Header -->
-    <header class="sticky top-0 z-50 border-b border-black/5 bg-[#faf7f2]/80 backdrop-blur-xl">
-      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <a href="#top" class="focus-ring-soft flex min-w-0 items-center gap-3 rounded-2xl">
-          <span class="logo-badge inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand via-brandSoft to-[#c78d95] text-white shadow-soft">
-            <i data-lucide="file-check-2" class="h-5 w-5"></i>
-          </span>
-          <span class="min-w-0">
-            <span class="block truncate font-display text-xl font-extrabold tracking-tight text-ink">SIPMODAG</span>
-            <span class="block truncate text-xs font-medium text-stone-600 sm:text-sm">Dinas P3AP2KB Provinsi NTT</span>
-          </span>
-        </a>
+<body class="antialiased bg-grid overflow-x-hidden selection:bg-ink selection:text-white">
 
-        <nav class="hidden items-center gap-8 md:flex" aria-label="Navigasi utama">
-          <a href="#fitur" class="nav-link focus-ring rounded-full text-sm font-semibold text-stone-700 transition hover:text-brand">Tujuan</a>
-          <a href="#kategori" class="nav-link focus-ring rounded-full text-sm font-semibold text-stone-700 transition hover:text-brand">Kategori</a>
+    <header class="fixed top-0 w-full z-50 bg-pure/80 backdrop-blur-md border-b border-gray-100">
+        <nav class="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20index%20dividers/3D/card_index_dividers_3d.png" 
+                     alt="Logo" class="w-8 h-8 icon-3d">
+                <h1 class="font-display font-bold text-xl tracking-tight">SIPMODAG.</h1>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#solusi" class="text-sm font-medium hover:opacity-50 transition-opacity">Solusi</a>
+                <a href="#fitur" class="text-sm font-medium hover:opacity-50 transition-opacity">Sistem</a>
+                <a href="#dokumen" class="text-sm font-medium hover:opacity-50 transition-opacity">Dokumen</a>
+                <a href="#faq" class="text-sm font-medium hover:opacity-50 transition-opacity">Bantuan</a>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
+                   target="_blank" rel="noopener noreferrer"
+                   class="bg-ink text-white px-6 py-2.5 rounded-full text-sm font-medium minimal-button hover:shadow-xl hover:shadow-black/20">
+                    Upload File
+                </a>
+            </div>
         </nav>
-
-        <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="focus-ring btn-shadow inline-flex items-center justify-center rounded-full bg-brand px-5 py-3 text-sm font-bold text-white hover:bg-brandDark"
-        >
-          Upload Dokumen
-        </a>
-      </div>
     </header>
 
-    <main id="top">
-      <!-- Hero -->
-      <section class="relative overflow-hidden">
-        <div class="mx-auto max-w-7xl px-4 pb-16 pt-14 sm:px-6 lg:px-8 lg:pb-24 lg:pt-20">
-          <div class="grid items-center gap-10 lg:grid-cols-[1.15fr_.85fr]">
-            <div>
-              <div
-                class="fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-brand/15 bg-white/70 px-4 py-2 text-sm font-semibold text-brand shadow-soft"
-                style="--delay: 0ms"
-              >
-                <span class="inline-block h-2.5 w-2.5 rounded-full bg-brand"></span>
-                Pengarsipan Digital Responsif Gender
-              </div>
-
-              <h1
-                class="fade-up text-balance font-display text-5xl font-black leading-[0.95] tracking-tight text-ink sm:text-6xl lg:text-7xl"
-                style="--delay: 100ms"
-              >
-                SIPMODAG
-                <span class="mt-4 block text-pretty text-2xl font-semibold italic text-brand/90 sm:text-3xl lg:text-4xl">
-                  Sistem Pengelolaan &amp; Monitoring Dokumen Analisis Gender
-                </span>
-              </h1>
-
-              <p
-                class="fade-up mt-6 max-w-2xl text-pretty text-base leading-8 text-stone-700 sm:text-lg"
-                style="--delay: 200ms"
-              >
-                Platform digital milik Dinas P3AP2KB Provinsi NTT untuk menerima, mengarsipkan,
-                memantau, dan menata dokumen analisis gender secara lebih tertib, terstruktur,
-                dan mudah diakses kapan saja.
-              </p>
-
-              <div class="fade-up mt-8 flex flex-col gap-4 sm:flex-row" style="--delay: 300ms">
-                <a
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="focus-ring btn-shadow inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-bold text-white hover:bg-brandDark"
-                >
-                  <i data-lucide="upload" class="h-4 w-4"></i>
-                  Upload via Google Form
-                </a>
-
-                <a
-                  href="#fitur"
-                  class="focus-ring btn-shadow inline-flex items-center justify-center gap-2 rounded-full border border-brand/20 bg-white/80 px-6 py-3.5 text-sm font-bold text-brand hover:border-brand hover:bg-white"
-                >
-                  <i data-lucide="arrow-down-circle" class="h-4 w-4"></i>
-                  Pelajari Lebih Lanjut
-                </a>
-              </div>
-            </div>
-
-            <div class="fade-up relative" style="--delay: 260ms">
-              <div class="rounded-[2rem] border border-brand/10 bg-white/75 p-5 shadow-soft backdrop-blur">
-                <div class="rounded-[1.75rem] border border-dashed border-brand/20 bg-gradient-to-br from-white to-[#f6efe6] p-6 sm:p-8">
-                  <div class="mb-6 flex items-center justify-between">
-                    <div>
-                      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/70">Portal Sistem</p>
-                      <h2 class="mt-2 font-display text-3xl font-bold text-ink">Pengelolaan Dokumen</h2>
-                    </div>
-                    <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                      <i data-lucide="folder-kanban" class="h-7 w-7"></i>
-                    </span>
-                  </div>
-
-                  <div class="space-y-4">
-                    <div class="lift-card rounded-2xl border border-stone-200 bg-white p-4">
-                      <div class="flex items-center gap-3">
-                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-700">
-                          <i data-lucide="git-fork" class="h-5 w-5"></i>
-                        </span>
-                        <div>
-                          <p class="font-bold text-ink">GAP</p>
-                          <p class="text-sm text-stone-600">Gender Analysis Pathway</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="lift-card rounded-2xl border border-stone-200 bg-white p-4">
-                      <div class="flex items-center gap-3">
-                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
-                          <i data-lucide="landmark" class="h-5 w-5"></i>
-                        </span>
-                        <div>
-                          <p class="font-bold text-ink">GBS</p>
-                          <p class="text-sm text-stone-600">Gender Budget Statement</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="lift-card rounded-2xl border border-stone-200 bg-white p-4">
-                      <div class="flex items-center gap-3">
-                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                          <i data-lucide="clipboard-list" class="h-5 w-5"></i>
-                        </span>
-                        <div>
-                          <p class="font-bold text-ink">KAK</p>
-                          <p class="text-sm text-stone-600">Kerangka Acuan Kegiatan</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="lift-card rounded-2xl border border-stone-200 bg-white p-4">
-                      <div class="flex items-center gap-3">
-                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-700">
-                          <i data-lucide="users" class="h-5 w-5"></i>
-                        </span>
-                        <div>
-                          <p class="font-bold text-ink">SK Tim Focal Point</p>
-                          <p class="text-sm text-stone-600">Dokumen kelembagaan pendukung</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+    <section class="pt-40 pb-20 px-6 min-h-[90vh] flex flex-col justify-center items-center text-center">
+        <div class="max-w-4xl mx-auto reveal active">
+            
+            <div class="flex justify-center mb-10">
+                <div class="relative">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Open%20file%20folder/3D/open_file_folder_3d.png" 
+                         alt="3D Folder" 
+                         class="w-40 h-40 md:w-48 md:h-48 icon-3d animate-float">
+                    
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Check%20mark%20button/3D/check_mark_button_3d.png" 
+                         class="absolute -top-4 -right-8 w-16 h-16 icon-3d animate-float-delayed" alt="Check">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Page%20facing%20up/3D/page_facing_up_3d.png" 
+                         class="absolute -bottom-4 -left-8 w-16 h-16 icon-3d animate-float-delayed" style="animation-delay: 1.5s;" alt="Document">
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-12 grid gap-4 sm:grid-cols-3">
-            <div class="fade-up lift-card rounded-3xl border border-brand/10 bg-white/75 p-6 shadow-soft" style="--delay: 350ms">
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/70">Kategori</p>
-              <p class="mt-3 font-display text-3xl font-extrabold text-ink">4</p>
-              <p class="mt-2 text-sm leading-7 text-stone-700">Kategori Dokumen</p>
             </div>
 
-            <div class="fade-up lift-card rounded-3xl border border-brand/10 bg-white/75 p-6 shadow-soft" style="--delay: 430ms">
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/70">Format</p>
-              <p class="mt-3 font-display text-3xl font-extrabold text-ink">100%</p>
-              <p class="mt-2 text-sm leading-7 text-stone-700">Digital &amp; Terstruktur</p>
+            <div class="inline-block px-4 py-1.5 mb-6 rounded-full border border-gray-200 bg-white shadow-sm">
+                <span class="text-xs font-semibold tracking-wide text-gray-500 uppercase">Dinas P3AP2KB Prov. NTT</span>
             </div>
-
-            <div class="fade-up lift-card rounded-3xl border border-brand/10 bg-white/75 p-6 shadow-soft" style="--delay: 510ms">
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/70">Monitoring</p>
-              <p class="mt-3 font-display text-3xl font-extrabold text-ink">24/7</p>
-              <p class="mt-2 text-sm leading-7 text-stone-700">Akses Monitoring</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Fitur -->
-      <section id="fitur" class="section-anchor py-16 sm:py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="fade-up mb-10 max-w-3xl rounded-[2rem] border border-brand/10 bg-gradient-to-r from-brand to-[#9e4653] p-8 text-white shadow-soft" style="--delay: 0ms">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-white/80">Fitur Utama</p>
-            <h2 class="mt-3 text-balance font-display text-3xl font-extrabold sm:text-4xl">
-              Alur kerja digital yang rapi untuk dokumen analisis gender
-            </h2>
-            <p class="mt-4 max-w-2xl text-pretty text-sm leading-7 text-white/85 sm:text-base">
-              SIPMODAG dirancang untuk memudahkan pengumpulan dokumen, menjaga kerapian arsip,
-              dan membantu proses pemantauan dokumen lintas kategori secara lebih efisien.
+            
+            <h1 class="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+                Fokus pada isinya.<br>
+                <span class="text-gray-400">Biar kami urus arsipnya.</span>
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto font-normal">
+                Kirim dokumen instansi Anda melalui satu form sederhana. Sistem kami akan otomatis menyusun, menamai ulang, dan melaporkannya di dashboard secara real-time.
             </p>
-          </div>
 
-          <div class="grid gap-5 md:grid-cols-2">
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/80 p-6 shadow-soft" style="--delay: 80ms">
-              <div class="flex items-start justify-between gap-4">
-                <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                  <i data-lucide="upload-cloud" class="h-7 w-7"></i>
-                </div>
-                <span class="font-display text-4xl font-black text-brand/15">01</span>
-              </div>
-              <h3 class="mt-6 font-display text-2xl font-bold text-ink">Upload Dokumen</h3>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-                Pengunggahan dokumen dilakukan melalui tautan Google Form yang mudah diakses,
-                sehingga proses penerimaan berkas menjadi lebih cepat dan seragam.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/80 p-6 shadow-soft" style="--delay: 160ms">
-              <div class="flex items-start justify-between gap-4">
-                <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                  <i data-lucide="folder-tree" class="h-7 w-7"></i>
-                </div>
-                <span class="font-display text-4xl font-black text-brand/15">02</span>
-              </div>
-              <h3 class="mt-6 font-display text-2xl font-bold text-ink">Pengarsipan Terstruktur</h3>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-                Dokumen diklasifikasikan berdasarkan jenisnya agar lebih mudah dicari, diperiksa,
-                dan dikelola sebagai arsip digital yang tertib.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/80 p-6 shadow-soft" style="--delay: 240ms">
-              <div class="flex items-start justify-between gap-4">
-                <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                  <i data-lucide="activity-square" class="h-7 w-7"></i>
-                </div>
-                <span class="font-display text-4xl font-black text-brand/15">03</span>
-              </div>
-              <h3 class="mt-6 font-display text-2xl font-bold text-ink">Monitoring &amp; Pelacakan</h3>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-                Sistem mendukung pemantauan status dan keterlacakan dokumen untuk membantu
-                evaluasi kelengkapan serta tindak lanjut administrasi.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/80 p-6 shadow-soft" style="--delay: 320ms">
-              <div class="flex items-start justify-between gap-4">
-                <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-                  <i data-lucide="form-input" class="h-7 w-7"></i>
-                </div>
-                <span class="font-display text-4xl font-black text-brand/15">04</span>
-              </div>
-              <h3 class="mt-6 font-display text-2xl font-bold text-ink">Integrasi Google Form</h3>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-                Integrasi ini mempermudah distribusi tautan unggah dan menjaga pengalaman pengguna
-                tetap sederhana tanpa perlu aplikasi tambahan.
-              </p>
-            </article>
-          </div>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center justify-center bg-ink text-white px-8 py-4 rounded-full text-lg font-medium minimal-button hover:shadow-2xl hover:shadow-black/20 w-full sm:w-auto">
+                Buka Google Form
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
         </div>
-      </section>
+    </section>
 
-      <!-- Kategori -->
-      <section id="kategori" class="section-anchor py-16 sm:py-20">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="fade-up mx-auto mb-12 max-w-3xl text-center" style="--delay: 0ms">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/75">Kategori Dokumen</p>
-            <h2 class="mt-3 text-balance font-display text-3xl font-extrabold text-ink sm:text-4xl">
-              Empat jenis dokumen utama dalam SIPMODAG
-            </h2>
-            <p class="mt-4 text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-              Setiap dokumen ditempatkan pada kategori yang jelas agar proses pengelolaan dan
-              monitoring menjadi lebih sistematis.
-            </p>
-          </div>
-
-          <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/85 p-6 shadow-soft" style="--delay: 80ms">
-              <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-700">
-                <i data-lucide="git-fork" class="h-7 w-7"></i>
-              </span>
-              <h3 class="mt-5 font-display text-2xl font-bold text-ink">GAP</h3>
-              <p class="mt-2 text-sm font-semibold text-brand">Gender Analysis Pathway</p>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700">
-                Dokumen analisis yang membantu pemetaan isu, kesenjangan, dan langkah responsif gender.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/85 p-6 shadow-soft" style="--delay: 160ms">
-              <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-700">
-                <i data-lucide="landmark" class="h-7 w-7"></i>
-              </span>
-              <h3 class="mt-5 font-display text-2xl font-bold text-ink">GBS</h3>
-              <p class="mt-2 text-sm font-semibold text-brand">Gender Budget Statement</p>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700">
-                Dokumen pernyataan anggaran yang menunjukkan keterkaitan program dan penganggaran responsif gender.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/85 p-6 shadow-soft" style="--delay: 240ms">
-              <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                <i data-lucide="clipboard-list" class="h-7 w-7"></i>
-              </span>
-              <h3 class="mt-5 font-display text-2xl font-bold text-ink">KAK</h3>
-              <p class="mt-2 text-sm font-semibold text-brand">Kerangka Acuan Kegiatan</p>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700">
-                Dokumen acuan kegiatan yang menjadi dasar perencanaan dan pelaksanaan program terkait.
-              </p>
-            </article>
-
-            <article class="fade-up lift-card rounded-[2rem] border border-stone-200 bg-white/85 p-6 shadow-soft" style="--delay: 320ms">
-              <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-50 text-purple-700">
-                <i data-lucide="users" class="h-7 w-7"></i>
-              </span>
-              <h3 class="mt-5 font-display text-2xl font-bold text-ink">SK Tim Focal Point</h3>
-              <p class="mt-2 text-sm font-semibold text-brand">Dokumen Penetapan Tim</p>
-              <p class="mt-3 text-pretty text-sm leading-7 text-stone-700">
-                Dokumen kelembagaan yang menetapkan tim focal point sebagai penggerak implementasi PUG.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- Final CTA -->
-      <section class="py-16 sm:py-20">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div class="fade-up rounded-[2.25rem] border border-brand/10 bg-gradient-to-br from-white to-[#f6efe8] px-6 py-12 text-center shadow-soft sm:px-10" style="--delay: 0ms">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand/75">Mulai Sekarang</p>
-            <h2 class="mt-3 text-balance font-display text-3xl font-extrabold text-ink sm:text-4xl">
-              Kirim dokumen analisis gender secara digital melalui SIPMODAG
-            </h2>
-            <p class="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-7 text-stone-700 sm:text-base">
-              Gunakan formulir unggah resmi untuk menyampaikan dokumen secara lebih cepat, terdokumentasi,
-              dan mudah dipantau oleh Dinas P3AP2KB Provinsi NTT.
-            </p>
-            <div class="mt-8">
-              <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="focus-ring btn-shadow inline-flex items-center justify-center gap-2 rounded-full bg-brand px-7 py-3.5 text-sm font-bold text-white hover:bg-brandDark"
-              >
-                <i data-lucide="external-link" class="h-4 w-4"></i>
-                Upload via Google Form
-              </a>
+    <section id="solusi" class="scroll-mt-24 py-24 px-6 border-y border-gray-100 bg-white/50 backdrop-blur-sm">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-display text-3xl font-bold">Mengapa SIPMODAG Diciptakan?</h2>
+                <p class="text-gray-500 mt-4 max-w-xl mx-auto">Kami memahami birokrasi pengarsipan seringkali memakan waktu. Kami mengubah proses manual menjadi sepenuhnya otomatis.</p>
             </div>
-          </div>
-        </div>
-      </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-white/5 bg-stone-900">
-      <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-5 px-4 py-8 text-stone-400 sm:px-6 md:flex-row md:items-center lg:px-8">
-        <div class="flex items-center gap-3">
-          <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand via-brandSoft to-[#c78d95] text-white">
-            <i data-lucide="file-check-2" class="h-5 w-5"></i>
-          </span>
-          <div>
-            <p class="font-display text-lg font-bold text-white">SIPMODAG</p>
-            <p class="text-sm text-stone-400">Dinas P3AP2KB Provinsi NTT</p>
-          </div>
-        </div>
+            <div class="grid md:grid-cols-2 gap-8 reveal">
+                <div class="p-10 bg-gray-50 rounded-[2.5rem] border border-gray-200 opacity-80 flex flex-col items-center text-center">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Wastebasket/3D/wastebasket_3d.png" 
+                         alt="Manual" class="w-20 h-20 icon-3d mb-6 grayscale opacity-60">
+                    <h3 class="font-display text-xl font-bold text-gray-600 mb-3">Cara Lama</h3>
+                    <ul class="text-gray-500 text-sm space-y-3">
+                        <li>• Kirim file via WhatsApp atau Email</li>
+                        <li>• Nama file tidak seragam / berantakan</li>
+                        <li>• Admin P3AP2KB harus mengunduh satu-satu</li>
+                        <li>• Sulit melacak OPD mana yang belum setor</li>
+                    </ul>
+                </div>
 
-        <p class="text-sm text-stone-400">© 2026 Dinas P3AP2KB Provinsi NTT</p>
-      </div>
+                <div class="p-10 bg-white rounded-[2.5rem] border-2 border-ink shadow-xl flex flex-col items-center text-center transform md:-translate-y-4">
+                    <div class="absolute -top-4 -right-4 bg-ink text-white text-xs font-bold px-4 py-1.5 rounded-full rotate-12">Solusi!</div>
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Sparkles/3D/sparkles_3d.png" 
+                         alt="Otomatis" class="w-20 h-20 icon-3d mb-6 animate-float">
+                    <h3 class="font-display text-2xl font-bold text-ink mb-3">Dengan SIPMODAG</h3>
+                    <ul class="text-ink font-medium text-sm space-y-3">
+                        <li>• Unggah mandiri via Google Form terpusat</li>
+                        <li>• File otomatis di-rename sesuai standar</li>
+                        <li>• Otomatis masuk ke Folder Drive OPD terkait</li>
+                        <li>• Dashboard Real-Time di Google Sheets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="fitur" class="scroll-mt-24 py-24 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="font-display text-3xl font-bold mb-16 text-center reveal">Cara Sistem Bekerja</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="text-center minimal-card group reveal">
+                    <div class="bg-pure w-32 h-32 rounded-full mx-auto flex items-center justify-center mb-6 border border-gray-100">
+                        <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Memo/3D/memo_3d.png" 
+                             alt="Isi Form" class="w-20 h-20 icon-3d">
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">1. Isi Form</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Pilih nama instansi Anda dari dropdown, lalu unggah dokumen yang diminta via form tanpa perlu proses login tambahan.</p>
+                </div>
+
+                <div class="text-center minimal-card group reveal" style="transition-delay: 100ms;">
+                    <div class="bg-pure w-32 h-32 rounded-full mx-auto flex items-center justify-center mb-6 border border-gray-100 relative">
+                        <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Magic%20wand/3D/magic_wand_3d.png" 
+                             alt="Otomatisasi" class="w-20 h-20 icon-3d">
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">2. Auto-Routing</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Secara magis, skrip kami akan mengganti nama file Anda dan memindahkannya ke folder khusus instansi Anda di Google Drive.</p>
+                </div>
+
+                <div class="text-center minimal-card group reveal" style="transition-delay: 200ms;">
+                    <div class="bg-pure w-32 h-32 rounded-full mx-auto flex items-center justify-center mb-6 border border-gray-100">
+                        <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Laptop/3D/laptop_3d.png" 
+                             alt="Dashboard" class="w-20 h-20 icon-3d">
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">3. Sinkronisasi Data</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">Setiap entri yang berhasil akan langsung memperbarui status pelaporan di Dashboard Google Sheets pusat P3AP2KB.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 border-y border-gray-100 bg-pure overflow-hidden">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16 reveal">
+            <div class="w-full md:w-1/2 relative">
+                <div class="absolute inset-0 bg-gray-200 rounded-[3rem] transform rotate-3 scale-105 opacity-50"></div>
+                <div class="bg-white p-8 rounded-[3rem] border border-gray-200 relative z-10 minimal-card">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20chart/3D/bar_chart_3d.png" 
+                         alt="Chart" class="w-32 h-32 icon-3d absolute -top-12 -right-8 animate-float">
+                    
+                    <div class="space-y-4 pt-4">
+                        <div class="h-4 w-1/3 bg-gray-200 rounded-full"></div>
+                        <div class="w-full bg-gray-100 rounded-full h-8 mb-4 overflow-hidden flex">
+                            <div class="bg-ink h-8 w-[85%] rounded-full px-4 flex items-center text-xs text-white font-bold">85% Dokumen Masuk</div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                            <span class="text-sm font-medium">BAPPEDA NTT</span>
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Lengkap</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                            <span class="text-sm font-medium">Dinas Kesehatan</span>
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">Proses</span>
+                        </div>
+                        <div class="flex items-center justify-between py-3">
+                            <span class="text-sm font-medium">Dinas Pendidikan</span>
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Lengkap</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-1/2">
+                <h2 class="font-display text-4xl font-bold mb-6">Transparansi Penuh 24/7.</h2>
+                <p class="text-gray-500 text-lg mb-6 leading-relaxed">
+                    Tidak perlu lagi saling bertanya "Apakah file saya sudah diterima?". Semua aliran dokumen bermuara pada satu Dashboard Live berbasis Google Sheets. 
+                </p>
+                <p class="text-gray-500 text-lg leading-relaxed">
+                    Pimpinan dan admin penilai dapat memantau progres pelaporan dari setiap instansi secara detik itu juga, memastikan tidak ada dokumen yang terlewat.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="dokumen" class="scroll-mt-24 py-24 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4 reveal">
+                <h2 class="font-display text-4xl font-bold tracking-tight">Kategori<br>Dokumen.</h2>
+                <p class="text-gray-500 max-w-sm md:text-right pb-2">Siapkan file PDF/Word Anda sesuai dengan 4 dokumen analisis gender yang diwajibkan berikut.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Magnifying%20glass%20tilted%20right/3D/magnifying_glass_tilted_right_3d.png" 
+                         alt="GAP" class="w-16 h-16 icon-3d mb-6">
+                    <h4 class="font-display text-xl font-bold mb-2">GAP</h4>
+                    <p class="text-sm text-gray-500">Gender Analysis Pathway. Panduan alur analisis kesenjangan.</p>
+                </div>
+
+                <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 100ms;">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" 
+                         alt="GBS" class="w-16 h-16 icon-3d mb-6">
+                    <h4 class="font-display text-xl font-bold mb-2">GBS</h4>
+                    <p class="text-sm text-gray-500">Gender Budget Statement. Dokumen pernyataan alokasi anggaran.</p>
+                </div>
+
+                <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 200ms;">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Clipboard/3D/clipboard_3d.png" 
+                         alt="KAK" class="w-16 h-16 icon-3d mb-6">
+                    <h4 class="font-display text-xl font-bold mb-2">KAK</h4>
+                    <p class="text-sm text-gray-500">Kerangka Acuan Kegiatan yang responsif gender.</p>
+                </div>
+
+                <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 300ms;">
+                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/People%20hugging/3D/people_hugging_3d.png" 
+                         alt="SK Tim" class="w-16 h-16 icon-3d mb-6">
+                    <h4 class="font-display text-xl font-bold mb-2">SK Tim</h4>
+                    <p class="text-sm text-gray-500">SK Tim Focal Point Pengarusutamaan Gender di OPD.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="scroll-mt-24 py-24 px-6 border-y border-gray-100 bg-pure">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Light%20bulb/3D/light_bulb_3d.png" 
+                     alt="FAQ" class="w-16 h-16 mx-auto mb-4 icon-3d animate-float">
+                <h2 class="font-display text-3xl font-bold">Pertanyaan Umum</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 reveal">
+                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
+                    <h4 class="font-display font-bold text-lg mb-3">Apakah saya perlu membuat akun?</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed">Tidak. Anda hanya memerlukan akun Google (Gmail) standar untuk mengakses Google Form dan mengunggah dokumen Anda.</p>
+                </div>
+                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
+                    <h4 class="font-display font-bold text-lg mb-3">Bagaimana jika saya salah upload file?</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed">Anda dapat mengisi form kembali dan mengunggah file yang benar. Sistem akan merekam *timestamp* terbaru sebagai data yang paling valid.</p>
+                </div>
+                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
+                    <h4 class="font-display font-bold text-lg mb-3">Format file apa yang diterima?</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed">Kami merekomendasikan format PDF agar isi dokumen tidak berubah. Namun sistem juga menerima format dokumen seperti .doc, .docx, dan .xls.</p>
+                </div>
+                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
+                    <h4 class="font-display font-bold text-lg mb-3">Bagaimana saya melihat dashboard?</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed">Link *Live Dashboard* Google Sheets dipegang secara eksklusif oleh tim penilai dari Dinas P3AP2KB untuk menjaga kerahasiaan antar OPD.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-4xl mx-auto bg-ink text-white rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden reveal">
+            <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rocket/3D/rocket_3d.png" 
+                 alt="Rocket" class="absolute -right-10 -top-10 w-48 h-48 opacity-20 blur-sm pointer-events-none">
+                 
+            <h2 class="font-display text-3xl md:text-5xl font-bold mb-6 relative z-10">Mulai Pengarsipan</h2>
+            <p class="text-gray-400 mb-10 max-w-lg mx-auto relative z-10">Akses form pengumpulan dokumen sekarang. Cepat, aman, dan terintegrasi otomatis dengan Google Workspace Pemerintah.</p>
+            
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
+               target="_blank" rel="noopener noreferrer"
+               class="inline-block bg-white text-ink px-10 py-4 rounded-full text-lg font-bold minimal-button shadow-[0_0_40px_rgba(255,255,255,0.3)] relative z-10">
+                Arahkan ke Google Form
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-12 px-6 border-t border-gray-200 bg-pure">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20index%20dividers/3D/card_index_dividers_3d.png" alt="Logo" class="w-6 h-6 grayscale opacity-60">
+                <span class="font-display font-bold text-lg tracking-tight text-gray-800">SIPMODAG.</span>
+            </div>
+            
+            <div class="text-center md:text-right">
+                <p class="text-gray-800 font-medium text-sm mb-1">Dinas P3AP2KB Provinsi Nusa Tenggara Timur</p>
+                <p class="text-gray-500 text-xs">Pusat Pemerintahan Prov. NTT, Kota Kupang</p>
+                <p class="text-gray-400 text-xs mt-4">© 2026 Seluruh Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
     </footer>
-  </div>
 
-  <!-- Lucide Icons v0.263.0 UMD -->
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script>
-    lucide.createIcons();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-
-    document.querySelectorAll(".fade-up").forEach((el) => observer.observe(el));
-  </script>
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal(); // Trigger on load
+    </script>
 </body>
 </html>
