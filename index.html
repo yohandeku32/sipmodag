@@ -25,6 +25,7 @@
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
                     },
                     keyframes: {
                         float: {
@@ -75,6 +76,23 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Custom File Input Styling */
+        input[type="file"]::file-selector-button {
+            border: none;
+            background: #0A0A0A;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 1rem;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: #333;
+        }
     </style>
 </head>
 <body class="antialiased bg-grid overflow-x-hidden selection:bg-ink selection:text-white">
@@ -92,8 +110,7 @@
                 <a href="#fitur" class="text-sm font-medium hover:opacity-50 transition-opacity">Sistem</a>
                 <a href="#dokumen" class="text-sm font-medium hover:opacity-50 transition-opacity">Dokumen</a>
                 <a href="#faq" class="text-sm font-medium hover:opacity-50 transition-opacity">Bantuan</a>
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
-                   target="_blank" rel="noopener noreferrer"
+                <a href="#upload-section" 
                    class="bg-ink text-white px-6 py-2.5 rounded-full text-sm font-medium minimal-button hover:shadow-xl hover:shadow-black/20">
                     Upload File
                 </a>
@@ -127,14 +144,13 @@
             </h1>
             
             <p class="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto font-normal">
-                Kirim dokumen instansi Anda melalui satu form sederhana. Sistem kami akan otomatis menyusun, menamai ulang, dan melaporkannya di dashboard secara real-time.
+                Kirim dokumen instansi Anda langsung dari halaman ini. Sistem kami akan otomatis menyusun, menamai ulang, dan melaporkannya di dashboard secara real-time.
             </p>
 
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
-               target="_blank" rel="noopener noreferrer"
+            <a href="#upload-section" 
                class="inline-flex items-center justify-center bg-ink text-white px-8 py-4 rounded-full text-lg font-medium minimal-button hover:shadow-2xl hover:shadow-black/20 w-full sm:w-auto">
-                Buka Google Form
-                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                Mulai Upload
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </a>
         </div>
     </section>
@@ -165,9 +181,9 @@
                          alt="Otomatis" class="w-20 h-20 icon-3d mb-6 animate-float">
                     <h3 class="font-display text-2xl font-bold text-ink mb-3">Dengan SIPMODAG</h3>
                     <ul class="text-ink font-medium text-sm space-y-3">
-                        <li>• Unggah mandiri via Google Form terpusat</li>
+                        <li>• Unggah mandiri langsung dari website</li>
                         <li>• File otomatis di-rename sesuai standar</li>
-                        <li>• Folder dibuat secara otomatis sehingga admin tidak perlu membuatnya secara manual </li>
+                        <li>• Folder dibuat otomatis di Google Drive</li>
                         <li>• Dashboard Real-Time di Google Sheets</li>
                     </ul>
                 </div>
@@ -195,7 +211,7 @@
                              alt="Otomatisasi" class="w-20 h-20 icon-3d">
                     </div>
                     <h3 class="font-display text-xl font-bold mb-3">2. Auto-Routing</h3>
-                    <p class="text-gray-500 text-sm leading-relaxed">Secara magis, skrip kami akan mengganti nama file Anda dan memindahkannya ke folder khusus instansi Anda di Google Drive.</p>
+                    <p class="text-gray-500 text-sm leading-relaxed">Secara magis, API kami akan mengganti nama file Anda dan memindahkannya ke folder khusus instansi Anda di Google Drive.</p>
                 </div>
 
                 <div class="text-center minimal-card group reveal" style="transition-delay: 200ms;">
@@ -210,44 +226,69 @@
         </div>
     </section>
 
-    <section class="py-24 px-6 border-y border-gray-100 bg-pure overflow-hidden">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16 reveal">
-            <div class="w-full md:w-1/2 relative">
-                <div class="absolute inset-0 bg-gray-200 rounded-[3rem] transform rotate-3 scale-105 opacity-50"></div>
-                <div class="bg-white p-8 rounded-[3rem] border border-gray-200 relative z-10 minimal-card">
-                    <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20chart/3D/bar_chart_3d.png" 
-                         alt="Chart" class="w-32 h-32 icon-3d absolute -top-12 -right-8 animate-float">
+    <section id="upload-section" class="scroll-mt-24 py-24 px-6 border-y border-gray-100 bg-pure">
+        <div class="max-w-3xl mx-auto reveal">
+            <div class="text-center mb-12">
+                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Inbox%20tray/3D/inbox_tray_3d.png" 
+                     alt="Upload" class="w-20 h-20 mx-auto mb-4 icon-3d animate-float">
+                <h2 class="font-display text-4xl font-bold mb-4">Portal Pengiriman Arsip</h2>
+                <p class="text-gray-500">Pilih instansi Anda, jenis dokumen, dan lampirkan file (Maks. 10MB).</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-200 shadow-xl relative overflow-hidden">
+                <form id="uploadForm" class="space-y-6 relative z-10">
                     
-                    <div class="space-y-4 pt-4">
-                        <div class="h-4 w-1/3 bg-gray-200 rounded-full"></div>
-                        <div class="w-full bg-gray-100 rounded-full h-8 mb-4 overflow-hidden flex">
-                            <div class="bg-ink h-8 w-[85%] rounded-full px-4 flex items-center text-xs text-white font-bold">85% Dokumen Masuk</div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="text-sm font-medium">BAPPEDA NTT</span>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Lengkap</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="text-sm font-medium">Dinas Kesehatan</span>
-                            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">Proses</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3">
-                            <span class="text-sm font-medium">Dinas Pendidikan</span>
-                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Lengkap</span>
+                    <div>
+                        <label for="opdName" class="block text-sm font-bold text-gray-700 mb-2">Nama Instansi / OPD <span class="text-red-500">*</span></label>
+                        <select id="opdName" required
+                                class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-ink focus:border-ink transition-all appearance-none outline-none text-gray-700">
+                            <option value="" disabled selected>-- Pilih Instansi Anda --</option>
+                            <option value="Dinas Kesehatan">Dinas Kesehatan</option>
+                            <option value="BAPPEDA">BAPPEDA</option>
+                            <option value="Dinas Pendidikan">Dinas Pendidikan</option>
+                            <option value="Dinas Sosial">Dinas Sosial</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="tahun" class="block text-sm font-bold text-gray-700 mb-2">Tahun Dokumen <span class="text-red-500">*</span></label>
+                        <select id="tahun" required
+                                class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-ink focus:border-ink transition-all appearance-none outline-none text-gray-700">
+                            <option value="" disabled selected>-- Pilih Tahun --</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="docType" class="block text-sm font-bold text-gray-700 mb-2">Jenis Dokumen <span class="text-red-500">*</span></label>
+                        <select id="docType" required
+                                class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-ink focus:border-ink transition-all appearance-none outline-none text-gray-700">
+                            <option value="" disabled selected>-- Pilih Jenis Dokumen --</option>
+                            <option value="GAP">Gender Analysis Pathway (GAP)</option>
+                            <option value="GBS">Gender Budget Statement (GBS)</option>
+                            <option value="KAK">Kerangka Acuan Kegiatan (KAK)</option>
+                            <option value="SK Tim">SK Tim Focal Point</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="fileDoc" class="block text-sm font-bold text-gray-700 mb-2">Pilih File <span class="text-gray-400 font-normal">(PDF/Word/Excel)</span> <span class="text-red-500">*</span></label>
+                        <div class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus-within:ring-2 focus-within:ring-ink transition-all">
+                            <input type="file" id="fileDoc" accept=".pdf,.doc,.docx,.xls,.xlsx" required class="w-full text-sm text-gray-500 outline-none">
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="w-full md:w-1/2">
-                <h2 class="font-display text-4xl font-bold mb-6">Transparansi Penuh 24/7.</h2>
-                <p class="text-gray-500 text-lg mb-6 leading-relaxed">
-                    Tidak perlu lagi saling bertanya "Apakah file saya sudah diterima?". Semua aliran dokumen bermuara pada satu Dashboard Live berbasis Google Sheets. 
-                </p>
-                <p class="text-gray-500 text-lg leading-relaxed">
-                    Pimpinan dan admin dapat memantau progres pelaporan dari setiap instansi secara detik itu juga, memastikan tidak ada dokumen yang terlewat.
-                </p>
+
+                    <button type="submit" id="submitBtn" 
+                            class="w-full bg-ink text-white mt-4 py-4 rounded-full text-lg font-bold minimal-button flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-black/20">
+                        <span>Kirim Dokumen</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V6m0 0l-7 7m7-7l7 7"></path></svg>
+                    </button>
+
+                </form>
+
+                <div id="statusMessage" class="hidden mt-6 p-4 rounded-2xl text-center text-sm font-medium transition-all"></div>
             </div>
         </div>
     </section>
@@ -256,7 +297,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4 reveal">
                 <h2 class="font-display text-4xl font-bold tracking-tight">Kategori<br>Dokumen.</h2>
-                <p class="text-gray-500 max-w-sm md:text-right pb-2">Siapkan file PDF Anda sesuai dengan 4 dokumen analisis gender yang diwajibkan berikut.</p>
+                <p class="text-gray-500 max-w-sm md:text-right pb-2">Siapkan file Anda sesuai dengan 4 dokumen analisis gender yang diwajibkan berikut.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -266,21 +307,18 @@
                     <h4 class="font-display text-xl font-bold mb-2">GAP</h4>
                     <p class="text-sm text-gray-500">Gender Analysis Pathway. Panduan alur analisis kesenjangan.</p>
                 </div>
-
                 <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 100ms;">
                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Money%20bag/3D/money_bag_3d.png" 
                          alt="GBS" class="w-16 h-16 icon-3d mb-6">
                     <h4 class="font-display text-xl font-bold mb-2">GBS</h4>
                     <p class="text-sm text-gray-500">Gender Budget Statement. Dokumen pernyataan alokasi anggaran.</p>
                 </div>
-
                 <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 200ms;">
                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Clipboard/3D/clipboard_3d.png" 
                          alt="KAK" class="w-16 h-16 icon-3d mb-6">
                     <h4 class="font-display text-xl font-bold mb-2">KAK</h4>
                     <p class="text-sm text-gray-500">Kerangka Acuan Kegiatan yang responsif gender.</p>
                 </div>
-
                 <div class="bg-pure p-8 rounded-[2rem] border border-gray-100 hover:border-gray-300 transition-colors minimal-card reveal" style="transition-delay: 300ms;">
                     <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/People%20hugging/3D/people_hugging_3d.png" 
                          alt="SK Tim" class="w-16 h-16 icon-3d mb-6">
@@ -288,51 +326,6 @@
                     <p class="text-sm text-gray-500">SK Tim Focal Point Pengarusutamaan Gender di OPD.</p>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section id="faq" class="scroll-mt-24 py-24 px-6 border-y border-gray-100 bg-pure">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-16 reveal">
-                <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Light%20bulb/3D/light_bulb_3d.png" 
-                     alt="FAQ" class="w-16 h-16 mx-auto mb-4 icon-3d animate-float">
-                <h2 class="font-display text-3xl font-bold">Pertanyaan Umum</h2>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6 reveal">
-                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
-                    <h4 class="font-display font-bold text-lg mb-3">Apakah saya perlu membuat akun?</h4>
-                    <p class="text-gray-500 text-sm leading-relaxed">Tidak. Anda hanya memerlukan akun Google (Gmail) standar untuk mengakses Google Form dan mengunggah dokumen Anda.</p>
-                </div>
-                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
-                    <h4 class="font-display font-bold text-lg mb-3">Bagaimana jika saya salah upload file?</h4>
-                    <p class="text-gray-500 text-sm leading-relaxed">Anda dapat mengisi form kembali dan mengunggah file yang benar. Sistem akan merekam *timestamp* terbaru sebagai data yang paling valid.</p>
-                </div>
-                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
-                    <h4 class="font-display font-bold text-lg mb-3">Format file apa yang diterima?</h4>
-                    <p class="text-gray-500 text-sm leading-relaxed">Kami merekomendasikan format PDF agar isi dokumen tidak berubah. Namun sistem juga menerima format dokumen seperti .doc, .docx, dan .xls.</p>
-                </div>
-                <div class="p-8 border border-gray-200 rounded-3xl bg-white minimal-card">
-                    <h4 class="font-display font-bold text-lg mb-3">Bagaimana saya melihat dashboard?</h4>
-                    <p class="text-gray-500 text-sm leading-relaxed">Link *Live Dashboard* Google Sheets dipegang secara eksklusif oleh tim penilai dari Dinas P3AP2KB untuk menjaga kerahasiaan antar OPD.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 bg-white">
-        <div class="max-w-4xl mx-auto bg-ink text-white rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden reveal">
-            <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Rocket/3D/rocket_3d.png" 
-                 alt="Rocket" class="absolute -right-10 -top-10 w-48 h-48 opacity-20 blur-sm pointer-events-none">
-                 
-            <h2 class="font-display text-3xl md:text-5xl font-bold mb-6 relative z-10">Mulai Pengarsipan</h2>
-            <p class="text-gray-400 mb-10 max-w-lg mx-auto relative z-10">Akses form pengumpulan dokumen sekarang. Cepat, aman, dan terintegrasi otomatis dengan Google Workspace Pemerintah.</p>
-            
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdT2NcBK4O0W0g-67ImIh6Z8bbwSiviuS0v-ynkvwecpsMuFA/viewform?usp=header" 
-               target="_blank" rel="noopener noreferrer"
-               class="inline-block bg-white text-ink px-10 py-4 rounded-full text-lg font-bold minimal-button shadow-[0_0_40px_rgba(255,255,255,0.3)] relative z-10">
-                Arahkan ke Google Form
-            </a>
         </div>
     </section>
 
@@ -352,20 +345,104 @@
     </footer>
 
     <script>
+        // Scroll Animation
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
                 var elementVisible = 100;
-                
                 if (elementTop < windowHeight - elementVisible) {
                     reveals[i].classList.add("active");
                 }
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal(); // Trigger on load
+        reveal();
+
+        // --- SCRIPT UPLOAD FILE KE GOOGLE APPS SCRIPT --- //
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby83OyFqemjkd0cUhtehKSoA72fsi5EKg6rB7nDtv_g5jFcInTizJNk7wHrk_GGqi9TWg/exec";
+
+        const form = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+
+            // Ambil data dari form, termasuk TAHUN
+            const opdName = document.getElementById('opdName').value;
+            const tahunDoc = document.getElementById('tahun').value;
+            const docType = document.getElementById('docType').value;
+            const fileInput = document.getElementById('fileDoc');
+            const file = fileInput.files[0];
+
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('Ukuran file terlalu besar. Maksimal 10MB.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Mengunggah...
+            `;
+            submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            statusMessage.classList.add('hidden');
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64Data = event.target.result.split(',')[1]; 
+                
+                // Susun paket data (Payload) dengan tambahan tahun
+                const payload = {
+                    namaOpd: opdName,
+                    tahun: tahunDoc, // Data tahun ditambahkan di sini
+                    jenisDokumen: docType,
+                    namaFile: file.name,
+                    mimeType: file.type,
+                    fileBase64: base64Data
+                };
+
+                fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === "success") {
+                        showStatus('Berhasil! Dokumen Anda telah diarsipkan.', 'success');
+                        form.reset(); 
+                    } else {
+                        showStatus('Terjadi kesalahan di server.', 'error');
+                    }
+                })
+                .catch(error => {
+                    showStatus('Koneksi gagal. Pastikan internet Anda stabil.', 'error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `
+                        <span>Kirim Dokumen</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V6m0 0l-7 7m7-7l7 7"></path></svg>
+                    `;
+                    submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                });
+            };
+            
+            reader.readAsDataURL(file);
+        });
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+            
+            if (type === 'success') {
+                statusMessage.classList.add('bg-green-100', 'text-green-700', 'border', 'border-green-200');
+            } else {
+                statusMessage.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-200');
+            }
+        }
     </script>
 </body>
 </html>
