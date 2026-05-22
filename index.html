@@ -26,12 +26,12 @@
                     },
                     keyframes: {
                         fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-12px)' },
+                            '50%': { transform: 'translateY(-8px)' },
                         }
                     }
                 }
@@ -39,114 +39,112 @@
         }
     </script>
     <style>
-        /* Tekstur Grid Tambahan untuk kedalaman visual */
         .bg-grid-texture {
             background-image: 
                 linear-gradient(#e2e8f0 0.5px, transparent 0.5px),
                 linear-gradient(90deg, #e2e8f0 0.5px, transparent 0.5px);
-            background-size: 20px 20px; /* Ukuran kotak grid */
-            opacity: 0.4; /* Transparansi grid agar halus */
+            background-size: 16px 16px;
+            opacity: 0.3;
         }
     </style>
 </head>
-<body class="bg-slate-50 flex flex-col min-h-screen font-sans text-slate-800 relative">
+<body class="bg-slate-50 flex flex-col min-h-screen font-sans text-slate-800 relative text-sm">
 
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div class="absolute inset-0 bg-grid-texture"></div>
-        
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] sm:w-[45rem] h-[30rem] sm:h-[45rem] bg-blue-400/15 rounded-full blur-[100px]"></div>
-        <div class="absolute top-0 right-0 w-64 h-64 bg-amber-300/15 rounded-full blur-[80px]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[25rem] sm:w-[35rem] h-[25rem] sm:h-[35rem] bg-blue-400/10 rounded-full blur-[80px]"></div>
+        <div class="absolute top-0 right-0 w-48 h-48 bg-amber-300/10 rounded-full blur-[60px]"></div>
     </div>
 
     <nav class="bg-white/85 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-50 shadow-sm transition-all">
-        <div class="container mx-auto px-4 lg:px-8 py-3">
+        <div class="container mx-auto px-4 lg:px-6 py-2.5">
             <div class="flex items-center justify-between">
+                
                 <div class="flex items-center space-x-3 cursor-pointer">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" 
-                         alt="Logo NTT" class="h-10 sm:h-12 w-auto drop-shadow-sm">
-                    <div>
-                        <span class="block text-gov-blue font-extrabold text-lg sm:text-xl leading-none uppercase tracking-tight">SIPMODAG</span>
-                        <span class="block text-slate-500 text-[10px] sm:text-xs font-semibold tracking-wider">DP3AP2KB PROVINSI NTT</span>
+                         alt="Logo NTT" class="h-9 sm:h-10 w-auto drop-shadow-sm">
+                    <div class="flex flex-col justify-center">
+                        <div class="flex items-center gap-2">
+                            <span class="block text-gov-blue font-extrabold text-base sm:text-lg leading-none uppercase tracking-tight">SIPMODAG</span>
+                            <span class="relative flex h-2 w-2 shrink-0">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-gov-gold"></span>
+                            </span>
+                        </div>
+                        <span class="hidden lg:block text-slate-500 text-[10px] font-semibold tracking-wider mt-1">
+                            Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Prov. NTT
+                        </span>
+                        <span class="block lg:hidden text-slate-500 text-[9px] font-semibold tracking-wider mt-1">
+                            DP3AP2KB PROVINSI NTT
+                        </span>
                     </div>
                 </div>
 
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-slate-600 hover:text-gov-blue font-medium transition-colors">Beranda</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-slate-600 hover:text-gov-blue font-medium text-xs transition-colors">Beranda</a>
                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9HHoDTWwMIQZbuA2VWL1612Jfq7VUv-Y9Ct8p9vxIFapOeQ/viewform?usp=publish-editor" target="_blank" 
-                       class="bg-gov-blue text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 ring-2 ring-transparent hover:ring-blue-200">
+                       class="bg-gov-blue text-white px-5 py-2 rounded-full text-xs font-semibold hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 ring-2 ring-transparent hover:ring-blue-200">
                         Isi Form Sekarang
                     </a>
                 </div>
                 
                 <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-gov-blue focus:outline-none p-2 rounded-md hover:bg-slate-100 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-gov-blue focus:outline-none p-1.5 rounded-md hover:bg-slate-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                 </div>
             </div>
 
-            <div id="mobile-menu" class="hidden md:hidden pt-4 pb-3 border-t border-slate-100 mt-3">
-                <a href="#" class="block px-4 py-2 text-slate-600 font-medium hover:bg-slate-50 hover:text-gov-blue rounded-lg">Beranda</a>
+            <div id="mobile-menu" class="hidden md:hidden pt-3 pb-2 border-t border-slate-100 mt-2.5">
+                <a href="#" class="block px-3 py-1.5 text-slate-600 font-medium text-xs hover:bg-slate-50 hover:text-gov-blue rounded-lg">Beranda</a>
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9HHoDTWwMIQZbuA2VWL1612Jfq7VUv-Y9Ct8p9vxIFapOeQ/viewform?usp=publish-editor" target="_blank" 
-                   class="block px-4 py-2 mt-2 text-center bg-gov-blue text-white font-semibold rounded-lg shadow-sm hover:bg-blue-800">
+                   class="block px-3 py-1.5 mt-1.5 text-center bg-gov-blue text-white text-xs font-semibold rounded-lg shadow-sm hover:bg-blue-800">
                     Isi Form Sekarang
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow relative flex items-center justify-center px-4 py-12 sm:py-20 overflow-hidden z-10">
+    <main class="flex-grow relative flex items-center justify-center px-4 py-10 sm:py-16 overflow-hidden z-10">
         
-        <div class="relative max-w-6xl w-full flex flex-col md:flex-row items-center justify-between gap-12 md:gap-6 opacity-0 animate-fade-in-up text-center md:text-left">
+        <div class="relative max-w-5xl w-full flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 opacity-0 animate-fade-in-up text-center md:text-left">
             
             <div class="flex-1 flex flex-col items-center md:items-start overflow-visible p-1">
                 
-                <div class="inline-flex items-center gap-2.5 bg-slate-900/80 backdrop-blur-md border border-white/10 shadow-xl shadow-slate-900/20 px-5 py-2.5 rounded-full mb-6 transform transition-transform duration-300 hover:scale-105 cursor-default">
-                    
-                    <span class="relative flex h-2.5 w-2.5 shrink-0">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-gov-gold"></span>
-                    </span>
-
-                    <span class="block text-slate-100 text-[11px] sm:text-sm font-semibold tracking-wide">
-                        Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana
-                    </span>
-                </div>
-
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-[1.15]">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-5 mt-4 md:mt-0 tracking-tight leading-[1.15]">
                     Sistem Pengelolahan dan Monitoring Dokumen Analisis Gender <br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-gov-blue via-blue-600 to-cyan-500">SIPMODAG</span>
                 </h1>
                 
-                <p class="text-slate-600 text-base md:text-lg lg:text-xl max-w-2xl mb-10 leading-relaxed font-medium overflow-visible">
+                <p class="text-sm md:text-base lg:text-lg text-slate-600 max-w-xl mb-8 leading-relaxed font-medium overflow-visible">
                     Platform terintegrasi untuk pengumpulan dokumen analisis gender DP3AP2KB Provinsi NTT. Silakan klik tombol di bawah untuk mulai mengisi melalui <span class="text-slate-800 font-bold border-b-2 border-amber-400">Google Form</span>.
                 </p>
 
                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9HHoDTWwMIQZbuA2VWL1612Jfq7VUv-Y9Ct8p9vxIFapOeQ/viewform?usp=publish-editor" 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   class="group relative inline-flex items-center justify-center px-8 sm:px-10 py-4 font-bold text-white transition-all duration-300 bg-gradient-to-r from-gov-gold to-amber-500 rounded-2xl hover:from-amber-500 hover:to-yellow-500 hover:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] transform hover:-translate-y-1 overflow-hidden text-base sm:text-lg w-full sm:w-auto ring-4 ring-amber-500/20">
+                   class="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3 font-bold text-white transition-all duration-300 bg-gradient-to-r from-gov-gold to-amber-500 rounded-xl hover:from-amber-500 hover:to-yellow-500 hover:shadow-[0_10px_20px_-8px_rgba(245,158,11,0.5)] transform hover:-translate-y-1 overflow-hidden text-sm sm:text-base w-full sm:w-auto ring-4 ring-amber-500/15">
                     
                     <div class="absolute inset-0 -mt-10 -ml-10 w-20 h-40 bg-white opacity-20 transform rotate-45 transition-transform duration-700 ease-in-out translate-x-[-150%] group-hover:translate-x-[400%]"></div>
                     
                     <span class="relative">Mulai Mengisi Form</span>
                     
-                    <svg class="relative w-5 h-5 sm:w-6 sm:h-6 ml-3 transform transition-transform duration-300 ease-in-out group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="relative w-4 h-4 sm:w-5 sm:h-5 ml-2.5 transform transition-transform duration-300 ease-in-out group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                     </svg>
                 </a>
             </div>
 
-            <div class="flex-1 flex justify-center md:justify-end order-first md:order-last">
+            <div class="flex-1 flex justify-center md:justify-end order-first md:order-last p-2">
                 <div class="relative group cursor-default animate-float">
-                    <div class="absolute inset-0 bg-amber-400 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
+                    <div class="absolute inset-0 bg-amber-400 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
                     
                     <div class="relative z-10 transform transition-transform duration-500 hover:scale-110">
                         <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20index%20dividers/3D/card_index_dividers_3d.png" 
                              alt="Ikon Folder 3D" 
-                             class="w-40 h-40 sm:w-52 sm:h-52 lg:w-72 lg:h-72 object-contain drop-shadow-[0_15px_25px_rgba(245,158,11,0.35)]">
+                             class="w-32 h-32 sm:w-48 sm:h-48 lg:w-60 lg:h-60 object-contain drop-shadow-[0_10px_20px_rgba(245,158,11,0.3)]">
                     </div>
                 </div>
             </div>
@@ -154,16 +152,16 @@
         </div>
     </main>
 
-    <footer class="bg-white border-t border-slate-200 py-8 relative z-20 mt-auto footer-grid-fix">
+    <footer class="bg-white border-t border-slate-200 py-6 relative z-20 mt-auto footer-grid-fix">
         <div class="container mx-auto px-4 footer-content-fix">
-            <div class="flex flex-col items-center justify-center text-center space-y-2 footer-content-fix">
-                <div class="flex items-center space-x-2 grayscale opacity-60 mb-2 footer-content-fix">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" alt="Logo NTT" class="h-6 w-auto">
+            <div class="flex flex-col items-center justify-center text-center space-y-1.5 footer-content-fix">
+                <div class="flex items-center space-x-2 grayscale opacity-50 mb-1.5 footer-content-fix">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" alt="Logo NTT" class="h-5 w-auto">
                 </div>
-                <p class="text-slate-500 text-sm font-medium footer-content-fix">
+                <p class="text-slate-500 text-xs font-medium footer-content-fix">
                     &copy; 2026 <span class="font-bold text-slate-700 footer-content-fix">SIPMODAG</span>
                 </p>
-                <p class="text-slate-400 text-xs footer-content-fix">
+                <p class="text-slate-400 text-[10px] footer-content-fix">
                     Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
                 </p>
             </div>
