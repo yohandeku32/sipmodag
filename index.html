@@ -229,7 +229,7 @@
             const googleSheetCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVpRDlbLQsH5ofDlimZX6eoyl1NgNjfUA-aDUbsN0Scjur7lWHeqwPwTZI41AVnefbPZwxq8OJLZEr/pub?gid=26018163&single=true&output=csv";
 
             loadData();
-            setInterval(loadData, 300000);
+            setInterval(loadData, 30000);
 
             function loadData() {
 
@@ -246,7 +246,9 @@
                 return;
             }
 
-            Papa.parse(googleSheetCSVUrl, {
+            const noCacheUrl = googleSheetCSVUrl + '&t=' + new Date().getTime();
+
+            Papa.parse(noCacheUrl, {
     
                 download: true,
                 header: true, 
