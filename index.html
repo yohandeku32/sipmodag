@@ -224,7 +224,14 @@
     <!-- LOGIKA SINKRONISASI DATA (SUDAH DIPERBAIKI) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            let barChart = null;
+            let pieChart = null;
             const googleSheetCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVpRDlbLQsH5ofDlimZX6eoyl1NgNjfUA-aDUbsN0Scjur7lWHeqwPwTZI41AVnefbPZwxq8OJLZEr/pub?gid=26018163&single=true&output=csv";
+
+            loadData();
+            setInterval(loadData, 300000);
+
+            function loadData() {
 
             
             if (typeof Papa === 'undefined') {
@@ -302,7 +309,8 @@
 
                     // 1. GENERATE GRAPH BAR
                     const ctxBar = document.getElementById('barChart').getContext('2d');
-                    new Chart(ctxBar, {
+                    if (barChart) barChart.destroy();
+                    barChart = new Chart(ctxBar, {
                         type: 'bar',
                         data: {
                             labels: labelsOPD.slice(0, 10), // Tetap ambil 10 teratas untuk grafik batang agar rapi
@@ -337,7 +345,8 @@
 
                     // 2. GENERATE GRAPH PIE
                     const ctxPie = document.getElementById('pieChart').getContext('2d');
-                    new Chart(ctxPie, {
+                    if (pieChart) pieChart.destroy();
+                    pieChart = new Chart(ctxPie, {
                         type: 'doughnut',
                         data: {
                             labels: ['Sudah Upload', 'Belum'],
@@ -363,6 +372,8 @@
                     showError();
                 }
             });
+
+            }
 
             function showError() {
                 document.getElementById('stat-target').innerText = "Gagal Sinkron";
