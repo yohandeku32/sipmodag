@@ -190,7 +190,7 @@
             <!-- Grafik Ringkasan -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-primary mb-4">Grafik Status per Sampel OPD (Top 10)</h3>
+                    <h3 class="font-bold text-primary mb-4">Status Upload OPD (10 Teratas)</h3>
                     <div class="relative h-[380px] w-full">
                         <canvas id="barChart"></canvas>
                     </div>
@@ -279,7 +279,20 @@
 
             if (!namaOPD) return;
 
-            labelsOPD.push(namaOPD);
+            let namaPendek = namaOPD
+                .replace("SETDA PROVINSI NTT", "SETDA")
+                .replace("PROVINSI NTT", "")
+                .replace("PROVINSI NUSA TENGGARA TIMUR", "")
+                .replace("BADAN", "BD.")
+                .replace("DINAS", "DIS.")
+                .replace("SEKRETARIAT", "SEK.")
+                .trim();
+
+            if (namaPendek.length > 35) {
+                namaPendek = namaPendek.substring(0, 35) + "...";
+            }
+
+            labelsOPD.push(namaPendek);
 
             const jumlahUpload = parseInt(row[6] || 0);
 
