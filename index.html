@@ -259,54 +259,54 @@
                         return;
                     }
 
-                    const headers = Object.keys(data[0]);
                     
-                    let opdKey = headers.find(h => h.toLowerCase().includes('opd') || h.toLowerCase().includes('instansi') || h.toLowerCase().includes('nama'));
-                    let statusKey = headers.find(h => h.toLowerCase().includes('status') || h.toLowerCase().includes('upload') || h.toLowerCase().includes('keterangan') || h.toLowerCase().includes('ket'));
+const TARGET_OPD = 42;
 
-                    if (!opdKey) opdKey = headers[1] || headers[0];
-                    if (!statusKey) statusKey = headers[2] || headers[1];
+const headers = Object.keys(data[0]);
 
-                    let sudahCount = 0;
-                    let belumCount = 0;
-                    
-                    const labelsOPD = [];
-                    const dataSudah = [];
-                    const dataBelum = [];
+const opdKey = headers.find(h =>
+    h.toLowerCase().includes('opd') ||
+    h.toLowerCase().includes('nama')
+);
 
-                    // PENTING: Maksimal yang diproses adalah 42 OPD
-                    const MAX_OPD = 42;
+const jumlahUploadKey = headers.find(h =>
+    h.toLowerCase().includes('jumlah')
+);
 
-                    data.forEach(row => {
-                        // Kalau sudah mencapai target 42 OPD, berhentikan proses penarikan baris selanjutnya
-                        if (labelsOPD.length >= MAX_OPD) return;
+let sudahCount = 0;
 
-                        const namaOPD = row[opdKey] ? row[opdKey].toString().trim() : '';
-                        const statusRaw = row[statusKey] ? row[statusKey].toString().trim().toLowerCase() : '';
+const labelsOPD = [];
+const dataSudah = [];
+const dataBelum = [];
 
-                        // Hanya abaikan jika sel nama OPD benar-benar kosong
-                        if (!namaOPD || namaOPD === "") return;
+data.forEach(row => {
 
-                        labelsOPD.push(namaOPD);
+    const namaOPD = row[opdKey]
+        ? row[opdKey].toString().trim()
+        : '';
 
-                        if (statusRaw.includes('sudah') || statusRaw === 'ya' || statusRaw === 'lengkap' || statusRaw === 'ada' || statusRaw === 'sukses' || statusRaw.includes('sesuai')) {
-                            sudahCount++;
-                            dataSudah.push(1);
-                            dataBelum.push(0);
-                        } else {
-                            belumCount++;
-                            dataSudah.push(0);
-                            dataBelum.push(1);
-                        }
-                    });
+    if (!namaOPD) return;
 
-                    // Pastikan yang tertulis di UI adalah total array yang berhasil ditarik (maksimal 42)
-                    const totalData = labelsOPD.length;
+    labelsOPD.push(namaOPD);
 
-                    // Mengunci dan menyalurkan angka real-time ke UI
-                    document.getElementById('stat-target').innerText = totalData;
-                    document.getElementById('stat-sudah').innerText = sudahCount;
-                    document.getElementById('stat-belum').innerText = belumCount;
+    const jumlahUpload = parseInt(row[jumlahUploadKey] || 0);
+
+    if (jumlahUpload > 0) {
+        sudahCount++;
+        dataSudah.push(1);
+        dataBelum.push(0);
+    } else {
+        dataSudah.push(0);
+        dataBelum.push(1);
+    }
+});
+
+const belumCount = TARGET_OPD - sudahCount;
+
+document.getElementById('stat-target').innerText = TARGET_OPD;
+document.getElementById('stat-sudah').innerText = sudahCount;
+document.getElementById('stat-belum').innerText = belumCount;
+
 
                     // 1. GENERATE GRAPH BAR
                     const ctxBar = document.getElementById('barChart').getContext('2d');
