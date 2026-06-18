@@ -250,62 +250,54 @@
             Papa.parse(noCacheUrl, {
     
                 download: true,
-                header: true, 
+                header: false,
                 skipEmptyLines: true,
                 complete: function(results) {
-                    const data = results.data;
-                    if (data.length === 0) {
-                        showError();
-                        return;
-                    }
 
-                    
-const TARGET_OPD = 42;
+        const rows = results.data;
 
-const headers = Object.keys(data[0]);
+        if (!rows || rows.length < 3) {
+            showError();
+            return;
+        }
 
-const opdKey = headers.find(h =>
-    h.toLowerCase().includes('opd') ||
-    h.toLowerCase().includes('nama')
-);
+        const data = rows.slice(2);
 
-const jumlahUploadKey = headers.find(h =>
-    h.toLowerCase().includes('jumlah')
-);
+        const TARGET_OPD = 42;
 
-let sudahCount = 0;
+        let sudahCount = 0;
 
-const labelsOPD = [];
-const dataSudah = [];
-const dataBelum = [];
+        const labelsOPD = [];
+        const dataSudah = [];
+        const dataBelum = [];
 
-data.forEach(row => {
+        data.forEach(row => {
 
-    const namaOPD = row[opdKey]
-        ? row[opdKey].toString().trim()
-        : '';
+            const namaOPD = row[1]
+                ? row[1].toString().trim()
+                : '';
 
-    if (!namaOPD) return;
+            if (!namaOPD) return;
 
-    labelsOPD.push(namaOPD);
+            labelsOPD.push(namaOPD);
 
-    const jumlahUpload = parseInt(row[jumlahUploadKey] || 0);
+            const jumlahUpload = parseInt(row[6] || 0);
 
-    if (jumlahUpload > 0) {
-        sudahCount++;
-        dataSudah.push(1);
-        dataBelum.push(0);
-    } else {
-        dataSudah.push(0);
-        dataBelum.push(1);
-    }
-});
+            if (jumlahUpload > 0) {
+                sudahCount++;
+                dataSudah.push(1);
+                dataBelum.push(0);
+            } else {
+                dataSudah.push(0);
+                dataBelum.push(1);
+            }
+        });
 
-const belumCount = TARGET_OPD - sudahCount;
+        const belumCount = TARGET_OPD - sudahCount;
 
-document.getElementById('stat-target').innerText = TARGET_OPD;
-document.getElementById('stat-sudah').innerText = sudahCount;
-document.getElementById('stat-belum').innerText = belumCount;
+        document.getElementById('stat-target').innerText = TARGET_OPD;
+        document.getElementById('stat-sudah').innerText = sudahCount;
+        document.getElementById('stat-belum').innerText = belumCount;
 
 
                     // 1. GENERATE GRAPH BAR
