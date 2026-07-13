@@ -1499,9 +1499,10 @@ export default function App() {
 
       {/* HERO SECTION */}
       <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
-        {/* Grid Texture Background for Hero Section */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-60 mask-gradient -z-10 pointer-events-none"></div>
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[800px] h-[800px] bg-blue-100/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        {/* Background dibuat sama seperti halaman login */}
+        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
+        <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
         
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
