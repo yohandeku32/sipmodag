@@ -400,14 +400,8 @@ function HeroTypewriter() {
     let index = 0;
     let timer: number;
 
-    const PAUSE_AFTER_TYPED = 5000;
-    const PAUSE_BEFORE_RETYPE = 900;
-
     const getTypingDelay = () =>
       Math.floor(Math.random() * 55) + 85;
-
-    const getDeletingDelay = () =>
-      Math.floor(Math.random() * 30) + 45;
 
     const typeNextCharacter = () => {
       index += 1;
@@ -418,28 +412,6 @@ function HeroTypewriter() {
           typeNextCharacter,
           getTypingDelay()
         );
-      } else {
-        timer = window.setTimeout(
-          deletePreviousCharacter,
-          PAUSE_AFTER_TYPED
-        );
-      }
-    };
-
-    const deletePreviousCharacter = () => {
-      index -= 1;
-      setDisplayText(HERO_TITLE.slice(0, index));
-
-      if (index > 0) {
-        timer = window.setTimeout(
-          deletePreviousCharacter,
-          getDeletingDelay()
-        );
-      } else {
-        timer = window.setTimeout(
-          typeNextCharacter,
-          PAUSE_BEFORE_RETYPE
-        );
       }
     };
 
@@ -449,7 +421,8 @@ function HeroTypewriter() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  const lines = displayText.split("\n");
+  const lines = displayText.split("
+");
 
   return (
     <>
