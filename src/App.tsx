@@ -34,7 +34,7 @@ import OPDLoginScreen from './components/OPDLoginScreen';
 import OPDDashboard from './components/OPDDashboard';
 
 // Masukkan URL Web App Google Apps Script Anda di bawah ini
-const GOOGLE_APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykopgKpoUCtPSVu4VvJsIRLQnYV9BLPYe8Q7dupmAorcgTu47r_iYgE4rBwxrjMNLXgw/exec";
+const GOOGLE_APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyOQVm5t4g8iekuWviSqHLV33IECqOJaC7gs0jBAVabWhjVHsC1NcaJBrxbYU59maq7/exec";
 
 
 // DAFTAR RESMI 42 OPD YANG BOLEH MASUK KE DASHBOARD.
@@ -1608,33 +1608,47 @@ export default function App() {
       </main>
 
       {/* QUICK VALUE PROPOSITIONS */}
-      <section className="bg-white border-y border-slate-200/60 py-12 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-          <div className="p-4 md:px-8 text-center md:text-left flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0 shadow-sm">
-              <TrendingUp className="w-6 h-6" />
+      <section className="relative z-10 border-y border-slate-200/70 bg-white py-10 sm:py-12">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-slate-200 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
+          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <TrendingUp className="h-6 w-6" />
             </div>
-            <div>
-              <h3 className="font-extrabold text-primary mb-1">Mendorong Partisipasi</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.</p>
-            </div>
-          </div>
-          <div className="p-4 md:px-8 text-center md:text-left flex items-start gap-4 pt-8 md:pt-0">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
-              <CheckCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-primary mb-1">Data Real-Time & Valid</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.</p>
+            <div className="min-w-0">
+              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                Mendorong Partisipasi
+              </h3>
+              <p className="text-sm leading-6 text-slate-500">
+                Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.
+              </p>
             </div>
           </div>
-          <div className="p-4 md:px-8 text-center md:text-left flex items-start gap-4 pt-8 md:pt-0">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 shadow-sm">
-              <Clock className="w-6 h-6" />
+
+          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <CheckCircle className="h-6 w-6" />
             </div>
-            <div>
-              <h3 className="font-extrabold text-primary mb-1">Efisiensi Administrasi</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.</p>
+            <div className="min-w-0">
+              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                Data Real-Time & Valid
+              </h3>
+              <p className="text-sm leading-6 text-slate-500">
+                Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+              <Clock className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                Efisiensi Administrasi
+              </h3>
+              <p className="text-sm leading-6 text-slate-500">
+                Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.
+              </p>
             </div>
           </div>
         </div>
