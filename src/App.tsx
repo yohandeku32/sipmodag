@@ -34,7 +34,7 @@ import OPDLoginScreen from './components/OPDLoginScreen';
 import OPDDashboard from './components/OPDDashboard';
 
 // Masukkan URL Web App Google Apps Script Anda di bawah ini
-const GOOGLE_APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykopgKpoUCtPSVu4VvJsIRLQnYV9BLPYe8Q7dupmAorcgTu47r_iYgE4rBwxrjMNLXgw/exec";
+const GOOGLE_APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyOQVm5t4g8iekuWviSqHLV33IECqOJaC7gs0jBAVabWhjVHsC1NcaJBrxbYU59maq7/exec";
 
 
 // DAFTAR RESMI 42 OPD YANG BOLEH MASUK KE DASHBOARD.
@@ -388,6 +388,103 @@ const isDashboardSnapshotRegression = (
     );
   });
 };
+
+
+const HERO_TITLE =
+  "Sistem Pengelolaan &\nMonitoring Dokumen\nAnalisis Gender";
+
+function HeroTypewriter() {
+  const [displayText, setDisplayText] = useState("");
+
+  useEffect(() => {
+    let index = 0;
+    let timer: number;
+
+    const PAUSE_AFTER_TYPED = 5000;
+    const PAUSE_BEFORE_RETYPE = 900;
+
+    const getTypingDelay = () =>
+      Math.floor(Math.random() * 55) + 85;
+
+    const getDeletingDelay = () =>
+      Math.floor(Math.random() * 30) + 45;
+
+    const typeNextCharacter = () => {
+      index += 1;
+      setDisplayText(HERO_TITLE.slice(0, index));
+
+      if (index < HERO_TITLE.length) {
+        timer = window.setTimeout(
+          typeNextCharacter,
+          getTypingDelay()
+        );
+      } else {
+        timer = window.setTimeout(
+          deletePreviousCharacter,
+          PAUSE_AFTER_TYPED
+        );
+      }
+    };
+
+    const deletePreviousCharacter = () => {
+      index -= 1;
+      setDisplayText(HERO_TITLE.slice(0, index));
+
+      if (index > 0) {
+        timer = window.setTimeout(
+          deletePreviousCharacter,
+          getDeletingDelay()
+        );
+      } else {
+        timer = window.setTimeout(
+          typeNextCharacter,
+          PAUSE_BEFORE_RETYPE
+        );
+      }
+    };
+
+    setDisplayText("");
+    timer = window.setTimeout(typeNextCharacter, 350);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const lines = displayText.split("\n");
+
+  return (
+    <>
+      <style>{`
+        @keyframes naturalCaretBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+      `}</style>
+
+      <h2
+        className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary leading-[1.1] tracking-tight"
+        aria-label="Sistem Pengelolaan dan Monitoring Dokumen Analisis Gender"
+      >
+      {lines.map((line, index) => (
+        <React.Fragment key={index}>
+          <span className={index === 1 ? "text-[#1E40AF]" : undefined}>
+            {line}
+          </span>
+
+          {index < lines.length - 1 && <br />}
+        </React.Fragment>
+      ))}
+
+        <span
+          aria-hidden="true"
+          className="ml-1 inline-block h-[0.88em] w-[2px] translate-y-[0.08em] bg-black"
+          style={{
+            animation: "naturalCaretBlink 1.06s steps(1, end) infinite",
+          }}
+        />
+      </h2>
+    </>
+  );
+}
 
 export default function App() {
   const [data, setData] = useState<OPDData[]>(OFFICIAL_OPDS);
@@ -1507,13 +1604,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           <div className="space-y-8 relative z-10">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary leading-[1.1] tracking-tight">
-              Sistem Pengelolaan & <br />
-              <span className="text-[#1E40AF]">
-                Monitoring Dokumen
-              </span> <br />
-              Analisis Gender
-            </h2>
+            <HeroTypewriter />
             
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
               Digitalisasi pengumpulan dokumen analisis gender pada Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
