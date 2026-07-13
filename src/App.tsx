@@ -421,8 +421,7 @@ function HeroTypewriter() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  const lines = displayText.split("
-");
+  const lines = displayText.split("\n");
 
   return (
     <>
