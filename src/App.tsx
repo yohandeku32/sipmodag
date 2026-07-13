@@ -1611,28 +1611,6 @@ export default function App() {
               )}
             </div>
 
-            {/* DataSource Badge Alert (Styled very minimally below) */}
-            <div className="pt-2">
-              <AnimatePresence mode="wait">
-                {dataSource !== 'LIVE_SHEET' && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-105 text-amber-700 text-xs font-medium"
-                  >
-                    <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                    <span>Gagal membaca CSV Form Responses. Menampilkan data cadangan.</span>
-                    <button 
-                      onClick={() => fetchData(true)} 
-                      className="underline font-bold hover:text-amber-900 ml-1 flex items-center gap-0.5"
-                    >
-                      Hubungkan Kembali <RefreshCw className="w-2.5 h-2.5 inline" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
 
           {/* Visual Side Graphics (Matched Exactly to screenshot!) */}
