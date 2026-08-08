@@ -1,838 +1,1797 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Bell,
-  CalendarDays,
-  Check,
-  CheckCircle2,
-  ChevronDown,
-  Download,
-  ExternalLink,
-  FileSpreadsheet,
-  FileText,
-  Info,
-  Loader2,
-  Save,
-  LogOut,
-  RefreshCw,
-  ShieldCheck,
-  UploadCloud,
-  User,
-  WalletCards,
-  X,
-} from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import { getReviewAction, postReviewAction, toBoolean } from '../reviewApi';
-import { OPDData } from '../types';
-import { BudgetInput, BudgetRecord, ReviewNotification, ReviewRecord, RevisionTarget } from '../reviewTypes';
+import React, { useState, useEffect, useRef } from 'react';import Papa from 'papaparse';import {RefreshCw,ExternalLink,Layers,CheckCircle2,AlertTriangle,FileText,HelpCircle,ArrowRight,TrendingUp,CheckCircle,XCircle,Clock,Info,ChevronRight,Database,Lock,Unlock,LogOut,UploadCloud,User,Check,Search,FileUp,ShieldCheck} from 'lucide-react';import { motion, AnimatePresence } from 'motion/react';import { OPDData, DashboardStats } from './types';import { FALLBACK_OPDS } from './fallbackData';import OPDList from './components/OPDList';import VisualCharts from './components/VisualCharts';import OPDLoginScreen from './components/OPDLoginScreen';import OPDDashboard from './components/OPDDashboard';import OperatorLogin from './components/OperatorLogin';import OperatorDashboard from './components/OperatorDashboard';import { BudgetInput, OperatorSession, RevisionTarget } from './reviewTypes';
 
-type UploadSlotKey = 'file1' | 'file2' | 'file3' | 'file4';
+// Masukkan URL Web App Google Apps Script Anda di bawah iniconst GOOGLE_APPS_SCRIPT_WEB_APP_URL =String(import.meta.env.VITE_APPS_SCRIPT_URL || '').trim() ||"https://script.google.com/macros/s/AKfycbzuktxlcWdkA7NtjbgYmU3Gsg4miqFY5HRYPl3mMjupqo4f2pqp4_uXgNTG5QdRHtAiRg/exec";
 
-type UploadedFile = {
-  name: string;
-  size: string;
-  fileObj: File | null;
-} | null;
+// DAFTAR RESMI 42 OPD YANG BOLEH MASUK KE DASHBOARD.// Baris Form Responses di luar daftar ini diabaikan sepenuhnya.const DASHBOARD_OPD_NAMES = ['BIRO UMUM SETDA PROVINSI NTT','BIRO PENGADAAN BARANG DAN JASA SETDA PROVINSI NTT','BIRO PEMERINTAHAN SETDA PROVINSI NTT','BIRO ORGANISASI SETDA PROVINSI NTT','BIRO ADMINISTRASI PIMPINAN SETDA PROVINSI NTT','BIRO HUKUM SETDA PROVINSI NTT','BIRO PEREKONOMIAN DAN ADMINISTRASI PEMBANGUNAN SETDA PROVINSI NTT','BADAN PENGELOLAAN BENCANA DAERAH PROVINSI NTT','BADAN SATUAN POLISI PAMONG PRAJA PROVINSI NTT','BADAN KESATUAN BANGSA DAN POLITIK PROVINSI NTT','BADAN PERENCANAAN PEMBANGUNAN, RISET DAN INOVASI DAERAH PROVINSI NTT','BADAN PENGELOLAAN PERBATASAN DAERAH PROVINSI NTT','BADAN PENDAPATAN DAN ASET DAERAH PROVINSI NTT','BADAN PENGEMBANGAN SUMBER DAYA MANUSIA DAERAH PROVINSI NTT','BADAN KEUANGAN DAERAH PROVINSI NTT','BADAN KEPEGAWAIAN DAERAH PROVINSI NTT','BADAN PENGHUBUNG PROVINSI NTT','DINAS SOSIAL PROVINSI NTT','DINAS LINGKUNGAN HIDUP DAN KEHUTANAN PROVINSI NTT','DINAS KETENAGAKERJAAN DAN TRANSMIGRASI PROVINSI NTT','DINAS KELAUTAN DAN PERIKANAN PROVINSI NTT','DINAS PERHUBUNGAN PROVINSI NTT','DINAS PENDIDIKAN DAN KEBUDAYAAN PROVINSI NTT','DINAS PARIWISATA DAN EKONOMI KREATIF PROVINSI NTT','DINAS PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU PROVINSI NTT','DINAS PETERNAKAN PROVINSI NTT','DINAS PERINDUSTRIAN DAN PERDAGANGAN PROVINSI NTT','DINAS PEKERJAAN UMUM DAN PERUMAHAN RAKYAT PROVINSI NTT','DINAS PEMBERDAYAAN MASYARAKAT DESA PROVINSI NTT','DINAS PERTANIAN DAN KETAHANAN PANGAN PROVINSI NTT','DINAS KEPENDUDUKAN DAN PENCATATAN SIPIL PROVINSI NTT','DINAS KOMUNIKASI DAN INFORMASI PROVINSI NTT','DINAS ENERGI DAN SUMBER DAYA MINERAL PROVINSI NTT','DINAS KESEHATAN PROVINSI NTT','DINAS KEARSIPAN DAN PERPUSTAKAAN PROVINSI NTT','DINAS KEPEMUDAAN DAN OLAHRAGA PROVINSI NTT','DINAS KOPERASI DAN USAHA KECIL MENENGAH PROVINSI NTT','DINAS P3AP2KB PROVINSI NTT','INSPEKTORAT DAERAH PROVINSI NTT','SEKRETARIAT DEWAN PROVINSI NTT','RSUD. W. Z. YOHANES KUPANG','RSKD JIWA NAIMATA',] as const;
 
-type UploadedFiles = Record<UploadSlotKey, UploadedFile>;
+type DocumentFlags = {gap: boolean;gbs: boolean;kak: boolean;sk: boolean;};
 
-type Props = {
-  apiUrl: string;
-  loggedInOPD: OPDData;
-  handleLogout: () => void;
-  selectedYear: string;
-  setSelectedYear: (value: string) => void;
-  uploadedFiles: UploadedFiles;
-  setUploadedFiles: React.Dispatch<React.SetStateAction<UploadedFiles>>;
-  uploadStatus: 'IDLE' | 'UPLOADING' | 'SUCCESS';
-  uploadProgress: number;
-  uploadedSuccessKeys: string[];
-  handleLocalFileChange: (slot: UploadSlotKey, file: File | null) => void;
-  triggerUploadSimulation: (budget: BudgetInput) => void | Promise<void>;
-  revisionTarget: RevisionTarget | null;
-  onStartRevision: (target: RevisionTarget) => void;
-  onCancelRevision: () => void;
-};
+type OPDDocumentGroup = DocumentFlags & {namaOPD: string;};
 
-const slots: Array<{
-  key: UploadSlotKey;
-  title: string;
-  documentName: string;
-  description: string;
-  accept: string;
-  icon: typeof FileText;
-}> = [
-  {
-    key: 'file1',
-    title: 'Dokumen GAP',
-    documentName: 'GAP',
-    description: 'Gender Analysis Pathway.',
-    accept: '.pdf,.doc,.docx,.xls,.xlsx',
-    icon: FileText,
-  },
-  {
-    key: 'file2',
-    title: 'Dokumen GBS',
-    documentName: 'GBS',
-    description: 'Gender Budget Statement.',
-    accept: '.pdf,.doc,.docx,.xls,.xlsx',
-    icon: FileSpreadsheet,
-  },
-  {
-    key: 'file3',
-    title: 'Dokumen KAK',
-    documentName: 'KAK',
-    description: 'Kerangka Acuan Kerja responsif gender.',
-    accept: '.pdf,.doc,.docx,.xls,.xlsx',
-    icon: FileText,
-  },
-  {
-    key: 'file4',
-    title: 'SK Focal Point',
-    documentName: 'SK FOCAL POINT',
-    description: 'SK Focal Point Pengarusutamaan Gender.',
-    accept: '.pdf,.doc,.docx,.xls,.xlsx',
-    icon: ShieldCheck,
-  },
-];
+type PendingUploadFlags = DocumentFlags & {expiresAt: number;};
 
-const statusLabel: Record<string, string> = {
-  MENUNGGU_REVIEW: 'Menunggu Review',
-  SEDANG_DIREVIEW: 'Sedang Direview',
-  PERLU_REVISI: 'Perlu Revisi',
-  DIUNGGAH_ULANG: 'Diunggah Ulang',
-  DISETUJUI: 'Disetujui',
-  DITOLAK: 'Ditolak',
-};
+/**
 
-const statusClass: Record<string, string> = {
-  MENUNGGU_REVIEW: 'border-amber-200 bg-amber-50 text-amber-700',
-  SEDANG_DIREVIEW: 'border-blue-200 bg-blue-50 text-blue-700',
-  PERLU_REVISI: 'border-rose-200 bg-rose-50 text-rose-700',
-  DIUNGGAH_ULANG: 'border-violet-200 bg-violet-50 text-violet-700',
-  DISETUJUI: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  DITOLAK: 'border-slate-300 bg-slate-100 text-slate-700',
-};
+Menormalkan nama OPD agar perbedaan kecil pada Spreadsheet
 
-const onlyDigits = (value: string) => value.replace(/[^0-9]/g, '');
+tidak menyebabkan data gagal dicocokkan.
 
-const formatAmountInput = (value: string | number) => {
-  const digits = onlyDigits(String(value ?? ''));
-  if (!digits) return '';
-  return new Intl.NumberFormat('id-ID').format(Number(digits));
-};
 
-const parseAmountInput = (value: string) => Number(onlyDigits(value) || 0);
 
-const formatRupiah = (value: string | number | undefined) =>
-  new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
+Contoh yang dianggap sama:
 
-export default function OPDDashboard({
-  apiUrl,
-  loggedInOPD,
-  handleLogout,
-  selectedYear,
-  setSelectedYear,
-  uploadedFiles,
-  setUploadedFiles,
-  uploadStatus,
-  uploadProgress,
-  uploadedSuccessKeys,
-  handleLocalFileChange,
-  triggerUploadSimulation,
-  revisionTarget,
-  onStartRevision,
-  onCancelRevision,
-}: Props) {
-  const selectedCount = Object.values(uploadedFiles).filter(Boolean).length;
-  const [notifications, setNotifications] = useState<ReviewNotification[]>([]);
-  const [reviews, setReviews] = useState<ReviewRecord[]>([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [reviewError, setReviewError] = useState<string | null>(null);
 
-  const [paguAnggaran, setPaguAnggaran] = useState('');
-  const [tanggalPagu, setTanggalPagu] = useState('');
-  const [realisasiAnggaran, setRealisasiAnggaran] = useState('');
-  const [tanggalRealisasi, setTanggalRealisasi] = useState('');
-  const [budgetLoading, setBudgetLoading] = useState(true);
-  const [budgetSaving, setBudgetSaving] = useState(false);
-  const [budgetMessage, setBudgetMessage] = useState<string | null>(null);
 
-  const unreadCount = notifications.filter(item => !toBoolean(item.IS_READ)).length;
+"&" dan "DAN"
 
-  const loadBudgetData = async () => {
-    setBudgetLoading(true);
-    setBudgetMessage(null);
 
-    try {
-      const result = await getReviewAction<{ budget: BudgetRecord | null }>(
-        apiUrl,
-        'getOPDBudget',
-        { opdName: loggedInOPD.namaOPD, tahun: selectedYear },
-      );
 
-      const budget = result.budget;
-      setPaguAnggaran(budget ? formatAmountInput(budget.PAGU_ARG) : '');
-      setTanggalPagu(budget?.TANGGAL_PAGU || '');
-      setRealisasiAnggaran(
-        budget && Number(budget.REALISASI_ARG || 0) > 0
-          ? formatAmountInput(budget.REALISASI_ARG)
-          : '',
-      );
-      setTanggalRealisasi(budget?.TANGGAL_REALISASI || '');
-    } catch (error) {
-      setPaguAnggaran('');
-      setTanggalPagu('');
-      setRealisasiAnggaran('');
-      setTanggalRealisasi('');
-      setBudgetMessage(error instanceof Error ? error.message : 'Data anggaran gagal dimuat.');
-    } finally {
-      setBudgetLoading(false);
-    }
-  };
+"Provinsi NTT" dan "Nusa Tenggara Timur"
 
-  const getBudgetPayload = (): BudgetInput | null => {
-    const pagu = parseAmountInput(paguAnggaran);
-    const realisasi = parseAmountInput(realisasiAnggaran);
 
-    if (pagu <= 0 || !tanggalPagu) {
-      setBudgetMessage('Pagu Anggaran Responsif Gender dan tanggal pagu wajib diisi sebelum upload.');
-      return null;
-    }
 
-    if (realisasi > 0 && !tanggalRealisasi) {
-      setBudgetMessage('Tanggal realisasi wajib diisi jika realisasi anggaran sudah diisi.');
-      return null;
-    }
+koma, titik, garis miring, serta spasi ganda*/const normalizeOPDName = (value: string): string =>String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/&/g, ' DAN ').replace(/\bNUSA\s+TENGGARA\s+TIMUR\b/g, ' NTT ').replace(/\bPROVINSI\s+NTT\b/g, ' NTT ').replace(/\bSEKRETARIAT\s+DAERAH\b/g, ' SETDA ').replace(/\bSATUAN\s+POLISI\s+PAMONG\s+PRAJA\b/g, ' SATPOL PP ').replace(/\bRUMAH\s+SAKIT\s+UMUM\s+DAERAH\b/g, ' RSUD ').replace(/[^A-Z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 
-    return {
-      paguAnggaran: pagu,
-      tanggalPagu,
-      realisasiAnggaran: realisasi,
-      tanggalRealisasi: realisasi > 0 ? tanggalRealisasi : '',
-    };
-  };
+const OPD_MATCH_STOP_WORDS = new Set(['PROVINSI','NTT','NUSA','TENGGARA','TIMUR','PEMERINTAH','DAERAH','DAN','DINAS','BADAN','BIRO','SEKRETARIAT','SETDA','UNIT','PELAKSANA','TEKNIS',]);
 
-  const saveBudgetData = async () => {
-    const budget = getBudgetPayload();
-    if (!budget) return;
+const getOPDTokens = (value: string): string[] => {const normalized = normalizeOPDName(value);const tokens = normalized.split(' ').filter(token => token.length > 1 && !OPD_MATCH_STOP_WORDS.has(token));
 
-    setBudgetSaving(true);
-    setBudgetMessage(null);
+return Array.from(new Set(tokens));};
 
-    try {
-      await postReviewAction<{ budget: BudgetRecord }>(apiUrl, {
-        action: 'saveOPDBudget',
-        opdName: loggedInOPD.namaOPD,
-        tahun: selectedYear,
-        ...budget,
-      });
-      setBudgetMessage('Data anggaran berhasil disimpan.');
-    } catch (error) {
-      setBudgetMessage(error instanceof Error ? error.message : 'Data anggaran gagal disimpan.');
-    } finally {
-      setBudgetSaving(false);
-    }
-  };
+const createOPDMatchKey = (value: string): string => {const tokens = getOPDTokens(value);return tokens.length > 0? [...tokens].sort().join('|'): normalizeOPDName(value).replace(/\s+/g, '');};
 
-  const handleUploadWithBudget = () => {
-    const budget = getBudgetPayload();
-    if (!budget) return;
-    void triggerUploadSimulation(budget);
-  };
+// Kunci identitas konservatif untuk membedakan setiap OPD.// Tidak menghapus kata DINAS/BADAN/BIRO dan tidak mengurutkan token,// sehingga dua OPD berbeda tidak akan tergabung hanya karena memiliki// beberapa kata yang sama.const createOPDIdentityKey = (value: string): string =>normalizeOPDName(value).replace(/\s+/g, '');
 
-  const loadReviewData = async (silent = false) => {
-    if (!silent) setLoadingReviews(true);
-    setReviewError(null);
+const DASHBOARD_OPD_IDENTITY_KEYS = new Set(DASHBOARD_OPD_NAMES.map(name => createOPDIdentityKey(name)));
 
-    try {
-      const [notificationResult, reviewResult] = await Promise.all([
-        getReviewAction<{ unreadCount: number; notifications: ReviewNotification[] }>(
-          apiUrl,
-          'getOPDNotifications',
-          { opdName: loggedInOPD.namaOPD },
-        ),
-        getReviewAction<{ count: number; reviews: ReviewRecord[] }>(
-          apiUrl,
-          'getOPDReviews',
-          { opdName: loggedInOPD.namaOPD, tahun: selectedYear },
-        ),
-      ]);
+const isDashboardOPD = (value: string): boolean =>DASHBOARD_OPD_IDENTITY_KEYS.has(createOPDIdentityKey(value));
 
-      setNotifications(notificationResult.notifications || []);
-      setReviews(reviewResult.reviews || []);
-    } catch (error) {
-      setReviewError(error instanceof Error ? error.message : 'Data review gagal dimuat.');
-    } finally {
-      setLoadingReviews(false);
-    }
-  };
+// Membaca tahun secara toleran, misalnya 2026, "Tahun 2026", atau "2026.0".const extractYear = (value: unknown): string => {const match = String(value ?? '').match(/\b(20\d{2})\b/);return match ? match[1] : '';};
 
-  useEffect(() => {
-    void loadBudgetData();
-  }, [loggedInOPD.namaOPD, selectedYear]);
+const getOPDNameSimilarity = (left: string, right: string): number => {const normalizedLeft = normalizeOPDName(left);const normalizedRight = normalizeOPDName(right);
 
-  useEffect(() => {
-    void loadReviewData();
-    const timer = window.setInterval(() => void loadReviewData(true), 30000);
-    return () => window.clearInterval(timer);
-  }, [loggedInOPD.namaOPD, selectedYear]);
+if (!normalizedLeft || !normalizedRight) return 0;if (normalizedLeft === normalizedRight) return 1;
 
-  const reviewById = useMemo(
-    () => new Map(reviews.map(item => [item.REVIEW_ID, item])),
-    [reviews],
-  );
+const compactLeft = normalizedLeft.replace(/\s+/g, '');const compactRight = normalizedRight.replace(/\s+/g, '');
 
-  const markNotificationRead = async (notification: ReviewNotification) => {
-    if (toBoolean(notification.IS_READ)) return;
+if (compactLeft === compactRight) return 0.99;
 
-    setNotifications(current =>
-      current.map(item =>
-        item.NOTIFICATION_ID === notification.NOTIFICATION_ID
-          ? { ...item, IS_READ: true }
-          : item,
-      ),
+const keyLeft = createOPDMatchKey(left);const keyRight = createOPDMatchKey(right);
+
+if (keyLeft && keyLeft === keyRight) return 0.98;
+
+const leftTokens = new Set(getOPDTokens(left));const rightTokens = new Set(getOPDTokens(right));
+
+if (leftTokens.size === 0 || rightTokens.size === 0) {return compactLeft.includes(compactRight) || compactRight.includes(compactLeft)? 0.75: 0;}
+
+let intersection = 0;leftTokens.forEach(token => {if (rightTokens.has(token)) intersection += 1;});
+
+const diceScore =(2 * intersection) / (leftTokens.size + rightTokens.size);
+
+const containsBonus =normalizedLeft.includes(normalizedRight) ||normalizedRight.includes(normalizedLeft)? 0.15: 0;
+
+return Math.min(1, diceScore + containsBonus);};
+
+const findBestOPDMatchIndex = (sourceName: string,opdList: OPDData[]): { index: number; score: number } => {let bestIndex = -1;let bestScore = 0;
+
+opdList.forEach((opd, index) => {const score = Math.max(getOPDNameSimilarity(sourceName, opd.namaOPD),getOPDNameSimilarity(sourceName, opd.namaPendek));
+
+if (score > bestScore) {
+  bestScore = score;
+  bestIndex = index;
+}
+
+});
+
+return {index: bestIndex,score: bestScore,};};
+
+// Bentuk daftar utama dari 42 nama resmi. Data tambahan di fallbackData// tidak pernah ikut tampil. namaPendek lama tetap dipakai bila ditemukan// agar sandi dan tampilan OPD yang sudah ada tidak berubah.const OFFICIAL_OPDS: OPDData[] = (() => {const usedFallbackIndexes = new Set<number>();
+
+return DASHBOARD_OPD_NAMES.map((officialName, officialIndex) => {let selectedIndex = FALLBACK_OPDS.findIndex((opd, fallbackIndex) => {if (usedFallbackIndexes.has(fallbackIndex)) return false;return (createOPDIdentityKey(opd.namaOPD) === createOPDIdentityKey(officialName) ||createOPDIdentityKey(opd.namaPendek) === createOPDIdentityKey(officialName));});
+
+if (selectedIndex < 0) {
+  let bestScore = 0;
+
+  FALLBACK_OPDS.forEach((opd, fallbackIndex) => {
+    if (usedFallbackIndexes.has(fallbackIndex)) return;
+
+    const score = Math.max(
+      getOPDNameSimilarity(officialName, opd.namaOPD),
+      getOPDNameSimilarity(officialName, opd.namaPendek)
     );
 
-    try {
-      await postReviewAction(apiUrl, {
-        action: 'markNotificationRead',
-        notificationId: notification.NOTIFICATION_ID,
-      });
-    } catch (error) {
-      console.error('Gagal menandai notifikasi:', error);
+    if (score > bestScore) {
+      bestScore = score;
+      selectedIndex = fallbackIndex;
     }
-  };
+  });
+}
 
-  const startRevisionFromReview = (review: ReviewRecord) => {
-    onStartRevision({
-      uploadId: review.UPLOAD_ID,
-      reviewId: review.REVIEW_ID,
-      jenisDokumen: review.JENIS_DOKUMEN,
-      tahun: review.TAHUN,
-      catatan: review.CATATAN,
-      reviewFileUrl: review.REVIEW_FILE_URL,
-      reviewFileName: review.REVIEW_FILE_NAME,
+const source = selectedIndex >= 0 ? FALLBACK_OPDS[selectedIndex] : undefined;
+if (selectedIndex >= 0) usedFallbackIndexes.add(selectedIndex);
+
+const generatedShortName = officialName
+  .replace(/ PROVINSI NTT$/i, '')
+  .replace(/ SETDA$/i, '')
+  .trim();
+
+return {
+  ...(source || {}),
+  no: officialIndex + 1,
+  namaOPD: officialName,
+  namaPendek: source?.namaPendek ||
+    (generatedShortName.length > 35
+      ? `${generatedShortName.substring(0, 35)}...`
+      : generatedShortName),
+  jumlahUpload: 0,
+  status: 'BELUM',
+  originalRow: [
+    '',
+    officialName,
+    'BELUM',
+    'BELUM',
+    'BELUM',
+    'BELUM',
+    '',
+  ],
+};
+
+});})();
+
+const hasDocumentValue = (value: unknown): boolean => {const cleaned = String(value || '').trim();const upper = cleaned.toUpperCase();
+
+return (cleaned !== '' &&upper !== 'BELUM' &&upper !== 'TIDAK' &&upper !== 'FALSE' &&upper !== '0' &&upper !== '-');};
+
+const mergeDocumentFlags = (current: DocumentFlags,incoming: DocumentFlags): DocumentFlags => ({gap: current.gap || incoming.gap,gbs: current.gbs || incoming.gbs,kak: current.kak || incoming.kak,sk: current.sk || incoming.sk,});
+
+const hasAnyDocument = (flags: DocumentFlags): boolean =>flags.gap || flags.gbs || flags.kak || flags.sk;
+
+// Membaca status empat dokumen dari satu baris data dashboard.const getFlagsFromOPDData = (opd: OPDData): DocumentFlags => ({gap: hasDocumentValue(opd.originalRow?.[2]),gbs: hasDocumentValue(opd.originalRow?.[3]),kak: hasDocumentValue(opd.originalRow?.[4]),sk: hasDocumentValue(opd.originalRow?.[5]),});
+
+// Tanda tangan snapshot dipakai untuk memastikan hasil CSV yang menurun// benar-benar sama pada dua pembacaan berturut-turut sebelum diterapkan.const createDashboardSnapshotSignature = (opds: OPDData[]): string =>opds.map(opd => {const flags = getFlagsFromOPDData(opd);return [createOPDIdentityKey(opd.namaOPD),flags.gap ? '1' : '0',flags.gbs ? '1' : '0',flags.kak ? '1' : '0',flags.sk ? '1' : '0',].join(':');}).join('|');
+
+// Penurunan berarti ada dokumen yang sebelumnya SUDAH tetapi pada hasil baru// berubah menjadi BELUM. Penambahan data tetap diterapkan seketika.const isDashboardSnapshotRegression = (previousData: OPDData[],nextData: OPDData[]): boolean => {const nextByIdentity = new Map(nextData.map(opd => [createOPDIdentityKey(opd.namaOPD), getFlagsFromOPDData(opd)]));
+
+return previousData.some(previousOPD => {const previousFlags = getFlagsFromOPDData(previousOPD);const nextFlags = nextByIdentity.get(createOPDIdentityKey(previousOPD.namaOPD)) || { gap: false, gbs: false, kak: false, sk: false };
+
+return (
+  (previousFlags.gap && !nextFlags.gap) ||
+  (previousFlags.gbs && !nextFlags.gbs) ||
+  (previousFlags.kak && !nextFlags.kak) ||
+  (previousFlags.sk && !nextFlags.sk)
+);
+
+});};
+
+const HERO_TITLE ="Sistem Pengelolaan &\nMonitoring Dokumen\nAnalisis Gender";
+
+function HeroTypewriter() {const [displayText, setDisplayText] = useState("");
+
+useEffect(() => {let index = 0;let timer: number;
+
+const getTypingDelay = () =>
+  Math.floor(Math.random() * 55) + 85;
+
+const typeNextCharacter = () => {
+  index += 1;
+  setDisplayText(HERO_TITLE.slice(0, index));
+
+  if (index < HERO_TITLE.length) {
+    timer = window.setTimeout(
+      typeNextCharacter,
+      getTypingDelay()
+    );
+  }
+};
+
+setDisplayText("");
+timer = window.setTimeout(typeNextCharacter, 350);
+
+return () => window.clearTimeout(timer);
+
+}, []);
+
+const lines = displayText.split("\n");
+
+return (<><style>{        @keyframes naturalCaretBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+     }</style>
+
+  <h2
+    className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary leading-[1.1] tracking-tight"
+    aria-label="Sistem Pengelolaan dan Monitoring Dokumen Analisis Gender"
+  >
+  {lines.map((line, index) => (
+    <React.Fragment key={index}>
+      <span className={index === 1 ? "text-[#1E40AF]" : undefined}>
+        {line}
+      </span>
+
+      {index < lines.length - 1 && <br />}
+    </React.Fragment>
+  ))}
+
+    <span
+      aria-hidden="true"
+      className="ml-1 inline-block h-[0.88em] w-[2px] translate-y-[0.08em] bg-black"
+      style={{
+        animation: "naturalCaretBlink 1.06s steps(1, end) infinite",
+      }}
+    />
+  </h2>
+</>
+
+);}
+
+export default function App() {const [data, setData] = useState<OPDData[]>(OFFICIAL_OPDS);const [loading, setLoading] = useState<boolean>(true);const [isRefreshing, setIsRefreshing] = useState<boolean>(false);const [dataSource, setDataSource] = useState<'LIVE_SHEET' | 'FALLBACK_DEMO'>('FALLBACK_DEMO');const [lastUpdated, setLastUpdated] = useState<Date>(new Date());const [errorMsg, setErrorMsg] = useState<string | null>(null);const [showFAQ, setShowFAQ] = useState<boolean>(false);
+
+// User authentication and document upload statesconst [loggedInOPD, setLoggedInOPD] = useState<OPDData | null>(null);const [showLoginModal, setShowLoginModal] = useState<boolean>(false);const [showOperatorLogin, setShowOperatorLogin] = useState<boolean>(false);const [operatorSession, setOperatorSession] = useState<OperatorSession | null>(null);const [revisionTarget, setRevisionTarget] = useState<RevisionTarget | null>(null);const [showProfileModal, setShowProfileModal] = useState<boolean>(false);const [allResponseRows, setAllResponseRows] = useState<string[][]>([]);const [successPopup, setSuccessPopup] = useState<{ show: boolean } | null>(null);
+
+const [searchOPDQuery, setSearchOPDQuery] = useState<string>('');const [selectedOPDToLogin, setSelectedOPDToLogin] = useState<OPDData | null>(null);const [password, setPassword] = useState<string>('');const [loginError, setLoginError] = useState<string | null>(null);const [showOPDDropdown, setShowOPDDropdown] = useState<boolean>(false);
+
+const [selectedYear, setSelectedYear] = useState<string>('2025');const [dashboardYear, setDashboardYear] = useState<string>('2025');const [availableDashboardYears, setAvailableDashboardYears] = useState<string[]>(['2025', '2026', '2027']);const [sheetUploadedCount, setSheetUploadedCount] = useState<number>(0);const [uploadedFiles, setUploadedFiles] = useState<{file1: { name: string; size: string; fileObj: File | null } | null;file2: { name: string; size: string; fileObj: File | null } | null;file3: { name: string; size: string; fileObj: File | null } | null;file4: { name: string; size: string; fileObj: File | null } | null;}>({file1: null,file2: null,file3: null,file4: null,});
+
+const [uploadStatus, setUploadStatus] = useState<'IDLE' | 'UPLOADING' | 'SUCCESS'>('IDLE');const [uploadProgress, setUploadProgress] = useState<number>(0);
+
+/*
+
+Penanda upload sementara hanya disimpan di memori sesi aktif.
+
+Tidak memakai localStorage, sehingga data yang dihapus dari Spreadsheet
+
+tidak akan terus tampil sebagai SUDAH pada kunjungan berikutnya.*/const [pendingUploadedDocs, setPendingUploadedDocs] = useState<Record<string, Record<string, PendingUploadFlags>>
+
+({});
+
+/*
+
+Pengendali sinkronisasi dashboard:
+
+
+
+hanya satu pembacaan CSV berjalan pada satu waktu;
+
+
+
+permintaan lain digabung menjadi satu antrean;
+
+
+
+hasil untuk tahun lama tidak boleh menimpa tahun yang sedang dipilih;
+
+
+
+penurunan data harus muncul sama pada dua refresh berturut-turut.*/const fetchInFlightRef = useRef<boolean>(false);const refreshQueuedRef = useRef<boolean>(false);const queuedManualRefreshRef = useRef<boolean>(false);const dashboardYearRef = useRef<string>(dashboardYear);const hasLiveDataRef = useRef<boolean>(false);const lastAcceptedSnapshotRef = useRef<{year: string;signature: string;data: OPDData[];} | null>(null);const pendingRegressionRef = useRef<{year: string;signature: string;confirmations: number;} | null>(null);
+
+// Ref selalu mengikuti tahun terbaru, termasuk ketika request lama belum selesai.dashboardYearRef.current = dashboardYear;
+
+/*
+
+PENTING:
+
+URL ini harus mengarah ke tab FORM RESPONSES, bukan tab Dashboard.
+
+Ganti angka gid=26018163 dengan GID tab Form Responses Anda.*/const formResponsesCSVUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVpRDlbLQsH5ofDlimZX6eoyl1NgNjfUA-aDUbsN0Scjur7lWHeqwPwTZI41AVnefbPZwxq8OJLZEr/pub?gid=1054627461&single=true&output=csv";
+
+const getPendingFlags = (opdName: string,year: string): PendingUploadFlags | null => {const key = createOPDIdentityKey(opdName);const record = pendingUploadedDocs[key]?.[year];
+
+if (!record || record.expiresAt <= Date.now()) return null;
+return record;
+
+};
+
+// Flags dokumen OPD yang sedang login untuk tahun yang dipilih.// Data Spreadsheet digabung dengan penanda sementara selama CSV diperbarui.const currentOPDFlags = React.useMemo<DocumentFlags>(() => {const flags: DocumentFlags = {gap: false,gbs: false,kak: false,sk: false,};
+
+if (!loggedInOPD) return flags;
+
+const matchingRows = allResponseRows.filter(row => {
+  const rowYear = extractYear(row[6]);
+  if (rowYear !== selectedYear) return false;
+
+  const rowOPDName = String(row[1] || '').trim();
+  const rowIdentity = createOPDIdentityKey(rowOPDName);
+  const isExactIdentity =
+    rowIdentity === createOPDIdentityKey(loggedInOPD.namaOPD) ||
+    rowIdentity === createOPDIdentityKey(loggedInOPD.namaPendek);
+
+  if (isExactIdentity) return true;
+
+  const score = Math.max(
+    getOPDNameSimilarity(rowOPDName, loggedInOPD.namaOPD),
+    getOPDNameSimilarity(rowOPDName, loggedInOPD.namaPendek)
+  );
+
+  return score >= 0.60;
+});
+
+matchingRows.forEach(row => {
+  flags.gap = flags.gap || hasDocumentValue(row[2]);
+  flags.gbs = flags.gbs || hasDocumentValue(row[3]);
+  flags.kak = flags.kak || hasDocumentValue(row[4]);
+  flags.sk = flags.sk || hasDocumentValue(row[5]);
+});
+
+const pending = getPendingFlags(loggedInOPD.namaOPD, selectedYear);
+if (pending) {
+  flags.gap = flags.gap || pending.gap;
+  flags.gbs = flags.gbs || pending.gbs;
+  flags.kak = flags.kak || pending.kak;
+  flags.sk = flags.sk || pending.sk;
+}
+
+return flags;
+
+}, [loggedInOPD, selectedYear, allResponseRows, pendingUploadedDocs]);
+
+// Data tampilan menggabungkan data resmi Spreadsheet dengan penanda upload// sementara. Penanda ini otomatis hilang setelah Spreadsheet terkonfirmasi// atau setelah masa tunggu berakhir.const displayData = React.useMemo<OPDData[]>(() => {return data.map(opd => {const pending = getPendingFlags(opd.namaOPD, dashboardYear);if (!pending) return opd;
+
+  const hasGap = opd.originalRow?.[2] === 'SUDAH' || pending.gap;
+  const hasGbs = opd.originalRow?.[3] === 'SUDAH' || pending.gbs;
+  const hasKak = opd.originalRow?.[4] === 'SUDAH' || pending.kak;
+  const hasSk = opd.originalRow?.[5] === 'SUDAH' || pending.sk;
+  const jumlahUpload = [hasGap, hasGbs, hasKak, hasSk].filter(Boolean).length;
+
+  return {
+    ...opd,
+    jumlahUpload,
+    status: jumlahUpload > 0 ? 'SUDAH' : 'BELUM',
+    originalRow: [
+      opd.originalRow?.[0] || '',
+      opd.namaOPD,
+      hasGap ? 'SUDAH' : 'BELUM',
+      hasGbs ? 'SUDAH' : 'BELUM',
+      hasKak ? 'SUDAH' : 'BELUM',
+      hasSk ? 'SUDAH' : 'BELUM',
+      dashboardYear,
+    ],
+  };
+});
+
+}, [data, dashboardYear, pendingUploadedDocs]);
+
+const currentOPDData = React.useMemo<OPDData | null>(() => {if (!loggedInOPD) return null;
+
+const loginIdentity = createOPDIdentityKey(loggedInOPD.namaOPD);
+
+const exactMatch = displayData.find(opd =>
+  createOPDIdentityKey(opd.namaOPD) === loginIdentity
+);
+
+const match = exactMatch || displayData.find(opd => {
+  const score = Math.max(
+    getOPDNameSimilarity(opd.namaOPD, loggedInOPD.namaOPD),
+    getOPDNameSimilarity(opd.namaPendek, loggedInOPD.namaPendek)
+  );
+  return score >= 0.60;
+});
+
+return match
+  ? {
+      ...loggedInOPD,
+      jumlahUpload: match.jumlahUpload,
+      status: match.status,
+    }
+  : loggedInOPD;
+
+}, [loggedInOPD, displayData]);
+
+// Statistik memakai jumlah OPD unik langsung dari Form Responses.// Hanya 42 OPD resmi yang dihitung; data OPD lain diabaikan.const stats = React.useMemo<DashboardStats>(() => {const targetOPD = OFFICIAL_OPDS.length;const visibleUploadedCount = displayData.filter(opd => opd.jumlahUpload > 0).length;
+
+const sourceCount = dataSource === 'LIVE_SHEET'
+  ? Math.max(sheetUploadedCount, visibleUploadedCount)
+  : visibleUploadedCount;
+
+const sudahCount = Math.min(targetOPD, sourceCount);
+const belumCount = Math.max(0, targetOPD - sudahCount);
+const percentageSudah = targetOPD > 0
+  ? (sudahCount / targetOPD) * 100
+  : 0;
+
+return {
+  targetOPD,
+  sudahCount,
+  belumCount,
+  percentageSudah,
+};
+
+}, [displayData, dataSource, sheetUploadedCount]);
+
+/**
+
+Membaca CSV mentah dari tab Form Responses.
+
+Susunan kolom yang digunakan:
+
+A = Timestamp
+
+B = Nama OPD
+
+C = Dokumen GAP
+
+D = Dokumen GBS
+
+E = Dokumen KAK
+
+F = Dokumen SK Focal Point
+
+G = Tahun*/const fetchData = (isManual = false) => {// Jangan membuat beberapa request CSV berjalan bersamaan.// Permintaan yang datang saat proses masih berjalan cukup diantrikan sekali.if (fetchInFlightRef.current) {refreshQueuedRef.current = true;queuedManualRefreshRef.current =queuedManualRefreshRef.current || isManual;
+
+if (isManual) setIsRefreshing(true);return;}
+
+fetchInFlightRef.current = true;
+
+const requestedYear = dashboardYearRef.current;
+
+if (isManual) setIsRefreshing(true);
+else setLoading(true);
+
+setErrorMsg(null);
+
+const finishFetch = () => {
+  setLoading(false);
+  setIsRefreshing(false);
+  fetchInFlightRef.current = false;
+
+  if (refreshQueuedRef.current) {
+    const queuedAsManual = queuedManualRefreshRef.current;
+    refreshQueuedRef.current = false;
+    queuedManualRefreshRef.current = false;
+
+    window.setTimeout(() => {
+      fetchData(queuedAsManual);
+    }, 0);
+  }
+};
+
+const noCacheUrl = `${formResponsesCSVUrl}&t=${Date.now()}`;
+
+Papa.parse(noCacheUrl, {
+  download: true,
+  header: false,
+  skipEmptyLines: true,
+  complete: (results) => {
+    try {
+      const rows = results.data as string[][];
+
+      if (!Array.isArray(rows) || rows.length === 0) {
+        throw new Error('CSV Form Responses kosong atau tidak dapat dibaca.');
+      }
+
+      /*
+       * Header otomatis dilewati:
+       * - Kolom B harus memiliki nama OPD.
+       * - Kolom G harus berisi tahun empat digit.
+       */
+      const responseRows = rows.filter(row => {
+        const opdName = String(row?.[1] || '').trim();
+        const year = extractYear(row?.[6]);
+
+        // Hanya 42 OPD resmi yang diizinkan masuk ke dashboard.
+        // Nama OPD lain di Form Responses tetap berada di Sheet,
+        // tetapi tidak dihitung dan tidak ditampilkan di website.
+        return opdName !== '' && year !== '' && isDashboardOPD(opdName);
+      });
+
+      const rowsForSelectedYear = responseRows.filter(
+        row => extractYear(row[6]) === requestedYear
+      );
+
+      /*
+       * Gabungkan baris milik OPD yang sama menggunakan identitas nama
+       * yang konservatif. Versi sebelumnya membuang kata DINAS/BADAN/BIRO
+       * dan memakai skor 0,34, sehingga beberapa OPD berbeda dapat masuk
+       * ke satu OPD yang sama dan jumlah tahun 2026/2027 menjadi kurang.
+       */
+      const documentsByOPD = new Map<string, OPDDocumentGroup>();
+
+      rowsForSelectedYear.forEach(row => {
+        const rawName = String(row[1] || '').trim();
+        const identityKey = createOPDIdentityKey(rawName);
+
+        if (!rawName || !identityKey) return;
+
+        const incoming: DocumentFlags = {
+          gap: hasDocumentValue(row[2]),
+          gbs: hasDocumentValue(row[3]),
+          kak: hasDocumentValue(row[4]),
+          sk: hasDocumentValue(row[5]),
+        };
+
+        const existing = documentsByOPD.get(identityKey);
+
+        if (existing) {
+          const merged = mergeDocumentFlags(existing, incoming);
+          documentsByOPD.set(identityKey, {
+            ...merged,
+            namaOPD: existing.namaOPD,
+          });
+        } else {
+          documentsByOPD.set(identityKey, {
+            ...incoming,
+            namaOPD: rawName,
+          });
+        }
+      });
+
+      const uploadedGroups = Array.from(documentsByOPD.entries())
+        .filter(([, group]) => hasAnyDocument(group))
+        .map(([groupKey, group]) => ({ groupKey, group }));
+
+      const flagsByFallbackIndex = new Map<number, DocumentFlags>();
+      const assignedGroupKeys = new Set<string>();
+      const usedFallbackIndexes = new Set<number>();
+
+      const assignGroupToFallback = (
+        groupKey: string,
+        group: OPDDocumentGroup,
+        fallbackIndex: number
+      ) => {
+        const existing = flagsByFallbackIndex.get(fallbackIndex) || {
+          gap: false,
+          gbs: false,
+          kak: false,
+          sk: false,
+        };
+
+        flagsByFallbackIndex.set(
+          fallbackIndex,
+          mergeDocumentFlags(existing, group)
+        );
+        assignedGroupKeys.add(groupKey);
+        usedFallbackIndexes.add(fallbackIndex);
+      };
+
+      // Tahap 1: cocokkan nama yang identitasnya benar-benar sama.
+      uploadedGroups.forEach(({ groupKey, group }) => {
+        const sourceIdentity = createOPDIdentityKey(group.namaOPD);
+        const exactIndex = OFFICIAL_OPDS.findIndex((opd, index) => {
+          if (usedFallbackIndexes.has(index)) return false;
+          return (
+            createOPDIdentityKey(opd.namaOPD) === sourceIdentity ||
+            createOPDIdentityKey(opd.namaPendek) === sourceIdentity
+          );
+        });
+
+        if (exactIndex >= 0) {
+          assignGroupToFallback(groupKey, group, exactIndex);
+        }
+      });
+
+      // Tahap 2: untuk variasi penulisan, lakukan pencocokan satu-lawan-satu.
+      // Satu OPD resmi hanya boleh dipakai oleh satu identitas Form Responses.
+      const fuzzyCandidates: Array<{
+        groupKey: string;
+        group: OPDDocumentGroup;
+        fallbackIndex: number;
+        score: number;
+      }> = [];
+
+      uploadedGroups.forEach(({ groupKey, group }) => {
+        if (assignedGroupKeys.has(groupKey)) return;
+
+        OFFICIAL_OPDS.forEach((opd, fallbackIndex) => {
+          if (usedFallbackIndexes.has(fallbackIndex)) return;
+
+          const score = Math.max(
+            getOPDNameSimilarity(group.namaOPD, opd.namaOPD),
+            getOPDNameSimilarity(group.namaOPD, opd.namaPendek)
+          );
+
+          fuzzyCandidates.push({
+            groupKey,
+            group,
+            fallbackIndex,
+            score,
+          });
+        });
+      });
+
+      fuzzyCandidates
+        .sort((left, right) => right.score - left.score)
+        .forEach(candidate => {
+          if (candidate.score < 0.45) return;
+          if (assignedGroupKeys.has(candidate.groupKey)) return;
+          if (usedFallbackIndexes.has(candidate.fallbackIndex)) return;
+
+          assignGroupToFallback(
+            candidate.groupKey,
+            candidate.group,
+            candidate.fallbackIndex
+          );
+        });
+
+      const unmatchedUploadedGroups = uploadedGroups
+        .filter(({ groupKey }) => !assignedGroupKeys.has(groupKey))
+        .map(({ group }) => group);
+
+      /*
+       * Angka kartu dashboard berasal langsung dari jumlah OPD unik yang
+       * memiliki minimal satu dokumen pada Form Responses tahun terpilih.
+       * Hanya OPD dalam daftar resmi yang dihitung, sehingga data lain di
+       * Form Responses tidak dapat menambah jumlah dashboard di atas 42.
+       */
+      const authoritativeUploadedCount = Math.min(
+        OFFICIAL_OPDS.length,
+        uploadedGroups.length
+      );
+
+      const parsedOPDs: OPDData[] = OFFICIAL_OPDS.map((opd, index) => {
+        const flags = flagsByFallbackIndex.get(index) || {
+          gap: false,
+          gbs: false,
+          kak: false,
+          sk: false,
+        };
+
+        const jumlahUpload = [
+          flags.gap,
+          flags.gbs,
+          flags.kak,
+          flags.sk
+        ].filter(Boolean).length;
+
+        return {
+          ...opd,
+          no: index + 1,
+          jumlahUpload,
+          status: jumlahUpload > 0 ? 'SUDAH' : 'BELUM',
+          originalRow: [
+            '',
+            opd.namaOPD,
+            flags.gap ? 'SUDAH' : 'BELUM',
+            flags.gbs ? 'SUDAH' : 'BELUM',
+            flags.kak ? 'SUDAH' : 'BELUM',
+            flags.sk ? 'SUDAH' : 'BELUM',
+            requestedYear,
+          ],
+        };
+      });
+
+      /*
+       * Jangan menambahkan baris OPD tambahan. Dashboard dan daftar OPD
+       * dibatasi hanya pada 42 OPD resmi di atas.
+       */
+
+      console.info('Diagnostik dashboard Form Responses', {
+        tahun: requestedYear,
+        jumlahBarisTahun: rowsForSelectedYear.length,
+        jumlahOPDResmiFormResponses: uploadedGroups.length,
+        jumlahCocokDaftar: flagsByFallbackIndex.size,
+        namaResmiBelumCocok: unmatchedUploadedGroups.map(item => item.namaOPD),
+        catatan: 'OPD di luar daftar resmi 42 tidak dihitung dan tidak ditampilkan.',
+      });
+
+      // Request untuk tahun lama tidak boleh menimpa tahun yang baru dipilih.
+      if (requestedYear !== dashboardYearRef.current) {
+        console.info('Hasil CSV diabaikan karena tahun dashboard sudah berubah.', {
+          tahunRequest: requestedYear,
+          tahunAktif: dashboardYearRef.current,
+        });
+        return;
+      }
+
+      const snapshotSignature = createDashboardSnapshotSignature(parsedOPDs);
+      const previousSnapshot = lastAcceptedSnapshotRef.current;
+      const isRegression = Boolean(
+        previousSnapshot &&
+        previousSnapshot.year === requestedYear &&
+        isDashboardSnapshotRegression(previousSnapshot.data, parsedOPDs)
+      );
+
+      let shouldAcceptSnapshot = true;
+
+      if (isRegression) {
+        const previousCandidate = pendingRegressionRef.current;
+        const confirmations =
+          previousCandidate?.year === requestedYear &&
+          previousCandidate.signature === snapshotSignature
+            ? previousCandidate.confirmations + 1
+            : 1;
+
+        pendingRegressionRef.current = {
+          year: requestedYear,
+          signature: snapshotSignature,
+          confirmations,
+        };
+
+        // Satu hasil yang menurun dapat berasal dari cache lama Google.
+        // Terapkan penurunan hanya setelah hasil yang sama terbaca dua kali.
+        shouldAcceptSnapshot = confirmations >= 2;
+      } else {
+        pendingRegressionRef.current = null;
+      }
+
+      if (!shouldAcceptSnapshot) {
+        console.warn('Penurunan sementara diabaikan sampai terkonfirmasi dua kali.', {
+          tahun: requestedYear,
+          jumlahSebelumnya: previousSnapshot?.data.filter(
+            opd => opd.jumlahUpload > 0
+          ).length,
+          jumlahHasilBaru: parsedOPDs.filter(
+            opd => opd.jumlahUpload > 0
+          ).length,
+        });
+        return;
+      }
+
+      pendingRegressionRef.current = null;
+      lastAcceptedSnapshotRef.current = {
+        year: requestedYear,
+        signature: snapshotSignature,
+        data: parsedOPDs,
+      };
+      hasLiveDataRef.current = true;
+
+      setAllResponseRows(responseRows);
+
+      const yearsFromSheet = Array.from(
+        new Set(responseRows.map(row => extractYear(row[6])).filter(Boolean))
+      ).sort((a, b) => Number(a) - Number(b));
+
+      setAvailableDashboardYears(prev =>
+        Array.from(
+          new Set([...prev, ...yearsFromSheet, '2025', '2026', '2027'])
+        ).sort((a, b) => Number(a) - Number(b))
+      );
+
+      // Hapus penanda sementara hanya berdasarkan snapshot yang diterima.
+      setPendingUploadedDocs(previous => {
+        const now = Date.now();
+        const next: Record<string, Record<string, PendingUploadFlags>> = {};
+
+        Object.entries(previous).forEach(([opdKey, recordsByYear]) => {
+          Object.entries(recordsByYear).forEach(([year, pending]) => {
+            if (pending.expiresAt <= now) return;
+
+            const confirmed: DocumentFlags = {
+              gap: false,
+              gbs: false,
+              kak: false,
+              sk: false,
+            };
+
+            responseRows.forEach(row => {
+              if (extractYear(row[6]) !== year) return;
+
+              const rowName = String(row[1] || '').trim();
+              const isExactIdentity =
+                createOPDIdentityKey(rowName) === opdKey;
+
+              if (!isExactIdentity) {
+                const score = getOPDNameSimilarity(rowName, opdKey);
+                if (score < 0.60) return;
+              }
+
+              confirmed.gap = confirmed.gap || hasDocumentValue(row[2]);
+              confirmed.gbs = confirmed.gbs || hasDocumentValue(row[3]);
+              confirmed.kak = confirmed.kak || hasDocumentValue(row[4]);
+              confirmed.sk = confirmed.sk || hasDocumentValue(row[5]);
+            });
+
+            const remaining: PendingUploadFlags = {
+              gap: pending.gap && !confirmed.gap,
+              gbs: pending.gbs && !confirmed.gbs,
+              kak: pending.kak && !confirmed.kak,
+              sk: pending.sk && !confirmed.sk,
+              expiresAt: pending.expiresAt,
+            };
+
+            if (hasAnyDocument(remaining)) {
+              next[opdKey] = {
+                ...(next[opdKey] || {}),
+                [year]: remaining,
+              };
+            }
+          });
+        });
+
+        return next;
+      });
+
+      setSheetUploadedCount(authoritativeUploadedCount);
+      setData(parsedOPDs);
+      setDataSource('LIVE_SHEET');
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Gagal memproses CSV Form Responses:', error);
+
+      const message = error instanceof Error
+        ? error.message
+        : 'Format CSV Form Responses tidak sesuai.';
+
+      if (hasLiveDataRef.current) {
+        // Kesalahan sesaat tidak boleh menghapus data live yang sudah valid.
+        setErrorMsg(`${message} Data terakhir yang valid tetap ditampilkan.`);
+      } else {
+        setErrorMsg(message);
+        setData(OFFICIAL_OPDS);
+        setSheetUploadedCount(
+          OFFICIAL_OPDS.filter(item => item.status === 'SUDAH').length
+        );
+        setDataSource('FALLBACK_DEMO');
+      }
+    } finally {
+      finishFetch();
+    }
+  },
+  error: (error) => {
+    console.error('Gagal mengambil CSV Form Responses:', error);
+
+    if (hasLiveDataRef.current) {
+      setErrorMsg(
+        'Koneksi ke Form Responses sempat gagal. Data terakhir yang valid tetap ditampilkan.'
+      );
+    } else {
+      setErrorMsg(
+        'Gagal terhubung ke CSV Form Responses. Pastikan tab sudah dipublikasikan dan URL/GID benar.'
+      );
+      setData(OFFICIAL_OPDS);
+      setSheetUploadedCount(
+        OFFICIAL_OPDS.filter(item => item.status === 'SUDAH').length
+      );
+      setDataSource('FALLBACK_DEMO');
+    }
+
+    finishFetch();
+  }
+});
+
+};
+
+// Login OPD sekarang menggunakan akun yang tersimpan di TiDB.const handleLoginSubmit = async (e: React.FormEvent) => {e.preventDefault();
+
+if (!selectedOPDToLogin) {
+  setLoginError("Silakan pilih instansi/OPD terlebih dahulu.");
+  return;
+}
+
+if (!password.trim()) {
+  setLoginError("Kata sandi wajib diisi.");
+  return;
+}
+
+setLoginError(null);
+
+try {
+  const response = await fetch(
+    '/api/opd-auth',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify({
+        action: 'loginOPD',
+        opdName: selectedOPDToLogin.namaOPD,
+        password,
+      }),
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || !result?.success) {
+    throw new Error(
+      result?.message || 'Login OPD gagal.'
+    );
+  }
+
+  setLoggedInOPD(selectedOPDToLogin);
+  setLoginError(null);
+  setPassword('');
+  setShowLoginModal(false);
+} catch (error) {
+  setLoginError(
+    error instanceof Error
+      ? error.message
+      : 'Login OPD gagal. Silakan coba lagi.'
+  );
+}
+
+};
+
+const handleLogout = () => {setLoggedInOPD(null);setRevisionTarget(null);setShowProfileModal(false);setUploadedFiles({file1: null,file2: null,file3: null,file4: null,});};
+
+const handleLocalFileChange = (slot: 'file1' | 'file2' | 'file3' | 'file4', file: File | null) => {if (!file) return;const sizeInMB = (file.size / (1024 * 1024)).toFixed(1);setUploadedFiles(prev => ({...prev,[slot]: {name: file.name,size: ${sizeInMB} MB,fileObj: file}}));};
+
+const fileToBase64 = (file: File): Promise<string> => {return new Promise((resolve, reject) => {const reader = new FileReader();reader.readAsDataURL(file);reader.onload = () => {const result = reader.result as string;// Hapus prefix "data/type;base64,"const base64Data = result.split(',')[1];resolve(base64Data);};reader.onerror = error => reject(error);});};
+
+const triggerUploadSimulation = async (budget: BudgetInput) => {const fileKeys: (keyof typeof uploadedFiles)[] = ['file1','file2','file3','file4'];
+
+const titles = [
+  'DOKUMEN GAP',
+  'DOKUMEN GBS',
+  'DOKUMEN KAK',
+  'DOKUMEN SK FOCAL POINT'
+];
+
+let activeFiles = fileKeys
+  .map((key, index) => ({
+    key,
+    fileData: uploadedFiles[key],
+    title: titles[index]
+  }))
+  .filter(item => item.fileData !== null);
+
+if (revisionTarget) {
+  const normalizedTarget = revisionTarget.jenisDokumen.trim().toUpperCase();
+  activeFiles = activeFiles.filter(item =>
+    item.title.replace('DOKUMEN ', '').trim().toUpperCase() === normalizedTarget
+  );
+}
+
+const fileCount = activeFiles.length;
+
+if (!loggedInOPD) {
+  alert('Sesi login OPD tidak ditemukan. Silakan login kembali.');
+  return;
+}
+
+if (fileCount === 0) {
+  alert('Silakan pilih minimal satu berkas untuk diunggah.');
+  return;
+}
+
+if (!GOOGLE_APPS_SCRIPT_WEB_APP_URL.trim()) {
+  alert('URL Web App Google Apps Script belum diatur.');
+  return;
+}
+
+if (!budget || !Number(budget.paguAnggaran) || !budget.tanggalPagu) {
+  alert('Pagu Anggaran Responsif Gender dan tanggal pagu wajib diisi sebelum upload.');
+  return;
+}
+
+if (Number(budget.realisasiAnggaran || 0) > 0 && !budget.tanggalRealisasi) {
+  alert('Tanggal realisasi wajib diisi jika realisasi anggaran sudah diisi.');
+  return;
+}
+
+const maxFileSize = 10 * 1024 * 1024;
+const oversizedFile = activeFiles.find(item => {
+  const fileObj = item.fileData?.fileObj;
+  return Boolean(fileObj && fileObj.size > maxFileSize);
+});
+
+if (oversizedFile?.fileData?.fileObj) {
+  alert(
+    `Ukuran file "${oversizedFile.fileData.fileObj.name}" melebihi batas maksimal 10 MB.`
+  );
+  return;
+}
+
+setUploadStatus('UPLOADING');
+setUploadProgress(5);
+
+try {
+  /*
+   * File dikirim satu per satu agar ukuran request Base64
+   * tidak terlalu besar untuk Google Apps Script.
+   */
+  for (let index = 0; index < activeFiles.length; index++) {
+    const activeFile = activeFiles[index];
+    const fileObj = activeFile.fileData?.fileObj;
+
+    if (!fileObj) {
+      throw new Error(`Berkas ${activeFile.title} tidak dapat dibaca.`);
+    }
+
+    setUploadProgress(
+      Math.max(5, Math.round((index / fileCount) * 100))
+    );
+
+    const base64Data = await fileToBase64(fileObj);
+
+    const payload = {
+      ...(revisionTarget
+        ? {
+            action: 'uploadRevision',
+            parentUploadId: revisionTarget.uploadId,
+          }
+        : { action: 'uploadOriginal' }),
+      opdName: loggedInOPD.namaOPD,
+      tahun: selectedYear,
+      paguAnggaran: Number(budget.paguAnggaran),
+      tanggalPagu: budget.tanggalPagu,
+      realisasiAnggaran: Number(budget.realisasiAnggaran || 0),
+      tanggalRealisasi: budget.tanggalRealisasi || '',
+      files: [
+        {
+          title: activeFile.title,
+          filename: fileObj.name,
+          mimeType: fileObj.type || 'application/octet-stream',
+          data: base64Data
+        }
+      ]
+    };
+
+    await fetch(GOOGLE_APPS_SCRIPT_WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
     });
 
-    document.getElementById('opd-upload-form')?.scrollIntoView({ behavior: 'smooth' });
-  };
+    setUploadProgress(
+      Math.round(((index + 1) / fileCount) * 100)
+    );
+  }
 
-  const matchingRevisionSlot = revisionTarget
-    ? slots.find(slot => slot.documentName === revisionTarget.jenisDokumen.toUpperCase())?.key || null
-    : null;
+  setUploadProgress(100);
+  setUploadStatus('SUCCESS');
+  updateLocalStateOnSuccess(fileCount);
+  if (revisionTarget) {
+    setRevisionTarget(null);
+  }
+  setSuccessPopup({ show: true });
+} catch (error: unknown) {
+  console.error('Upload error:', error);
 
-  return (
-    <main className="min-h-screen bg-slate-100 text-slate-800">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-slate-950 text-white shadow-lg">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-300">
-              <User className="h-5 w-5" />
+  const message = error instanceof Error
+    ? error.message
+    : 'Terjadi kesalahan yang tidak diketahui.';
+
+  alert(`Terjadi kesalahan saat mengunggah dokumen:\n${message}`);
+  setUploadStatus('IDLE');
+  setUploadProgress(0);
+}
+
+};
+
+const updateLocalStateOnSuccess = (fileCount: number) => {if (loggedInOPD) {const opdName = loggedInOPD.namaOPD;const opdKey = createOPDIdentityKey(opdName);const year = selectedYear;const expiresAt = Date.now() + 60000;
+
+  setPendingUploadedDocs(previous => {
+    const previousYear = previous[opdKey]?.[year] || {
+      gap: false,
+      gbs: false,
+      kak: false,
+      sk: false,
+      expiresAt,
+    };
+
+    return {
+      ...previous,
+      [opdKey]: {
+        ...(previous[opdKey] || {}),
+        [year]: {
+          gap: previousYear.gap || Boolean(uploadedFiles.file1),
+          gbs: previousYear.gbs || Boolean(uploadedFiles.file2),
+          kak: previousYear.kak || Boolean(uploadedFiles.file3),
+          sk: previousYear.sk || Boolean(uploadedFiles.file4),
+          expiresAt,
+        },
+      },
+    };
+  });
+
+  if (selectedYear === dashboardYear) {
+    setData(previousData => {
+      return previousData.map(opd => {
+        const isExactIdentity =
+          createOPDIdentityKey(opd.namaOPD) === createOPDIdentityKey(opdName);
+
+        if (!isExactIdentity) {
+          const score = Math.max(
+            getOPDNameSimilarity(opd.namaOPD, opdName),
+            getOPDNameSimilarity(opd.namaPendek, loggedInOPD.namaPendek)
+          );
+
+          if (score < 0.60) return opd;
+        }
+
+        const newUploadCount = Math.min(4, opd.jumlahUpload + fileCount);
+        return {
+          ...opd,
+          jumlahUpload: newUploadCount,
+          status: newUploadCount > 0 ? 'SUDAH' : 'BELUM',
+        };
+      });
+    });
+  }
+
+  setLoggedInOPD(previous => previous ? {
+    ...previous,
+    jumlahUpload: Math.min(4, previous.jumlahUpload + fileCount),
+    status: 'SUDAH',
+  } : null);
+}
+
+window.setTimeout(() => {
+  setUploadedFiles({
+    file1: null,
+    file2: null,
+    file3: null,
+    file4: null,
+  });
+  setUploadStatus('IDLE');
+  setUploadProgress(0);
+}, 1000);
+
+// Google Sheets Published CSV dapat terlambat beberapa detik.
+[1500, 4000, 8000, 12000].forEach(delay => {
+  window.setTimeout(() => fetchData(true), delay);
+});
+
+};
+
+// Muat ulang dashboard ketika pilihan tahun berubah.useEffect(() => {fetchData();
+
+const interval = window.setInterval(() => {
+  fetchData();
+}, 10000);
+
+return () => window.clearInterval(interval);
+
+}, [dashboardYear]);
+
+// Notifikasi sukses ringkas dan otomatis tertutup.useEffect(() => {if (!successPopup?.show) return;
+
+const timeout = window.setTimeout(() => {
+  setSuccessPopup(null);
+}, 3500);
+
+return () => window.clearTimeout(timeout);
+
+}, [successPopup]);
+
+return (<div className="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen flex flex-col relative antialiased selection:bg-secondary/15 selection:text-secondary">{/* Background Grid Accent */}<div className="fixed inset-0 pointer-events-none z-[-1] mask-gradient"><div className="absolute inset-0 bg-grid-pattern opacity-[0.25]"></div></div>
+
+  {/* Decorative Orbs */}
+  <div className="absolute top-0 right-0 -translate-y-24 translate-x-1/4 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div className="absolute top-1/2 left-0 -translate-x-1/4 w-[400px] h-[400px] bg-indigo-100/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <AnimatePresence mode="wait">
+    {operatorSession ? (
+      <motion.div
+        key="operator-dashboard"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -12 }}
+        transition={{ duration: 0.3 }}
+        className="flex-grow"
+      >
+        <OperatorDashboard
+          apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
+          session={operatorSession}
+          onLogout={() => setOperatorSession(null)}
+        />
+      </motion.div>
+    ) : showOperatorLogin ? (
+      <motion.div
+        key="operator-login"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3 }}
+        className="flex-grow"
+      >
+        <OperatorLogin
+          apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
+          onAuthenticated={(session) => {
+            setOperatorSession(session);
+            setShowOperatorLogin(false);
+          }}
+          onCancel={() => setShowOperatorLogin(false)}
+        />
+      </motion.div>
+    ) : showLoginModal ? (
+      <motion.div
+        key="login-page"
+        initial={{ x: 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -20, opacity: 0 }}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
+        className="flex-grow flex flex-col"
+      >
+        <OPDLoginScreen
+          apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
+          data={displayData}
+          searchOPDQuery={searchOPDQuery}
+          setSearchOPDQuery={setSearchOPDQuery}
+          showOPDDropdown={showOPDDropdown}
+          setShowOPDDropdown={setShowOPDDropdown}
+          selectedOPDToLogin={selectedOPDToLogin}
+          setSelectedOPDToLogin={setSelectedOPDToLogin}
+          password={password}
+          setPassword={setPassword}
+          loginError={loginError}
+          setLoginError={setLoginError}
+          handleLoginSubmit={handleLoginSubmit}
+          onCancel={() => setShowLoginModal(false)}
+        />
+      </motion.div>
+    ) : loggedInOPD ? (
+      <motion.div
+        key="dashboard-page"
+        initial={{ y: 15, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -15, opacity: 0 }}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
+        className="flex-grow flex flex-col"
+      >
+        <OPDDashboard
+          loggedInOPD={currentOPDData || loggedInOPD}
+          handleLogout={handleLogout}
+          selectedYear={selectedYear}
+          setSelectedYear={(value) => {
+            setSelectedYear(value);
+            setDashboardYear(value);
+          }}
+          uploadedFiles={uploadedFiles}
+          setUploadedFiles={setUploadedFiles}
+          uploadStatus={uploadStatus}
+          uploadProgress={uploadProgress}
+          uploadedSuccessKeys={
+            [
+              currentOPDFlags.gap ? 'file1' : '',
+              currentOPDFlags.gbs ? 'file2' : '',
+              currentOPDFlags.kak ? 'file3' : '',
+              currentOPDFlags.sk ? 'file4' : '',
+            ].filter(Boolean)
+          }
+          handleLocalFileChange={handleLocalFileChange}
+          triggerUploadSimulation={triggerUploadSimulation}
+          apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
+          revisionTarget={revisionTarget}
+          onStartRevision={(target) => {
+            setRevisionTarget(target);
+            setSelectedYear(target.tahun);
+            setDashboardYear(target.tahun);
+            setUploadedFiles({ file1: null, file2: null, file3: null, file4: null });
+          }}
+          onCancelRevision={() => {
+            setRevisionTarget(null);
+            setUploadedFiles({ file1: null, file2: null, file3: null, file4: null });
+          }}
+        />
+      </motion.div>
+    ) : (
+      <motion.div
+        key="home-page"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex-grow flex flex-col"
+      >
+        {/* NAVIGATION BAR */}
+        <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 sm:py-6 transition-all duration-300">
+    <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-md border border-slate-200/60 shadow-sm rounded-2xl px-6 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" 
+          alt="Logo Provinsi NTT" 
+          className="h-10 w-auto hover:scale-105 transition-transform duration-300"
+          referrerPolicy="no-referrer"
+        />
+        <div className="border-l-2 border-slate-200 h-8"></div>
+        <div>
+          <h1 className="font-bold text-primary tracking-tight leading-none text-lg">SIPMODAG</h1>
+          <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-1">DP3AP2KB PROVINSI NTT</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => {
+            const el = document.getElementById('dashboard');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors cursor-pointer"
+        >
+          Lihat Dashboard
+        </button>
+        <button
+          onClick={() => setShowFAQ(true)}
+          className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors flex items-center gap-1 cursor-pointer"
+        >
+          <HelpCircle className="w-4 h-4" />
+          <span>Panduan</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setShowLoginModal(false);
+            setShowOperatorLogin(true);
+          }}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-100 px-3 py-2.5 text-xs font-semibold text-rose-700 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-200 hover:text-rose-800 sm:px-4"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          <span className="hidden sm:inline">LOGIN OPERATOR</span>
+          <span className="sm:hidden">OPERATOR</span>
+        </button>
+        
+        {loggedInOPD ? (
+          <button
+            onClick={() => setShowProfileModal(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md flex items-center gap-1.5 cursor-pointer"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>{loggedInOPD.namaPendek}</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              setSelectedOPDToLogin(null);
+              setSearchOPDQuery('');
+              setPassword('');
+              setLoginError(null);
+              setShowLoginModal(true);
+            }}
+            className="bg-[#0F172A] hover:bg-slate-800 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
+          >
+            LOGIN OPD
+          </button>
+        )}
+      </div>
+    </div>
+  </nav>
+
+  {/* HERO SECTION */}
+  <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
+    {/* Background dibuat sama seperti halaman login */}
+    <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
+    <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
+    <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
+    
+    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      
+      <div className="space-y-8 relative z-10">
+        <HeroTypewriter />
+        
+        <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+          Digitalisasi pengumpulan dokumen analisis gender pada Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 pt-2">
+          {loggedInOPD ? (
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+            >
+              <User className="w-5 h-5" />
+              <span>Profil & Upload ({loggedInOPD.namaPendek})</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setSelectedOPDToLogin(null);
+                setSearchOPDQuery('');
+                setPassword('');
+                setLoginError(null);
+                setShowLoginModal(true);
+              }}
+              className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+            >
+              LOGIN OPD
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </button>
+          )}
+        </div>
+
+      </div>
+
+      {/* Visual Side Graphics (Matched Exactly to screenshot!) */}
+      <div className="relative hidden lg:block z-10 h-[500px] w-full">
+        {/* Radial Glow Background */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/40 to-indigo-50/40 rounded-full scale-90 blur-2xl"></div>
+        
+        {/* Back Card (Yellow Icon on the left) */}
+        <div className="absolute left-[10%] top-[10%] w-[270px] h-[330px] bg-white rounded-2xl shadow-lg border border-slate-100 transform -rotate-[5deg] flex flex-col p-6 z-10">
+          <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
+            <svg className="w-5.5 h-5.5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </div>
+          <div className="h-3 w-1/3 bg-slate-100 rounded-full mb-3.5"></div>
+          <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
+          <div className="h-3 w-5/6 bg-slate-100 rounded-full"></div>
+        </div>
+
+        {/* Front Card (Blue Icon on the right) */}
+        <div className="absolute left-[34%] top-[15%] w-[270px] h-[330px] bg-white rounded-2xl shadow-2xl border border-slate-100/80 transform rotate-[3deg] flex flex-col p-6 z-20">
+          <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
+            <svg className="w-5.5 h-5.5 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div className="h-3 w-2/3 bg-slate-100 rounded-full mb-3.5"></div>
+          <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
+          <div className="h-3 w-11/12 bg-slate-100 rounded-full mb-2.5"></div>
+          <div className="h-3 w-4/5 bg-slate-100 rounded-full mb-2.5"></div>
+          
+          <div className="mt-auto h-12 w-full bg-slate-50/50 rounded-xl border border-slate-200/80 border-dashed"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  {/* QUICK VALUE PROPOSITIONS */}
+  <section className="relative z-10 border-y border-slate-200/70 bg-white py-10 sm:py-12">
+    <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-slate-200 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <TrendingUp className="h-6 w-6" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+            Mendorong Partisipasi
+          </h3>
+          <p className="text-sm leading-6 text-slate-500">
+            Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+          <CheckCircle className="h-6 w-6" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+            Data Real-Time & Valid
+          </h3>
+          <p className="text-sm leading-6 text-slate-500">
+            Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+          <Clock className="h-6 w-6" />
+        </div>
+        <div className="min-w-0">
+          <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+            Efisiensi Administrasi
+          </h3>
+          <p className="text-sm leading-6 text-slate-500">
+            Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* FAQ / GUIDELINES SIDE PANEL */}
+  <AnimatePresence>
+    {showFAQ && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-primary/20 backdrop-blur-xs z-50 flex justify-end"
+        onClick={() => setShowFAQ(false)}
+      >
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="bg-white w-full max-w-lg h-full p-8 shadow-2xl overflow-y-auto flex flex-col justify-between"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <h3 className="font-extrabold text-primary text-xl flex items-center gap-2">
+                <HelpCircle className="w-5.5 h-5.5 text-secondary" />
+                Panduan & Informasi
+              </h3>
+              <button 
+                onClick={() => setShowFAQ(false)}
+                className="text-slate-400 hover:text-slate-700 text-sm font-bold bg-slate-100 px-3 py-1.5 rounded-lg"
+              >
+                Tutup
+              </button>
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-black sm:text-base">{loggedInOPD.namaPendek}</p>
-              <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Dashboard OPD</p>
+
+            <div className="space-y-5 text-sm">
+              <div className="bg-secondary/5 p-4 rounded-xl border border-secondary/15">
+                <h4 className="font-bold text-secondary mb-1">Apa itu Analisis Gender?</h4>
+                <p className="text-slate-600 leading-relaxed text-xs">
+                  Proses menganalisis data dan informasi untuk mengidentifikasi kesenjangan gender, kebutuhan, serta aspirasi laki-laki dan perempuan dalam pembangunan daerah.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-bold text-primary">Dokumen yang Wajib Dikumpulkan:</h4>
+                
+                <div className="flex gap-3 items-start">
+                  <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                  <div>
+                    <p className="font-semibold text-slate-800 text-xs">Gender Analysis Pathway (GAP)</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Langkah sistematis analisis gender untuk merumuskan kebijakan yang responsif gender.</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 items-start">
+                  <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                  <div>
+                    <p className="font-semibold text-slate-800 text-xs">Gender Budget Statement (GBS)</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Dokumen anggaran yang menerangkan alokasi dana khusus untuk mengatasi kesenjangan gender.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 pt-4 space-y-3">
+                <h4 className="font-bold text-primary">Langkah Pengunggahan:</h4>
+                <ol className="list-decimal list-inside text-xs text-slate-600 space-y-2">
+                  <li>Persiapkan berkas Surat Keputusan (SK) atau berkas analisis gender OPD Anda.</li>
+                  <li>Klik tombol <strong>LOGIN OPD</strong>.</li>
+                  <li>Pilih nama instansi/OPD Anda dan masukkan kata sandi Anda.</li>
+                  <li>Pilih tahun anggaran (2025 / 2026 / 2027) lalu unggah 4 berkas SK yang diminta.</li>
+                </ol>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="border-t border-slate-100 pt-6 mt-8 space-y-3">
             <button
-              type="button"
-              onClick={() => setShowNotifications(true)}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 transition hover:bg-white/10"
-              aria-label="Buka notifikasi review"
+              onClick={() => {
+                setShowFAQ(false);
+                const el = document.getElementById('dashboard');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
             >
-              <Bell className="h-4.5 w-4.5" />
-              {unreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white ring-2 ring-slate-950">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
+              <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Lihat Dashboard Monitoring
             </button>
+
+            {loggedInOPD ? (
+              <button
+                onClick={() => {
+                  setShowFAQ(false);
+                  setShowProfileModal(true);
+                }}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
+              >
+                <User className="w-4 h-4" />
+                Profil & Upload ({loggedInOPD.namaPendek})
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowFAQ(false);
+                  setSelectedOPDToLogin(null);
+                  setSearchOPDQuery('');
+                  setPassword('');
+                  setLoginError(null);
+                  setShowLoginModal(true);
+                }}
+                className="w-full bg-[#1E40AF] hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
+              >
+                <Lock className="w-4 h-4" />
+                Login & Isi Dokumen
+              </button>
+            )}
+            <p className="text-[10px] text-slate-400 text-center mt-2 font-medium">DP3AP2KB Nusa Tenggara Timur &copy; 2026</p>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+
+
+
+  {/* MONITORING DASHBOARD WORKSPACE */}
+  <section id="dashboard" className="py-16 bg-slate-50 relative z-10 border-t border-slate-200">
+    <div className="max-w-7xl mx-auto px-4 space-y-12">
+      
+      {/* Dashboard Header */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div>
+          <span className="text-secondary font-extrabold tracking-wider text-xs uppercase flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+            Sistem Monitoring Progress
+          </span>
+          <h2 className="text-3xl font-black text-primary mt-2">Dashboard Progres OPD Tahun {dashboardYear}</h2>
+          <p className="text-slate-500 text-sm mt-1 max-w-xl">
+            Memantau progres pengunggahan dokumen analisis gender seluruh OPD berdasarkan tahun yang dipilih.
+          </p>
+        </div>
+
+        {/* Kontrol Dashboard: Dropdown Tahun, Waktu Update, dan Segarkan */}
+        <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
+          <label
+            htmlFor="dashboard-year-select"
+            className="block text-[10px] font-extrabold text-blue-700 uppercase tracking-wider mb-2"
+          >
+            Pilih Tahun Dashboard
+          </label>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative w-full sm:w-48">
+              <select
+                id="dashboard-year-select"
+                value={dashboardYear}
+                onChange={(e) => setDashboardYear(e.target.value)}
+                className="w-full appearance-none bg-blue-50 border-2 border-blue-300 text-blue-900 text-sm font-extrabold py-3 pl-4 pr-10 rounded-xl hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-all"
+                aria-label="Pilih tahun dashboard"
+              >
+                {availableDashboardYears.map(year => (
+                  <option key={year} value={year}>
+                    Tahun {year}
+                  </option>
+                ))}
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90 text-blue-600 pointer-events-none" />
+            </div>
+
+            <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50 px-3 py-2.5 rounded-xl border border-slate-200 whitespace-nowrap">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              Update: {lastUpdated.toLocaleTimeString('id-ID')}
+            </span>
 
             <button
               type="button"
-              onClick={handleLogout}
-              className="flex h-10 items-center gap-2 rounded-xl border border-red-400/20 bg-red-500/10 px-3 text-xs font-extrabold text-red-300 transition hover:bg-red-500/20"
+              onClick={() => fetchData(true)}
+              disabled={isRefreshing}
+              className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-sm transition-all disabled:opacity-50 whitespace-nowrap"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Keluar</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
             </button>
           </div>
         </div>
-      </header>
-
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-7 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:px-8">
-        <aside className="space-y-5">
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400">Profil Instansi</p>
-                <p className="mt-1 truncate text-sm font-black text-slate-900">{loggedInOPD.namaPendek}</p>
-              </div>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Dokumen</p>
-                <p className="mt-1 text-2xl font-black text-slate-950">{loggedInOPD.jumlahUpload}<span className="ml-1 text-xs text-slate-400">/4</span></p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowNotifications(true)}
-                className="rounded-2xl bg-blue-50 p-4 text-left transition hover:bg-blue-100"
-              >
-                <p className="text-[9px] font-bold uppercase tracking-wider text-blue-500">Notifikasi</p>
-                <p className="mt-1 text-2xl font-black text-blue-800">{unreadCount}</p>
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-blue-200 bg-blue-950 p-5 text-white shadow-lg">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-300">Tahun Anggaran</p>
-            <div className="relative mt-4">
-              <select
-                value={selectedYear}
-                onChange={event => setSelectedYear(event.target.value)}
-                className="w-full appearance-none rounded-2xl border border-white/15 bg-white/10 px-4 py-3.5 pr-10 text-sm font-extrabold text-white outline-none"
-              >
-                <option value="2025" className="text-slate-900">Tahun 2025</option>
-                <option value="2026" className="text-slate-900">Tahun 2026</option>
-                <option value="2027" className="text-slate-900">Tahun 2027</option>
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-200" />
-            </div>
-          </section>
-
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-black text-slate-900">Hasil Review</p>
-                <p className="mt-1 text-[10px] text-slate-400">Tahun {selectedYear}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void loadReviewData()}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100"
-                aria-label="Segarkan hasil review"
-              >
-                <RefreshCw className={`h-4 w-4 ${loadingReviews ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
-
-            {reviewError ? (
-              <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-[10px] font-semibold leading-relaxed text-red-700">{reviewError}</p>
-            ) : loadingReviews ? (
-              <div className="mt-5 flex items-center justify-center gap-2 py-6 text-xs font-semibold text-slate-400"><Loader2 className="h-4 w-4 animate-spin" /> Memuat review...</div>
-            ) : reviews.length === 0 ? (
-              <p className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-center text-[10px] leading-relaxed text-slate-400">Belum ada hasil review untuk tahun ini.</p>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {reviews.slice(0, 5).map(review => (
-                  <article key={review.REVIEW_ID} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-black text-slate-900">{review.JENIS_DOKUMEN}</p>
-                        <p className="mt-1 text-[9px] text-slate-400">{review.CREATED_AT}</p>
-                      </div>
-                      <span className={`shrink-0 rounded-full border px-2 py-1 text-[8px] font-extrabold ${statusClass[review.STATUS_REVIEW] || statusClass.SEDANG_DIREVIEW}`}>
-                        {statusLabel[review.STATUS_REVIEW] || review.STATUS_REVIEW}
-                      </span>
-                    </div>
-                    {review.CATATAN && <p className="mt-3 text-[10px] leading-relaxed text-slate-600">{review.CATATAN}</p>}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {review.REVIEW_FILE_URL && (
-                        <a href={review.REVIEW_FILE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[9px] font-extrabold text-slate-600 hover:text-blue-700">
-                          <Download className="h-3 w-3" /> File Review
-                        </a>
-                      )}
-                      {review.STATUS_REVIEW === 'PERLU_REVISI' && (
-                        <button type="button" onClick={() => startRevisionFromReview(review)} className="inline-flex items-center gap-1 rounded-lg bg-blue-700 px-2.5 py-2 text-[9px] font-extrabold text-white hover:bg-blue-900">
-                          <UploadCloud className="h-3 w-3" /> Upload Ulang
-                        </button>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-        </aside>
-
-        <section id="opd-upload-form" className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-700">Form Pengunggahan Dokumen PUG</p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
-                {revisionTarget ? `Upload Ulang ${revisionTarget.jenisDokumen}` : `Dokumen Tahun ${selectedYear}`}
-              </h2>
-              {revisionTarget && (
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
-                  File perbaikan disimpan sebagai versi baru.
-                </p>
-              )}
-            </div>
-            <div className="rounded-2xl bg-slate-50 px-4 py-3 text-right">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Dipilih</p>
-              <p className="mt-1 text-xl font-black text-slate-900">{selectedCount}</p>
-            </div>
-          </div>
-
-          {revisionTarget && (
-            <div className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-black text-rose-800">Dokumen memerlukan revisi</p>
-                  <p className="mt-2 text-[11px] leading-relaxed text-rose-700">{revisionTarget.catatan || 'Periksa catatan operator pada bagian hasil review.'}</p>
-                  {revisionTarget.reviewFileUrl && (
-                    <a href={revisionTarget.reviewFileUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-[10px] font-extrabold text-rose-800 underline">
-                      <ExternalLink className="h-3 w-3" /> Buka {revisionTarget.reviewFileName || 'file hasil review'}
-                    </a>
-                  )}
-                </div>
-                <button type="button" onClick={onCancelRevision} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-rose-600 shadow-sm" aria-label="Batalkan upload ulang">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          <section className="relative mt-6 overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-100 shadow-md shadow-blue-100/60">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-300/20 blur-3xl" />
-
-            <div className="relative flex flex-col gap-3 border-b border-blue-100/80 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-blue-300 shadow-sm">
-                  <WalletCards className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-black text-slate-950">Anggaran Responsif Gender</p>
-                  <p className="mt-1 text-[10px] font-semibold text-slate-500">Tahun {selectedYear}</p>
-                </div>
-              </div>
-              <span className="self-start rounded-full border border-rose-200 bg-white/80 px-2.5 py-1 text-[9px] font-extrabold text-rose-700 shadow-sm sm:self-auto">
-                Pagu wajib
-              </span>
-            </div>
-
-            <div className="relative p-5 pt-0">
-
-            {budgetLoading ? (
-              <div className="mt-5 flex items-center gap-2 rounded-xl border border-white/70 bg-white/75 px-4 py-4 text-xs font-semibold text-slate-400 shadow-sm">
-                <Loader2 className="h-4 w-4 animate-spin" /> Memuat data anggaran...
-              </div>
-            ) : (
-              <>
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">Pagu Anggaran Responsif Gender *</label>
-                    <div className="relative">
-                      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
-                      <input
-                        value={paguAnggaran}
-                        onChange={event => { setPaguAnggaran(formatAmountInput(event.target.value)); setBudgetMessage(null); }}
-                        inputMode="numeric"
-                        placeholder="0"
-                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">Tanggal Pagu *</label>
-                    <div className="relative">
-                      <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="date"
-                        value={tanggalPagu}
-                        onChange={event => { setTanggalPagu(event.target.value); setBudgetMessage(null); }}
-                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">Realisasi Anggaran Responsif Gender</label>
-                    <div className="relative">
-                      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
-                      <input
-                        value={realisasiAnggaran}
-                        onChange={event => { setRealisasiAnggaran(formatAmountInput(event.target.value)); setBudgetMessage(null); }}
-                        inputMode="numeric"
-                        placeholder="Bisa diisi menyusul"
-                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">Tanggal Realisasi</label>
-                    <div className="relative">
-                      <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="date"
-                        value={tanggalRealisasi}
-                        disabled={!realisasiAnggaran}
-                        onChange={event => { setTanggalRealisasi(event.target.value); setBudgetMessage(null); }}
-                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-400"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-white shadow-lg sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ringkasan {selectedYear}</p>
-                    <p className="mt-1 text-xs font-semibold text-slate-200">
-                      Pagu {formatRupiah(parseAmountInput(paguAnggaran))} · Realisasi {formatRupiah(parseAmountInput(realisasiAnggaran))}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void saveBudgetData()}
-                    disabled={budgetSaving}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {budgetSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                    {budgetSaving ? 'Menyimpan...' : 'Simpan / Perbarui Anggaran'}
-                  </button>
-                </div>
-              </>
-            )}
-
-            {budgetMessage && (
-              <div className={`mt-4 rounded-xl border px-4 py-3 text-[10px] font-semibold shadow-sm ${budgetMessage.includes('berhasil') ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
-                {budgetMessage}
-              </div>
-            )}
-            </div>
-          </section>
-
-          <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
-            {slots.map(slot => {
-              const Icon = slot.icon;
-              const file = uploadedFiles[slot.key];
-              const isUploaded = uploadedSuccessKeys.includes(slot.key);
-              const inputId = `upload-${slot.key}`;
-              const disabledByRevision = Boolean(revisionTarget && matchingRevisionSlot !== slot.key);
-
-              return (
-                <article
-                  key={slot.key}
-                  className={`relative overflow-hidden rounded-2xl border-2 p-5 transition-all ${
-                    disabledByRevision
-                      ? 'border-slate-200 bg-slate-50 opacity-45'
-                      : isUploaded
-                        ? 'border-emerald-200 bg-emerald-50/50'
-                        : file
-                          ? 'border-blue-300 bg-blue-50/50'
-                          : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`rounded-xl p-2.5 ${isUploaded ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-black uppercase tracking-wide text-slate-900">{slot.title}</h3>
-                        <p className="mt-2 text-[11px] leading-relaxed text-slate-500">{slot.description}</p>
-                      </div>
-                    </div>
-                    {isUploaded && !revisionTarget ? (
-                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[9px] font-extrabold text-emerald-700"><Check className="h-3 w-3" /> Terkirim</span>
-                    ) : file ? (
-                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-100 px-2.5 py-1 text-[9px] font-extrabold text-blue-700"><Check className="h-3 w-3" /> Terpilih</span>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-5">
-                    {file ? (
-                      <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
-                        <div className="min-w-0">
-                          <p className="truncate text-[11px] font-extrabold text-slate-700">{file.name}</p>
-                          <p className="mt-0.5 text-[9px] font-semibold text-slate-400">{file.size}</p>
-                        </div>
-                        <button type="button" onClick={() => setUploadedFiles(previous => ({ ...previous, [slot.key]: null }))} className="shrink-0 rounded-lg bg-red-50 px-2.5 py-2 text-[10px] font-extrabold text-red-600">Hapus</button>
-                      </div>
-                    ) : (
-                      <>
-                        <input
-                          id={inputId}
-                          type="file"
-                          accept={slot.accept}
-                          disabled={disabledByRevision}
-                          className="hidden"
-                          onChange={event => {
-                            handleLocalFileChange(slot.key, event.target.files?.[0] || null);
-                            event.currentTarget.value = '';
-                          }}
-                        />
-                        <button
-                          type="button"
-                          disabled={disabledByRevision}
-                          onClick={() => document.getElementById(inputId)?.click()}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3.5 text-[11px] font-extrabold text-white transition hover:bg-blue-900 disabled:pointer-events-none disabled:bg-slate-300"
-                        >
-                          <UploadCloud className="h-4 w-4" />
-                          {revisionTarget && matchingRevisionSlot === slot.key ? 'Pilih File Revisi' : 'Pilih Dokumen'}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          {uploadStatus === 'UPLOADING' && (
-            <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-              <div className="flex items-center justify-between gap-4 text-xs font-extrabold text-blue-800">
-                <span className="flex items-center gap-2"><UploadCloud className="h-4 w-4 animate-pulse" /> Sedang mengunggah...</span>
-                <span>{uploadProgress}%</span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-blue-100">
-                <div className="h-full rounded-full bg-blue-700 transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
-              </div>
-            </div>
-          )}
-
-          <div className="mt-7 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[10px] font-semibold leading-relaxed text-slate-400">Format PDF, DOC, DOCX, XLS, XLSX. Maksimal 10 MB per file.</p>
-            <button
-              type="button"
-              onClick={handleUploadWithBudget}
-              disabled={uploadStatus !== 'IDLE' || selectedCount === 0 || budgetLoading || parseAmountInput(paguAnggaran) <= 0 || !tanggalPagu}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3.5 text-xs font-extrabold text-white shadow-lg transition hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {uploadStatus === 'SUCCESS' ? <CheckCircle2 className="h-4 w-4" /> : <UploadCloud className="h-4 w-4" />}
-              {revisionTarget ? 'Kirim File Revisi' : 'Kirim ke Antrean Review'}
-            </button>
-          </div>
-        </section>
       </div>
 
-      <AnimatePresence>
-        {showNotifications && (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Tutup notifikasi"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowNotifications(false)}
-              className="fixed inset-0 z-[90] cursor-default bg-transparent"
-            />
+      {/* CARD METRICS BENTO GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* Target Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-slate-300 transition-colors">
+          <div className="space-y-1">
+            <p className="text-xs text-slate-500 font-bold tracking-wider uppercase">Total Target OPD</p>
+            <p className="text-3xl font-black text-primary font-mono">{stats.targetOPD}</p>
+            <p className="text-[10px] text-slate-400 font-medium">OPD Terdaftar Provinsi NTT</p>
+          </div>
+          <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center shrink-0">
+            <Layers className="w-6 h-6" />
+          </div>
+        </div>
 
-            <motion.aside
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.98 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="fixed right-4 top-20 z-[100] flex max-h-[calc(100vh-6rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-950/20 backdrop-blur-xl sm:right-6 sm:top-24"
-            >
-              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                    <Bell className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-black text-slate-950">Notifikasi</h2>
-                    {unreadCount > 0 && (
-                      <p className="mt-0.5 text-[9px] font-semibold text-slate-400">{unreadCount} belum dibaca</p>
-                    )}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowNotifications(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+        {/* Sudah Upload Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-green-300 transition-colors">
+          <div className="space-y-1">
+            <p className="text-xs text-green-600 font-bold tracking-wider uppercase">Sudah Upload</p>
+            <p className="text-3xl font-black text-green-700 font-mono">{stats.sudahCount}</p>
+            <p className="text-[10px] text-green-600/80 font-bold">Telah mengunggah dokumen</p>
+          </div>
+          <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle className="w-6 h-6" />
+          </div>
+        </div>
 
-              <div className="overflow-y-auto p-3">
-                {notifications.length === 0 ? (
-                  <div className="flex min-h-44 flex-col items-center justify-center text-center">
-                    <Bell className="h-8 w-8 text-slate-300" />
-                    <p className="mt-3 text-xs font-black text-slate-700">Belum ada notifikasi</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2.5">
-                    {notifications.map(notification => {
-                      const review = reviewById.get(notification.REVIEW_ID);
-                      const unread = !toBoolean(notification.IS_READ);
+        {/* Belum Upload Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-300 transition-colors">
+          <div className="space-y-1">
+            <p className="text-xs text-red-600 font-bold tracking-wider uppercase">Belum Upload</p>
+            <p className="text-3xl font-black text-red-600 font-mono">{stats.belumCount}</p>
+            <p className="text-[10px] text-red-500 font-bold">Membutuhkan tindak lanjut</p>
+          </div>
+          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
+            <XCircle className="w-6 h-6" />
+          </div>
+        </div>
 
-                      return (
-                        <article
-                          key={notification.NOTIFICATION_ID}
-                          onClick={() => void markNotificationRead(notification)}
-                          className={`cursor-pointer rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md ${
-                            unread
-                              ? 'border-blue-200 bg-blue-50/80'
-                              : 'border-slate-200 bg-white'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <p className="text-[11px] font-black text-slate-900">{notification.JUDUL}</p>
-                              <p className="mt-1.5 text-[10px] leading-relaxed text-slate-600">{notification.PESAN}</p>
-                            </div>
-                            {unread && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-600" />}
-                          </div>
+        {/* Percentage Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-300 transition-colors">
+          <div className="space-y-1">
+            <p className="text-xs text-secondary font-bold tracking-wider uppercase">Tingkat Partisipasi</p>
+            <p className="text-3xl font-black text-secondary font-mono">{stats.percentageSudah.toFixed(1)}%</p>
+            <div className="w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1.5">
+              <div 
+                className="bg-secondary h-full rounded-full transition-all duration-500" 
+                style={{ width: `${stats.percentageSudah}%` }}
+              />
+            </div>
+          </div>
+          <div className="w-12 h-12 bg-blue-50 text-secondary rounded-xl flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+        </div>
 
-                          <p className="mt-2 text-[8px] text-slate-400">{notification.CREATED_AT}</p>
+      </div>
 
-                          {review && (
-                            <div className="mt-2.5 flex flex-wrap gap-2">
-                              {review.REVIEW_FILE_URL && (
-                                <a
-                                  href={review.REVIEW_FILE_URL}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={event => event.stopPropagation()}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[8px] font-extrabold text-slate-600 hover:text-blue-700"
-                                >
-                                  <Download className="h-3 w-3" /> File Review
-                                </a>
-                              )}
+      {/* VISUAL CHARTS SECTION */}
+      <VisualCharts data={displayData} stats={stats} />
 
-                              {review.STATUS_REVIEW === 'PERLU_REVISI' && (
-                                <button
-                                  type="button"
-                                  onClick={event => {
-                                    event.stopPropagation();
-                                    void markNotificationRead(notification);
-                                    startRevisionFromReview(review);
-                                    setShowNotifications(false);
-                                  }}
-                                  className="inline-flex items-center gap-1 rounded-lg bg-blue-700 px-2.5 py-1.5 text-[8px] font-extrabold text-white hover:bg-blue-900"
-                                >
-                                  <UploadCloud className="h-3 w-3" /> Upload Ulang
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </article>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </motion.aside>
-          </>
+      {/* OPD LIST SEARCHABLE TABLE */}
+      <OPDList data={displayData} />
+
+    </div>
+  </section>
+
+  {/* FOOTER */}
+  <footer className="bg-primary text-slate-400 py-12 relative z-10 border-t border-slate-800">
+    <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+      <div className="flex items-center gap-3">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" 
+          alt="Logo NTT" 
+          className="h-8 w-auto grayscale opacity-80"
+          referrerPolicy="no-referrer"
+        />
+        <div>
+          <p className="text-white font-extrabold text-sm tracking-tight">SIPMODAG</p>
+          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide mt-0.5">DP3AP2KB PROVINSI NTT</p>
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap gap-6 text-xs font-semibold text-slate-500">
+        <a href="#dashboard" className="hover:text-white transition-colors">Dashboard</a>
+        <a href="#daftar-opd" className="hover:text-white transition-colors">Daftar OPD</a>
+        {loggedInOPD ? (
+          <button 
+            onClick={() => setShowProfileModal(true)} 
+            className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+          >
+            Upload Dokumen ({loggedInOPD.namaPendek})
+          </button>
+        ) : (
+          <button 
+            onClick={() => {
+              setSelectedOPDToLogin(null);
+              setSearchOPDQuery('');
+              setPassword('');
+              setLoginError(null);
+              setShowLoginModal(true);
+            }} 
+            className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+          >
+            Login & Upload <Lock className="w-3 h-3" />
+          </button>
         )}
-      </AnimatePresence>
-    </main>
-  );
-}
+      </div>
+
+      <div className="text-center md:text-right space-y-1">
+        <p className="text-xs">&copy; 2026 Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & KB</p>
+        <p className="text-[10px] text-slate-600 font-medium">Pemerintah Provinsi Nusa Tenggara Timur</p>
+      </div>
+    </div>
+  </footer>
+      </motion.div>
+    )}
+  </AnimatePresence>
+
+  {/* SUCCESS POPUP OVERLAY */}
+  <AnimatePresence>
+    {successPopup && successPopup.show && (
+      <motion.div
+        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+        className="fixed bottom-6 right-6 z-[60] bg-white border border-emerald-100 rounded-2xl shadow-2xl p-5 max-w-sm flex items-start gap-4"
+      >
+        <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <CheckCircle className="w-6 h-6 animate-bounce" />
+        </div>
+        <div className="flex-1 flex items-center justify-between gap-4">
+          <h4 className="font-extrabold text-slate-800 text-sm">Berhasil Upload</h4>
+          <button
+            onClick={() => setSuccessPopup(null)}
+            className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+            aria-label="Tutup notifikasi"
+          >
+            <XCircle className="w-4 h-4" />
+          </button>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
+
+);}
