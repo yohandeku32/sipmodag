@@ -748,6 +748,98 @@ export default function App() {
   }, [displayData, dataSource, sheetUploadedCount]);
 
   /**
+   * Membentuk data dashboard untuk satu tahun dari cache CSV yang sudah ada.
+   * Karena satu unduhan CSV berisi semua tahun, perpindahan tahun tidak perlu
+   * menunggu unduhan baru untuk menampilkan data.
+   */
+  const buildDashboardDataFromRows = (
+    responseRows: string[][],
+    year: string
+  ): { parsedOPDs: OPDData[]; uploadedCount: number } => {
+    const flagsByIdentity = new Map<string, DocumentFlags>();
+
+    responseRows.forEach(row => {
+      if (extractYear(row?.[6]) !== year) return;
+
+      const rawName = String(row?.[1] || '').trim();
+      if (!rawName || !isDashboardOPD(rawName)) return;
+
+      const identityKey = createOPDIdentityKey(rawName);
+      const incoming: DocumentFlags = {
+        gap: hasDocumentValue(row?.[2]),
+        gbs: hasDocumentValue(row?.[3]),
+        kak: hasDocumentValue(row?.[4]),
+        sk: hasDocumentValue(row?.[5]),
+      };
+
+      const existing = flagsByIdentity.get(identityKey) || {
+        gap: false,
+        gbs: false,
+        kak: false,
+        sk: false,
+      };
+
+      flagsByIdentity.set(
+        identityKey,
+        mergeDocumentFlags(existing, incoming)
+      );
+    });
+
+    const parsedOPDs = OFFICIAL_OPDS.map((opd, index) => {
+      const identityKey = createOPDIdentityKey(opd.namaOPD);
+      const flags = flagsByIdentity.get(identityKey) || {
+        gap: false,
+        gbs: false,
+        kak: false,
+        sk: false,
+      };
+
+      const jumlahUpload = [
+        flags.gap,
+        flags.gbs,
+        flags.kak,
+        flags.sk,
+      ].filter(Boolean).length;
+
+      return {
+        ...opd,
+        no: index + 1,
+        jumlahUpload,
+        status: jumlahUpload > 0 ? 'SUDAH' : 'BELUM',
+        originalRow: [
+          '',
+          opd.namaOPD,
+          flags.gap ? 'SUDAH' : 'BELUM',
+          flags.gbs ? 'SUDAH' : 'BELUM',
+          flags.kak ? 'SUDAH' : 'BELUM',
+          flags.sk ? 'SUDAH' : 'BELUM',
+          year,
+        ],
+      };
+    });
+
+    return {
+      parsedOPDs,
+      uploadedCount: parsedOPDs.filter(opd => opd.jumlahUpload > 0).length,
+    };
+  };
+
+  const applyCachedDashboardYear = (
+    year: string,
+    rows: string[][] = allResponseRows
+  ): boolean => {
+    if (!Array.isArray(rows) || rows.length === 0) return false;
+
+    const snapshot = buildDashboardDataFromRows(rows, year);
+
+    setData(snapshot.parsedOPDs);
+    setSheetUploadedCount(snapshot.uploadedCount);
+    setDataSource('LIVE_SHEET');
+
+    return true;
+  };
+
+  /**
    * Membaca CSV mentah dari tab Form Responses.
    * Susunan kolom yang digunakan:
    * A = Timestamp
@@ -778,7 +870,17 @@ export default function App() {
 
     setErrorMsg(null);
 
+    let settled = false;
+    let timeoutId: number | null = null;
+
     const finishFetch = () => {
+      if (settled) return;
+      settled = true;
+
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
+
       setLoading(false);
       setIsRefreshing(false);
       fetchInFlightRef.current = false;
@@ -790,9 +892,25 @@ export default function App() {
 
         window.setTimeout(() => {
           fetchData(queuedAsManual);
-        }, 0);
+        }, 60);
       }
     };
+
+    // PapaParse/XHR kadang tidak mengembalikan callback saat koneksi bermasalah.
+    // Lepaskan lock agar tombol refresh dan perpindahan tahun tetap bisa dipakai.
+    timeoutId = window.setTimeout(() => {
+      if (settled) return;
+
+      console.warn('Timeout membaca CSV dashboard.');
+
+      if (!hasLiveDataRef.current) {
+        setErrorMsg(
+          'Data dashboard belum merespons. Silakan tekan Segarkan sekali lagi.'
+        );
+      }
+
+      finishFetch();
+    }, 12000);
 
     const noCacheUrl = `${formResponsesCSVUrl}&t=${Date.now()}`;
 
@@ -801,6 +919,8 @@ export default function App() {
       header: false,
       skipEmptyLines: true,
       complete: (results) => {
+        if (settled) return;
+
         try {
           const rows = results.data as string[][];
 
@@ -823,6 +943,8 @@ export default function App() {
             return opdName !== '' && year !== '' && isDashboardOPD(opdName);
           });
 
+          // CSV yang sama memuat semua tahun. Simpan segera sebagai cache lokal
+          // agar pergantian tahun berikutnya bisa tampil tanpa menunggu jaringan.
           const rowsForSelectedYear = responseRows.filter(
             row => extractYear(row[6]) === requestedYear
           );
@@ -1012,12 +1134,21 @@ export default function App() {
             catatan: 'OPD di luar daftar resmi 42 tidak dihitung dan tidak ditampilkan.',
           });
 
-          // Request untuk tahun lama tidak boleh menimpa tahun yang baru dipilih.
+          // Jika user sudah pindah tahun ketika request lama selesai,
+          // jangan menimpa dengan tahun lama. Karena CSV memuat semua tahun,
+          // langsung bentuk data untuk tahun yang SEKARANG aktif dari hasil ini.
           if (requestedYear !== dashboardYearRef.current) {
-            console.info('Hasil CSV diabaikan karena tahun dashboard sudah berubah.', {
+            const activeYear = dashboardYearRef.current;
+
+            console.info('Request lama selesai setelah tahun berubah.', {
               tahunRequest: requestedYear,
-              tahunAktif: dashboardYearRef.current,
+              tahunAktif: activeYear,
             });
+
+            applyCachedDashboardYear(activeYear, responseRows);
+
+            // Tetap antrekan satu pembacaan baru untuk memastikan data paling segar.
+            refreshQueuedRef.current = true;
             return;
           }
 
@@ -1053,7 +1184,7 @@ export default function App() {
           }
 
           if (!shouldAcceptSnapshot) {
-            console.warn('Penurunan sementara diabaikan sampai terkonfirmasi dua kali.', {
+            console.warn('Penurunan sementara sedang diverifikasi otomatis.', {
               tahun: requestedYear,
               jumlahSebelumnya: previousSnapshot?.data.filter(
                 opd => opd.jumlahUpload > 0
@@ -1062,6 +1193,12 @@ export default function App() {
                 opd => opd.jumlahUpload > 0
               ).length,
             });
+
+            // Dulu perubahan menurun baru terlihat setelah refresh berikutnya.
+            // Sekarang konfirmasi kedua dijalankan otomatis.
+            refreshQueuedRef.current = true;
+            queuedManualRefreshRef.current =
+              queuedManualRefreshRef.current || isManual;
             return;
           }
 
@@ -1166,6 +1303,8 @@ export default function App() {
         }
       },
       error: (error) => {
+        if (settled) return;
+
         console.error('Gagal mengambil CSV Form Responses:', error);
 
         if (hasLiveDataRef.current) {
@@ -1186,6 +1325,33 @@ export default function App() {
         finishFetch();
       }
     });
+  };
+
+  const handleDashboardYearChange = (nextYear: string) => {
+    if (!nextYear || nextYear === dashboardYearRef.current) return;
+
+    // Update ref SEBELUM React selesai render. Ini mencegah hasil request
+    // tahun lama masuk beberapa milidetik setelah pilihan tahun berubah.
+    dashboardYearRef.current = nextYear;
+    setDashboardYear(nextYear);
+    setErrorMsg(null);
+
+    // Berikan feedback visual bahwa sinkronisasi background sedang berjalan.
+    setIsRefreshing(true);
+
+    // Tampilkan data dari cache CSV seketika. Network fetch di useEffect
+    // tetap berjalan untuk memverifikasi data terbaru.
+    applyCachedDashboardYear(nextYear);
+
+    if (fetchInFlightRef.current) {
+      refreshQueuedRef.current = true;
+    }
+  };
+
+  const handleDashboardRefresh = () => {
+    // Pastikan refresh selalu memakai tahun yang sedang terlihat di UI.
+    dashboardYearRef.current = dashboardYear;
+    fetchData(true);
   };
 
   // Login OPD sekarang menggunakan akun yang tersimpan di TiDB.
@@ -1513,6 +1679,11 @@ export default function App() {
 
   // Muat ulang dashboard ketika pilihan tahun berubah.
   useEffect(() => {
+    dashboardYearRef.current = dashboardYear;
+
+    // Jika CSV pernah berhasil dibaca, ubah tampilan tahun secara instan.
+    // Fetch jaringan tetap dilakukan di belakang untuk mengambil versi terbaru.
+    applyCachedDashboardYear(dashboardYear);
     fetchData();
 
     const interval = window.setInterval(() => {
@@ -2025,9 +2196,10 @@ export default function App() {
                   <select
                     id="dashboard-year-select"
                     value={dashboardYear}
-                    onChange={(e) => setDashboardYear(e.target.value)}
+                    onChange={(e) => handleDashboardYearChange(e.target.value)}
                     className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-xs font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 sm:w-40"
                     aria-label="Pilih tahun dashboard"
+                    aria-busy={isRefreshing}
                   >
                     {availableDashboardYears.map(year => (
                       <option key={year} value={year}>
@@ -2047,7 +2219,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => fetchData(true)}
+                  onClick={handleDashboardRefresh}
                   disabled={isRefreshing}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-xs font-extrabold text-white shadow-sm shadow-blue-900/15 transition hover:bg-blue-800 disabled:opacity-50"
                 >
