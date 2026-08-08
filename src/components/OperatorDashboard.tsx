@@ -759,8 +759,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   };
 
   return (
-    <main className="min-h-screen bg-[#F1F1F6] p-3 text-slate-800 sm:p-5 lg:p-7">
-      <div className="mx-auto grid max-w-[1760px] border border-white/80 bg-white shadow-[0_30px_90px_-45px_rgba(47,39,93,0.38)] lg:min-h-[calc(100vh-3.5rem)] lg:grid-cols-[245px_minmax(0,1fr)]">
+    <main className="min-h-screen bg-[#F1F1F6] text-slate-800">
+      <div className="grid min-h-screen w-full bg-white lg:grid-cols-[245px_minmax(0,1fr)]">
 
         {/* SIDEBAR */}
         <aside className="relative overflow-hidden bg-[#31275F] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:self-start lg:px-5 lg:py-6">
