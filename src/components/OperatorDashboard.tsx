@@ -1511,17 +1511,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(410px,0.70fr)_minmax(0,1.30fr)]">
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <div className="border-b border-slate-100 p-5">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
-                    value={search}
-                    onChange={event => setSearch(event.target.value)}
-                    placeholder="Cari OPD atau dokumen..."
-                    className="w-full rounded-xl border border-slate-200 bg-[#FAFAFD] py-3 pl-11 pr-4 text-sm font-medium text-slate-800 caret-violet-600 outline-none placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
-                  />
-                </div>
-
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <div className="relative">
                   <select
                     value={year}
