@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  BarChart3,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
@@ -488,6 +489,76 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     };
   }, [opdDashboardRows]);
 
+
+  const overviewAnalytics = useMemo(() => {
+    const totalOPD = Math.max(1, overviewSummary.total);
+    const partial = Math.max(
+      0,
+      overviewSummary.uploaded - overviewSummary.complete,
+    );
+
+    const documentCounts = [
+      {
+        key: 'GAP',
+        label: 'GAP',
+        count: opdDashboardRows.filter(item => item.gap).length,
+        barClass: 'bg-gradient-to-t from-pink-500 to-rose-300',
+        badgeClass: 'bg-rose-50 text-rose-700',
+      },
+      {
+        key: 'GBS',
+        label: 'GBS',
+        count: opdDashboardRows.filter(item => item.gbs).length,
+        barClass: 'bg-gradient-to-t from-violet-600 to-purple-300',
+        badgeClass: 'bg-violet-50 text-violet-700',
+      },
+      {
+        key: 'KAK',
+        label: 'KAK',
+        count: opdDashboardRows.filter(item => item.kak).length,
+        barClass: 'bg-gradient-to-t from-sky-500 to-cyan-300',
+        badgeClass: 'bg-sky-50 text-sky-700',
+      },
+      {
+        key: 'SK',
+        label: 'SK Focal Point',
+        count: opdDashboardRows.filter(item => item.sk).length,
+        barClass: 'bg-gradient-to-t from-amber-500 to-yellow-300',
+        badgeClass: 'bg-amber-50 text-amber-700',
+      },
+    ].map(item => ({
+      ...item,
+      percentage: Math.round((item.count / totalOPD) * 100),
+    }));
+
+    const uploadedDocuments = documentCounts.reduce(
+      (total, item) => total + item.count,
+      0,
+    );
+    const expectedDocuments = overviewSummary.total * 4;
+
+    return {
+      uploadPercentage: Math.round(
+        (overviewSummary.uploaded / totalOPD) * 100,
+      ),
+      completePercentage: Math.round(
+        (overviewSummary.complete / totalOPD) * 100,
+      ),
+      partial,
+      partialPercentage: Math.round((partial / totalOPD) * 100),
+      emptyPercentage: Math.round(
+        (overviewSummary.empty / totalOPD) * 100,
+      ),
+      uploadedDocuments,
+      expectedDocuments,
+      documentPercentage:
+        expectedDocuments > 0
+          ? Math.round((uploadedDocuments / expectedDocuments) * 100)
+          : 0,
+      documentCounts,
+    };
+  }, [opdDashboardRows, overviewSummary]);
+
   useEffect(() => {
     budgetRequestRef.current += 1;
     setBudgetPopover(null);
@@ -799,6 +870,186 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   </div>
                 </div>
               ))}
+            </section>
+
+            <section className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(330px,0.8fr)]">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white">
+                      <BarChart3 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-black tracking-tight text-slate-950">
+                        Grafik Kelengkapan Dokumen
+                      </h2>
+                      <p className="mt-0.5 text-[10px] font-semibold text-slate-400">
+                        Jumlah OPD yang telah mengunggah setiap jenis dokumen
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="w-fit rounded-xl bg-slate-100 px-3 py-2 text-[10px] font-extrabold text-slate-600">
+                    Tahun {overviewYear}
+                  </span>
+                </div>
+
+                <div className="p-5 sm:p-6">
+                  <div className="grid min-h-[270px] grid-cols-4 gap-3 sm:gap-5">
+                    {overviewAnalytics.documentCounts.map(item => (
+                      <div
+                        key={item.key}
+                        className="flex min-w-0 flex-col justify-end"
+                      >
+                        <div className="mb-3 text-center">
+                          <p className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+                            {item.count}
+                          </p>
+                          <p className="mt-0.5 text-[9px] font-extrabold text-slate-400">
+                            {item.percentage}%
+                          </p>
+                        </div>
+
+                        <div className="flex h-44 items-end rounded-2xl bg-slate-50 p-2 ring-1 ring-inset ring-slate-100">
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{
+                              height: `${Math.max(6, item.percentage)}%`,
+                              opacity: 1,
+                            }}
+                            transition={{
+                              duration: 0.55,
+                              ease: 'easeOut',
+                            }}
+                            className={`w-full rounded-xl ${item.barClass}`}
+                          />
+                        </div>
+
+                        <div className="mt-3 text-center">
+                          <span className={`inline-flex max-w-full rounded-lg px-2 py-1.5 text-[9px] font-extrabold ${item.badgeClass}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                          Total Dokumen Terkumpul
+                        </p>
+                        <p className="mt-1 text-sm font-black text-slate-800">
+                          {overviewAnalytics.uploadedDocuments} dari {overviewAnalytics.expectedDocuments} dokumen
+                        </p>
+                      </div>
+                      <span className="rounded-xl bg-white px-3 py-2 text-sm font-black text-blue-700 shadow-sm ring-1 ring-slate-200">
+                        {overviewAnalytics.documentPercentage}%
+                      </span>
+                    </div>
+
+                    <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-200">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${overviewAnalytics.documentPercentage}%`,
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          ease: 'easeOut',
+                        }}
+                        className="h-full rounded-full bg-gradient-to-r from-blue-600 via-violet-500 to-pink-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div>
+                  <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                    Persentase Upload OPD
+                  </p>
+                  <h2 className="mt-1 text-lg font-black tracking-tight text-slate-950">
+                    Cakupan Tahun {overviewYear}
+                  </h2>
+                </div>
+
+                <div className="mt-6 flex justify-center">
+                  <div
+                    className="relative flex h-52 w-52 items-center justify-center rounded-full p-[18px] shadow-inner"
+                    style={{
+                      background: `conic-gradient(#2563eb 0 ${overviewAnalytics.uploadPercentage}%, #e2e8f0 ${overviewAnalytics.uploadPercentage}% 100%)`,
+                    }}
+                  >
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-sm">
+                      <span className="text-4xl font-black tracking-tight text-slate-950">
+                        {overviewAnalytics.uploadPercentage}%
+                      </span>
+                      <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                        Sudah Upload
+                      </span>
+                      <span className="mt-2 rounded-lg bg-blue-50 px-2.5 py-1 text-[9px] font-extrabold text-blue-700">
+                        {overviewSummary.uploaded}/{overviewSummary.total} OPD
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                      <span className="text-[10px] font-extrabold text-emerald-800">
+                        Lengkap 4 Dokumen
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-emerald-800">
+                        {overviewSummary.complete} OPD
+                      </p>
+                      <p className="text-[9px] font-bold text-emerald-600">
+                        {overviewAnalytics.completePercentage}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-2xl bg-violet-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
+                      <span className="text-[10px] font-extrabold text-violet-800">
+                        Belum Lengkap
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-violet-800">
+                        {overviewAnalytics.partial} OPD
+                      </p>
+                      <p className="text-[9px] font-bold text-violet-600">
+                        {overviewAnalytics.partialPercentage}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                      <span className="text-[10px] font-extrabold text-amber-800">
+                        Belum Upload
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-amber-800">
+                        {overviewSummary.empty} OPD
+                      </p>
+                      <p className="text-[9px] font-bold text-amber-600">
+                        {overviewAnalytics.emptyPercentage}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
