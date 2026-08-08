@@ -119,7 +119,7 @@ export default function OPDLoginScreen({
     setRegisterLoading(true);
 
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/opd-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain;charset=utf-8',
