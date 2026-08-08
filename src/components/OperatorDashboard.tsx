@@ -760,14 +760,14 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
 
   return (
     <main className="min-h-screen bg-[#F1F1F6] p-3 text-slate-800 sm:p-5 lg:p-7">
-      <div className="mx-auto grid max-w-[1760px] overflow-hidden rounded-[28px] border border-white/80 bg-white shadow-[0_30px_90px_-45px_rgba(47,39,93,0.38)] lg:min-h-[calc(100vh-3.5rem)] lg:grid-cols-[245px_minmax(0,1fr)]">
+      <div className="mx-auto grid max-w-[1760px] border border-white/80 bg-white shadow-[0_30px_90px_-45px_rgba(47,39,93,0.38)] lg:min-h-[calc(100vh-3.5rem)] lg:grid-cols-[245px_minmax(0,1fr)]">
 
         {/* SIDEBAR */}
-        <aside className="relative overflow-hidden bg-[#31275F] px-4 py-5 text-white lg:px-5 lg:py-6">
+        <aside className="relative overflow-hidden bg-[#31275F] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:self-start lg:px-5 lg:py-6">
           <div className="pointer-events-none absolute -left-16 top-20 h-44 w-44 rounded-full bg-violet-400/10 blur-3xl" />
           <div className="pointer-events-none absolute -right-16 bottom-24 h-48 w-48 rounded-full bg-indigo-300/10 blur-3xl" />
 
-          <div className="relative z-10 flex h-full flex-col">
+          <div className="relative z-10 flex h-full min-h-0 flex-col">
             <div className="flex items-center gap-3 px-2">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg shadow-black/10">
                 <img
@@ -872,7 +872,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </aside>
 
         {/* MAIN CONTENT */}
-        <section className="min-w-0 bg-[#F8F8FC]">
+        <section className="min-w-0 bg-[#F8F8FC] lg:min-h-screen">
           {/* MOBILE BRAND */}
           <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
             <div className="flex items-center gap-2">
