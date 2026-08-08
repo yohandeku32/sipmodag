@@ -108,7 +108,7 @@ const statusClass: Record<string, string> = {
   MENUNGGU_REVIEW: 'border-amber-200 bg-amber-50 text-amber-700',
   SEDANG_DIREVIEW: 'border-blue-200 bg-blue-50 text-blue-700',
   PERLU_REVISI: 'border-rose-200 bg-rose-50 text-rose-700',
-  DIUNGGAH_ULANG: 'border-violet-200 bg-violet-50 text-violet-700',
+  DIUNGGAH_ULANG: 'border-violet-200 bg-[#F0ECFF] text-[#695BD8]',
   DISETUJUI: 'border-emerald-200 bg-emerald-50 text-emerald-700',
   DITOLAK: 'border-slate-300 bg-slate-100 text-slate-700',
 };
@@ -327,156 +327,160 @@ export default function OPDDashboard({
     : null;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#F3F1FF] text-slate-800">
-      <div className="pointer-events-none fixed -left-24 top-16 h-80 w-80 rounded-full bg-violet-300/20 blur-3xl" />
-      <div className="pointer-events-none fixed -right-28 top-24 h-96 w-96 rounded-full bg-orange-200/20 blur-3xl" />
-
-      <div className="relative z-10 mx-auto max-w-[1500px] p-3 sm:p-5 lg:p-7">
-        <div className="overflow-hidden rounded-[34px] border border-white/90 bg-[#F8F8FC] shadow-[0_32px_90px_-46px_rgba(91,92,226,0.34)] ring-1 ring-violet-100/70 lg:grid lg:min-h-[calc(100vh-3.5rem)] lg:grid-cols-[245px_minmax(0,1fr)]">
+    <main className="min-h-screen bg-[#F1F1F6] text-slate-800">
+      <div className="w-full">
+        <div className="grid min-h-screen w-full bg-white lg:grid-cols-[245px_minmax(0,1fr)]">
 
           {/* SIDEBAR */}
-          <aside className="border-b border-slate-200 bg-white px-4 py-5 lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
-            <div className="flex items-center justify-between gap-3 lg:block">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
-                    alt="Logo Pemerintah Provinsi Nusa Tenggara Timur"
-                    className="h-full w-full object-contain"
-                    referrerPolicy="no-referrer"
-                  />
+          <aside className="relative overflow-hidden bg-[#31275F] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:self-start lg:px-5 lg:py-6">
+            <div className="pointer-events-none absolute -left-16 top-20 h-44 w-44 rounded-full bg-violet-400/10 blur-3xl" />
+            <div className="pointer-events-none absolute -right-16 bottom-24 h-48 w-48 rounded-full bg-indigo-300/10 blur-3xl" />
+
+            <div className="relative z-10 flex h-full min-h-0 flex-col">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg shadow-black/10">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                      alt="Logo Pemerintah Provinsi Nusa Tenggara Timur"
+                      className="h-full w-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-black tracking-tight text-white">
+                      SIPMODAG
+                    </p>
+                    <p className="mt-0.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-200/70">
+                      Portal OPD
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-black tracking-tight text-slate-950">SIPMODAG</p>
-                  <p className="mt-0.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-slate-400">
-                    Portal OPD
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowNotifications(true)}
-                className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-700 transition hover:bg-violet-100 lg:hidden"
-                aria-label="Buka notifikasi review"
-              >
-                <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white ring-2 ring-white">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <div className="mt-6 hidden lg:block">
-              <p className="px-3 text-[8px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                Menu
-              </p>
-
-              <nav className="mt-3 space-y-1.5">
-                <button
-                  type="button"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="flex w-full items-center gap-3 rounded-xl bg-violet-50 px-3 py-3 text-left text-[10px] font-extrabold text-violet-700"
-                >
-                  <User className="h-4 w-4" />
-                  Dashboard
-                  <span className="ml-auto h-5 w-1 rounded-full bg-violet-600" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('opd-upload-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
-                >
-                  <UploadCloud className="h-4 w-4" />
-                  Upload Dokumen
-                </button>
 
                 <button
                   type="button"
                   onClick={() => setShowNotifications(true)}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-violet-100 transition hover:bg-white/15 lg:hidden"
+                  aria-label="Buka notifikasi review"
                 >
                   <Bell className="h-4 w-4" />
-                  Notifikasi
                   {unreadCount > 0 && (
-                    <span className="ml-auto flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[8px] font-black text-white">
-                      {unreadCount}
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white ring-2 ring-[#31275F]">
+                      {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => void loadReviewData()}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-bold text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  Hasil Review
-                </button>
-              </nav>
-            </div>
-
-            <div className="mt-5 rounded-2xl bg-[#F7F5FF] p-4 ring-1 ring-violet-100 lg:mt-8">
-              <p className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-500">
-                Tahun Anggaran
-              </p>
-              <div className="relative mt-3">
-                <select
-                  value={selectedYear}
-                  onChange={event => setSelectedYear(event.target.value)}
-                  className="w-full appearance-none rounded-xl border border-violet-100 bg-white px-3 py-3 pr-9 text-xs font-extrabold text-slate-700 outline-none transition focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
-                >
-                  <option value="2025">Tahun 2025</option>
-                  <option value="2026">Tahun 2026</option>
-                  <option value="2027">Tahun 2027</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               </div>
-            </div>
 
-            <div className="mt-5 hidden lg:block">
-              <p className="px-3 text-[8px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
-                Instansi
-              </p>
-              <div className="mt-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-violet-600 shadow-sm">
+              <div className="mt-9 hidden lg:block">
+                <p className="px-3 text-[8px] font-extrabold uppercase tracking-[0.17em] text-violet-200/45">
+                  Workspace
+                </p>
+
+                <nav className="mt-3 space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="flex w-full items-center gap-3 rounded-xl bg-white/15 px-3 py-3 text-left text-[10px] font-extrabold text-white shadow-sm ring-1 ring-white/10"
+                  >
                     <User className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] font-black text-slate-900">
-                      {loggedInOPD.namaPendek}
-                    </p>
-                    <p className="mt-1 text-[8px] font-semibold text-slate-400">
-                      OPD Provinsi NTT
-                    </p>
+                    Dashboard
+                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('opd-upload-form')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <UploadCloud className="h-4 w-4" />
+                    Upload Dokumen
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(true)}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <Bell className="h-4 w-4" />
+                    Notifikasi
+                    {unreadCount > 0 && (
+                      <span className="ml-auto flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[8px] font-black text-white">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void loadReviewData()}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Hasil Review
+                  </button>
+                </nav>
+              </div>
+
+              <div className="mt-7 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                <p className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-200/55">
+                  Tahun Anggaran
+                </p>
+
+                <div className="relative mt-3">
+                  <select
+                    value={selectedYear}
+                    onChange={event => setSelectedYear(event.target.value)}
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-white px-3 py-3 pr-9 text-xs font-extrabold text-[#31275F] outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-white/10"
+                  >
+                    <option value="2025">Tahun 2025</option>
+                    <option value="2026">Tahun 2026</option>
+                    <option value="2027">Tahun 2027</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                </div>
+              </div>
+
+              <div className="mt-auto pt-6">
+                <div className="rounded-2xl border border-white/10 bg-white/10 p-3.5 backdrop-blur-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100">
+                      <User className="h-4 w-4" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[10px] font-black text-white">
+                        {loggedInOPD.namaPendek}
+                      </p>
+                      <p className="mt-1 text-[8px] font-semibold text-violet-200/60">
+                        OPD Provinsi NTT
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-violet-100 transition hover:bg-rose-500/25 hover:text-white"
+                      aria-label="Keluar"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="mt-5 hidden w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-rose-600 transition hover:bg-rose-50 lg:flex"
-            >
-              <LogOut className="h-4 w-4" />
-              Keluar
-            </button>
           </aside>
 
           {/* MAIN CONTENT */}
-          <section className="min-w-0">
+          <section className="min-w-0 bg-[#F8F8FC] lg:min-h-screen">
             {/* TOP BAR */}
-            <header className="flex flex-col gap-4 border-b border-slate-200/80 bg-white/55 px-5 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-8">
+            <header className="flex flex-col gap-4 border-b border-slate-200/80 bg-white/85 px-5 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-8">
               <div>
-                <p className="text-[9px] font-extrabold uppercase tracking-[0.17em] text-violet-600">
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.17em] text-[#6558D3]">
                   Dashboard OPD
                 </p>
-                <h1 className="mt-1 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-[#241E4A]">
                   Selamat Datang, {loggedInOPD.namaPendek}
                 </h1>
                 <p className="mt-1 text-[10px] font-medium text-slate-400">
@@ -523,32 +527,36 @@ export default function OPDDashboard({
                     value: `${loggedInOPD.jumlahUpload}/4`,
                     caption: 'Dokumen terkirim',
                     icon: FileText,
-                    iconClass: 'bg-orange-50 text-orange-500',
-                    badgeClass: 'text-emerald-600',
+                    cardClass: 'border-[#C9D8FF] bg-[#E9F0FF]',
+                    iconClass: 'bg-white/75 text-[#596DDE]',
+                    captionClass: 'text-[#596DDE]',
                   },
                   {
                     label: 'Notifikasi',
                     value: unreadCount,
                     caption: 'Belum dibaca',
                     icon: Bell,
-                    iconClass: 'bg-violet-50 text-violet-600',
-                    badgeClass: unreadCount > 0 ? 'text-rose-500' : 'text-emerald-600',
+                    cardClass: 'border-[#FFD1D1] bg-[#FFF0F0]',
+                    iconClass: 'bg-white/75 text-[#E56B73]',
+                    captionClass: unreadCount > 0 ? 'text-[#D85D66]' : 'text-emerald-600',
                   },
                   {
                     label: 'Hasil Review',
                     value: reviews.length,
                     caption: `Tahun ${selectedYear}`,
                     icon: CheckCircle2,
-                    iconClass: 'bg-cyan-50 text-cyan-600',
-                    badgeClass: 'text-cyan-600',
+                    cardClass: 'border-[#CDEBE5] bg-[#EAF8F5]',
+                    iconClass: 'bg-white/75 text-[#3B9C8B]',
+                    captionClass: 'text-[#3B9C8B]',
                   },
                   {
                     label: 'Tahun Aktif',
                     value: selectedYear,
                     caption: 'Tahun anggaran',
                     icon: CalendarDays,
-                    iconClass: 'bg-rose-50 text-rose-500',
-                    badgeClass: 'text-violet-600',
+                    cardClass: 'border-[#DDD4FF] bg-[#F0ECFF]',
+                    iconClass: 'bg-white/75 text-[#695BD8]',
+                    captionClass: 'text-[#695BD8]',
                   },
                 ].map(item => {
                   const Icon = item.icon;
@@ -556,22 +564,22 @@ export default function OPDDashboard({
                   return (
                     <div
                       key={item.label}
-                      className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                      className={`rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.cardClass}`}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-[9px] font-extrabold text-slate-500">
                             {item.label}
                           </p>
-                          <p className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+                          <p className="mt-2 text-2xl font-black tracking-tight text-[#241E4A]">
                             {item.value}
                           </p>
-                          <p className={`mt-1 text-[8px] font-extrabold ${item.badgeClass}`}>
+                          <p className={`mt-1 text-[8px] font-extrabold ${item.captionClass}`}>
                             {item.caption}
                           </p>
                         </div>
 
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.iconClass}`}>
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-sm ${item.iconClass}`}>
                           <Icon className="h-4 w-4" />
                         </div>
                       </div>
@@ -655,7 +663,7 @@ export default function OPDDashboard({
 
                       <div className="relative flex flex-col gap-3 border-b border-violet-100/70 p-5 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-600 text-white shadow-sm">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#31275F] text-white shadow-sm">
                             <WalletCards className="h-5 w-5" />
                           </div>
                           <div>
@@ -775,7 +783,7 @@ export default function OPDDashboard({
                                 type="button"
                                 onClick={() => void saveBudgetData()}
                                 disabled={budgetSaving}
-                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:opacity-50"
                               >
                                 {budgetSaving ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -911,7 +919,7 @@ export default function OPDDashboard({
                                     onClick={() =>
                                       document.getElementById(inputId)?.click()
                                     }
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#5B5CE2] px-4 py-3.5 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:pointer-events-none disabled:bg-slate-300"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3.5 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:pointer-events-none disabled:bg-slate-300"
                                   >
                                     <UploadCloud className="h-4 w-4" />
                                     {revisionTarget && matchingRevisionSlot === slot.key
@@ -1062,7 +1070,7 @@ export default function OPDDashboard({
                                 <button
                                   type="button"
                                   onClick={() => startRevisionFromReview(review)}
-                                  className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-2 text-[8px] font-extrabold text-white hover:bg-violet-700"
+                                  className="inline-flex items-center gap-1 rounded-lg bg-[#31275F] px-2.5 py-2 text-[8px] font-extrabold text-white hover:bg-violet-700"
                                 >
                                   <UploadCloud className="h-3 w-3" />
                                   Upload Ulang
@@ -1112,7 +1120,7 @@ export default function OPDDashboard({
             >
               <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F0ECFF] text-[#695BD8]">
                     <Bell className="h-4 w-4" />
                   </div>
                   <div>
