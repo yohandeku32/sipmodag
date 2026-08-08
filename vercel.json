@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/opd",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/operator",
+      "destination": "/index.html"
+    }
+  ]
+}
