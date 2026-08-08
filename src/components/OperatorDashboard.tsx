@@ -1502,7 +1502,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     value={search}
                     onChange={event => setSearch(event.target.value)}
                     placeholder="Cari OPD atau dokumen..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-slate-800 caret-violet-600 outline-none placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
                   />
                 </div>
 
