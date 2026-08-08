@@ -396,74 +396,6 @@ const isDashboardSnapshotRegression = (
 };
 
 
-const HERO_TITLE =
-  "Sistem Pengelolaan &\nMonitoring Dokumen\nAnalisis Gender";
-
-function HeroTypewriter() {
-  const [displayText, setDisplayText] = useState("");
-
-  useEffect(() => {
-    let index = 0;
-    let timer: number;
-
-    const getTypingDelay = () =>
-      Math.floor(Math.random() * 55) + 85;
-
-    const typeNextCharacter = () => {
-      index += 1;
-      setDisplayText(HERO_TITLE.slice(0, index));
-
-      if (index < HERO_TITLE.length) {
-        timer = window.setTimeout(
-          typeNextCharacter,
-          getTypingDelay()
-        );
-      }
-    };
-
-    setDisplayText("");
-    timer = window.setTimeout(typeNextCharacter, 350);
-
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  const lines = displayText.split("\n");
-
-  return (
-    <>
-      <style>{`
-        @keyframes naturalCaretBlink {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
-        }
-      `}</style>
-
-      <h2
-        className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary leading-[1.1] tracking-tight"
-        aria-label="Sistem Pengelolaan dan Monitoring Dokumen Analisis Gender"
-      >
-      {lines.map((line, index) => (
-        <React.Fragment key={index}>
-          <span className={index === 1 ? "text-[#1E40AF]" : undefined}>
-            {line}
-          </span>
-
-          {index < lines.length - 1 && <br />}
-        </React.Fragment>
-      ))}
-
-        <span
-          aria-hidden="true"
-          className="ml-1 inline-block h-[0.88em] w-[2px] translate-y-[0.08em] bg-black"
-          style={{
-            animation: "naturalCaretBlink 1.06s steps(1, end) infinite",
-          }}
-        />
-      </h2>
-    </>
-  );
-}
-
 export default function App() {
   const [data, setData] = useState<OPDData[]>(OFFICIAL_OPDS);
   const [loading, setLoading] = useState<boolean>(true);
@@ -1679,30 +1611,48 @@ export default function App() {
       </nav>
 
       {/* HERO SECTION */}
-      <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
-        {/* Background dibuat sama seperti halaman login */}
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
-        <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
-          <div className="space-y-8 relative z-10">
-            <HeroTypewriter />
-            
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
-              Digitalisasi pengumpulan dokumen analisis gender pada Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
+      <main
+        className="relative flex-grow overflow-hidden bg-[#0B1220] px-4 pb-20 pt-32 sm:pt-36 lg:pb-24 lg:pt-40"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px',
+        }}
+      >
+        <div className="pointer-events-none absolute -left-48 -top-48 h-[560px] w-[560px] rounded-full bg-blue-600/15 blur-[130px]" />
+        <div className="pointer-events-none absolute -bottom-64 right-0 h-[600px] w-[600px] rounded-full bg-indigo-600/10 blur-[140px]" />
+
+        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-2xl"
+          >
+            <div className="inline-flex items-center rounded-lg border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">
+              PUG & PPRG Provinsi NTT
+            </div>
+
+            <h2 className="mt-6 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Monitoring Dokumen
+              <span className="block text-blue-400">Analisis Gender</span>
+            </h2>
+
+            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">
+              Monitoring GAP, GBS, KAK, dan SK Focal Point perangkat daerah Provinsi Nusa Tenggara Timur.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               {loggedInOPD ? (
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-500"
                 >
-                  <User className="w-5 h-5" />
-                  <span>Profil & Upload ({loggedInOPD.namaPendek})</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <User className="h-4 w-4" />
+                  Dashboard OPD
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
                 <button
@@ -1713,99 +1663,86 @@ export default function App() {
                     setLoginError(null);
                     setShowLoginModal(true);
                   }}
-                  className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
                 >
-                  LOGIN OPD
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                  </svg>
+                  <Lock className="h-4 w-4" />
+                  Login OPD
                 </button>
               )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('dashboard');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.05] px-6 py-3.5 text-sm font-bold text-slate-200 backdrop-blur-sm transition-all duration-300 hover:border-white/25 hover:bg-white/[0.09]"
+              >
+                Lihat Dashboard
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
+          </motion.div>
 
-          </div>
+          <motion.div
+            initial={{ opacity: 0, x: 18 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.45, delay: 0.05 }}
+            className="relative"
+          >
+            <div className="pointer-events-none absolute inset-8 rounded-[30px] bg-blue-500/10 blur-3xl" />
 
-          {/* Visual Side Graphics (Matched Exactly to screenshot!) */}
-          <div className="relative hidden lg:block z-10 h-[500px] w-full">
-            {/* Radial Glow Background */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/40 to-indigo-50/40 rounded-full scale-90 blur-2xl"></div>
-            
-            {/* Back Card (Yellow Icon on the left) */}
-            <div className="absolute left-[10%] top-[10%] w-[270px] h-[330px] bg-white rounded-2xl shadow-lg border border-slate-100 transform -rotate-[5deg] flex flex-col p-6 z-10">
-              <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-5.5 h-5.5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
+            <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.055] p-5 shadow-2xl shadow-black/30 backdrop-blur-md sm:p-7">
+              <div className="flex items-center justify-between border-b border-white/10 pb-5">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-300">
+                    Dokumen PUG & PPRG
+                  </p>
+                  <h3 className="mt-1.5 text-lg font-black text-white">
+                    Dokumen yang dimonitor
+                  </h3>
+                </div>
+
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-400/10 text-blue-300">
+                  <FileText className="h-5 w-5" />
+                </div>
               </div>
-              <div className="h-3 w-1/3 bg-slate-100 rounded-full mb-3.5"></div>
-              <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-5/6 bg-slate-100 rounded-full"></div>
-            </div>
 
-            {/* Front Card (Blue Icon on the right) */}
-            <div className="absolute left-[34%] top-[15%] w-[270px] h-[330px] bg-white rounded-2xl shadow-2xl border border-slate-100/80 transform rotate-[3deg] flex flex-col p-6 z-20">
-              <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-5.5 h-5.5 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
+              <div className="grid grid-cols-1 gap-3 pt-5 sm:grid-cols-2">
+                {[
+                  ['GAP', 'Gender Analysis Pathway'],
+                  ['GBS', 'Gender Budget Statement'],
+                  ['KAK', 'Kerangka Acuan Kerja'],
+                  ['SK', 'SK Focal Point'],
+                ].map(([code, label]) => (
+                  <div
+                    key={code}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-400/20 hover:bg-white/[0.07]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.07] text-[10px] font-black text-blue-300">
+                        {code}
+                      </span>
+                      <p className="text-xs font-semibold leading-5 text-slate-300">
+                        {label}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="h-3 w-2/3 bg-slate-100 rounded-full mb-3.5"></div>
-              <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-11/12 bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-4/5 bg-slate-100 rounded-full mb-2.5"></div>
-              
-              <div className="mt-auto h-12 w-full bg-slate-50/50 rounded-xl border border-slate-200/80 border-dashed"></div>
+
+              <div className="mt-4 flex items-center justify-between rounded-xl border border-white/[0.08] bg-slate-950/30 px-4 py-3">
+                <span className="text-[10px] font-semibold text-slate-400">
+                  OPD terdaftar
+                </span>
+                <span className="text-sm font-black text-white">
+                  {stats.targetOPD} OPD
+                </span>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </main>
-
-      {/* QUICK VALUE PROPOSITIONS */}
-      <section className="relative z-10 border-y border-slate-200/70 bg-white py-10 sm:py-12">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-slate-200 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <TrendingUp className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Mendorong Partisipasi
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <CheckCircle className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Data Real-Time & Valid
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-              <Clock className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Efisiensi Administrasi
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* FAQ / GUIDELINES SIDE PANEL */}
       <AnimatePresence>
@@ -1829,7 +1766,7 @@ export default function App() {
                 <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                   <h3 className="font-extrabold text-primary text-xl flex items-center gap-2">
                     <HelpCircle className="w-5.5 h-5.5 text-secondary" />
-                    Panduan & Informasi
+                    Panduan
                   </h3>
                   <button 
                     onClick={() => setShowFAQ(false)}
@@ -1843,7 +1780,7 @@ export default function App() {
                   <div className="bg-secondary/5 p-4 rounded-xl border border-secondary/15">
                     <h4 className="font-bold text-secondary mb-1">Apa itu Analisis Gender?</h4>
                     <p className="text-slate-600 leading-relaxed text-xs">
-                      Proses menganalisis data dan informasi untuk mengidentifikasi kesenjangan gender, kebutuhan, serta aspirasi laki-laki dan perempuan dalam pembangunan daerah.
+                      Analisis untuk mengidentifikasi kesenjangan gender dalam perencanaan pembangunan.
                     </p>
                   </div>
 
@@ -1854,7 +1791,7 @@ export default function App() {
                       <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
                       <div>
                         <p className="font-semibold text-slate-800 text-xs">Gender Analysis Pathway (GAP)</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Langkah sistematis analisis gender untuk merumuskan kebijakan yang responsif gender.</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Dokumen analisis kesenjangan gender.</p>
                       </div>
                     </div>
 
@@ -1862,7 +1799,7 @@ export default function App() {
                       <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
                       <div>
                         <p className="font-semibold text-slate-800 text-xs">Gender Budget Statement (GBS)</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Dokumen anggaran yang menerangkan alokasi dana khusus untuk mengatasi kesenjangan gender.</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">Pernyataan anggaran responsif gender.</p>
                       </div>
                     </div>
                   </div>
@@ -1870,10 +1807,10 @@ export default function App() {
                   <div className="border-t border-slate-100 pt-4 space-y-3">
                     <h4 className="font-bold text-primary">Langkah Pengunggahan:</h4>
                     <ol className="list-decimal list-inside text-xs text-slate-600 space-y-2">
-                      <li>Persiapkan berkas Surat Keputusan (SK) atau berkas analisis gender OPD Anda.</li>
+                      <li>Siapkan dokumen GAP, GBS, KAK, dan SK Focal Point.</li>
                       <li>Klik tombol <strong>LOGIN OPD</strong>.</li>
-                      <li>Pilih nama instansi/OPD Anda dan masukkan kata sandi Anda.</li>
-                      <li>Pilih tahun anggaran (2025 / 2026 / 2027) lalu unggah 4 berkas SK yang diminta.</li>
+                      <li>Pilih OPD dan masukkan kata sandi.</li>
+                      <li>Pilih tahun anggaran lalu unggah dokumen.</li>
                     </ol>
                   </div>
                 </div>
@@ -1893,7 +1830,7 @@ export default function App() {
                   <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  Lihat Dashboard Monitoring
+                  Lihat Dashboard
                 </button>
 
                 {loggedInOPD ? (
@@ -1920,7 +1857,7 @@ export default function App() {
                     className="w-full bg-[#1E40AF] hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
                   >
                     <Lock className="w-4 h-4" />
-                    Login & Isi Dokumen
+                    Login OPD
                   </button>
                 )}
                 <p className="text-[10px] text-slate-400 text-center mt-2 font-medium">DP3AP2KB Nusa Tenggara Timur &copy; 2026</p>
@@ -1933,131 +1870,159 @@ export default function App() {
 
 
       {/* MONITORING DASHBOARD WORKSPACE */}
-      <section id="dashboard" className="py-16 bg-slate-50 relative z-10 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 space-y-12">
-          
-          {/* Dashboard Header */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div>
-              <span className="text-secondary font-extrabold tracking-wider text-xs uppercase flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                Sistem Monitoring Progress
-              </span>
-              <h2 className="text-3xl font-black text-primary mt-2">Dashboard Progres OPD Tahun {dashboardYear}</h2>
-              <p className="text-slate-500 text-sm mt-1 max-w-xl">
-                Memantau progres pengunggahan dokumen analisis gender seluruh OPD berdasarkan tahun yang dipilih.
-              </p>
-            </div>
+      <section
+        id="dashboard"
+        className="relative z-10 border-t border-slate-300 bg-[#E9EFF6] py-14 sm:py-16"
+      >
+        <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6">
 
-            {/* Kontrol Dashboard: Dropdown Tahun, Waktu Update, dan Segarkan */}
-            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
-              <label
-                htmlFor="dashboard-year-select"
-                className="block text-[10px] font-extrabold text-blue-700 uppercase tracking-wider mb-2"
-              >
-                Pilih Tahun Dashboard
-              </label>
+          {/* DASHBOARD HEADER */}
+          <div className="overflow-hidden rounded-[28px] border border-slate-800 bg-[#0F172A] shadow-xl shadow-slate-300/40">
+            <div
+              className="relative p-6 sm:p-8"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px)
+                `,
+                backgroundSize: '28px 28px',
+              }}
+            >
+              <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="relative w-full sm:w-48">
-                  <select
-                    id="dashboard-year-select"
-                    value={dashboardYear}
-                    onChange={(e) => setDashboardYear(e.target.value)}
-                    className="w-full appearance-none bg-blue-50 border-2 border-blue-300 text-blue-900 text-sm font-extrabold py-3 pl-4 pr-10 rounded-xl hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-all"
-                    aria-label="Pilih tahun dashboard"
-                  >
-                    {availableDashboardYears.map(year => (
-                      <option key={year} value={year}>
-                        Tahun {year}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90 text-blue-600 pointer-events-none" />
+              <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-blue-300">
+                    Dashboard OPD
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black tracking-tight text-white sm:text-3xl">
+                    Monitoring Tahun {dashboardYear}
+                  </h2>
+                  <p className="mt-2 text-xs text-slate-400 sm:text-sm">
+                    Status pengunggahan GAP, GBS, KAK, dan SK Focal Point.
+                  </p>
                 </div>
 
-                <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50 px-3 py-2.5 rounded-xl border border-slate-200 whitespace-nowrap">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Update: {lastUpdated.toLocaleTimeString('id-ID')}
-                </span>
+                <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:items-center lg:w-auto">
+                  <div className="relative w-full sm:w-44">
+                    <select
+                      id="dashboard-year-select"
+                      value={dashboardYear}
+                      onChange={(e) => setDashboardYear(e.target.value)}
+                      className="w-full appearance-none rounded-xl border border-white/15 bg-white/10 py-3 pl-4 pr-10 text-sm font-extrabold text-white outline-none transition hover:bg-white/15 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                      aria-label="Pilih tahun dashboard"
+                    >
+                      {availableDashboardYears.map(year => (
+                        <option key={year} value={year} className="text-slate-900">
+                          Tahun {year}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-300" />
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={() => fetchData(true)}
-                  disabled={isRefreshing}
-                  className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-sm transition-all disabled:opacity-50 whitespace-nowrap"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                  <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
-                </button>
+                  <span className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white/10 bg-white/[0.05] px-3 py-3 text-[10px] font-semibold text-slate-400">
+                    <Clock className="h-3.5 w-3.5" />
+                    {lastUpdated.toLocaleTimeString('id-ID')}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => fetchData(true)}
+                    disabled={isRefreshing}
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-blue-600 px-4 py-3 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-500 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* CARD METRICS BENTO GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Target Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-slate-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-bold tracking-wider uppercase">Total Target OPD</p>
-                <p className="text-3xl font-black text-primary font-mono">{stats.targetOPD}</p>
-                <p className="text-[10px] text-slate-400 font-medium">OPD Terdaftar Provinsi NTT</p>
+          {/* METRICS */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="group flex items-center justify-between rounded-2xl border border-slate-300 bg-slate-100 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">
+                  Target OPD
+                </p>
+                <p className="mt-2 font-mono text-3xl font-black text-slate-950">
+                  {stats.targetOPD}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold text-slate-500">
+                  OPD Provinsi NTT
+                </p>
               </div>
-              <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center shrink-0">
-                <Layers className="w-6 h-6" />
-              </div>
-            </div>
-
-            {/* Sudah Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-green-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-green-600 font-bold tracking-wider uppercase">Sudah Upload</p>
-                <p className="text-3xl font-black text-green-700 font-mono">{stats.sudahCount}</p>
-                <p className="text-[10px] text-green-600/80 font-bold">Telah mengunggah dokumen</p>
-              </div>
-              <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
-                <CheckCircle className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-600 shadow-sm">
+                <Layers className="h-5 w-5" />
               </div>
             </div>
 
-            {/* Belum Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-red-600 font-bold tracking-wider uppercase">Belum Upload</p>
-                <p className="text-3xl font-black text-red-600 font-mono">{stats.belumCount}</p>
-                <p className="text-[10px] text-red-500 font-bold">Membutuhkan tindak lanjut</p>
+            <div className="group flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-emerald-700">
+                  Sudah Upload
+                </p>
+                <p className="mt-2 font-mono text-3xl font-black text-emerald-800">
+                  {stats.sudahCount}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold text-emerald-700/70">
+                  OPD
+                </p>
               </div>
-              <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
-                <XCircle className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-200 bg-white/80 text-emerald-700 shadow-sm">
+                <CheckCircle className="h-5 w-5" />
               </div>
             </div>
 
-            {/* Percentage Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-secondary font-bold tracking-wider uppercase">Tingkat Partisipasi</p>
-                <p className="text-3xl font-black text-secondary font-mono">{stats.percentageSudah.toFixed(1)}%</p>
-                <div className="w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1.5">
-                  <div 
-                    className="bg-secondary h-full rounded-full transition-all duration-500" 
+            <div className="group flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-rose-700">
+                  Belum Upload
+                </p>
+                <p className="mt-2 font-mono text-3xl font-black text-rose-700">
+                  {stats.belumCount}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold text-rose-600/70">
+                  OPD
+                </p>
+              </div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-rose-200 bg-white/80 text-rose-700 shadow-sm">
+                <XCircle className="h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="group flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div className="min-w-0">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-blue-700">
+                  Partisipasi
+                </p>
+                <p className="mt-2 font-mono text-3xl font-black text-blue-800">
+                  {stats.percentageSudah.toFixed(1)}%
+                </p>
+                <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-full bg-blue-100">
+                  <div
+                    className="h-full rounded-full bg-blue-700 transition-all duration-500"
                     style={{ width: `${stats.percentageSudah}%` }}
                   />
                 </div>
               </div>
-              <div className="w-12 h-12 bg-blue-50 text-secondary rounded-xl flex items-center justify-center shrink-0">
-                <TrendingUp className="w-6 h-6" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-200 bg-white/80 text-blue-700 shadow-sm">
+                <TrendingUp className="h-5 w-5" />
               </div>
             </div>
-
           </div>
 
-          {/* VISUAL CHARTS SECTION */}
-          <VisualCharts data={displayData} stats={stats} />
+          {/* VISUAL CHARTS */}
+          <div className="rounded-[28px] border border-slate-300/80 bg-[#F8FAFC] p-2 shadow-sm sm:p-4">
+            <VisualCharts data={displayData} stats={stats} />
+          </div>
 
-          {/* OPD LIST SEARCHABLE TABLE */}
-          <OPDList data={displayData} />
-
+          {/* OPD LIST */}
+          <div className="rounded-[28px] border border-slate-300/80 bg-slate-200/45 p-2 shadow-sm sm:p-4">
+            <OPDList data={displayData} />
+          </div>
         </div>
       </section>
 
@@ -2098,7 +2063,7 @@ export default function App() {
                 }} 
                 className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
               >
-                Login & Upload <Lock className="w-3 h-3" />
+                Login OPD <Lock className="w-3 h-3" />
               </button>
             )}
           </div>
@@ -2113,28 +2078,32 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* SUCCESS POPUP OVERLAY */}
+      {/* SUCCESS TOAST */}
       <AnimatePresence>
         {successPopup && successPopup.show && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            initial={{ opacity: 0, y: 14, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-[60] bg-white border border-emerald-100 rounded-2xl shadow-2xl p-5 max-w-sm flex items-start gap-4"
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            className="fixed bottom-5 right-5 z-[60] flex w-[calc(100vw-2.5rem)] max-w-xs items-center gap-3 rounded-2xl border border-emerald-200 bg-white/95 p-4 shadow-2xl shadow-slate-950/15 backdrop-blur-xl"
           >
-            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <CheckCircle className="w-6 h-6 animate-bounce" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <CheckCircle className="h-5 w-5" />
             </div>
-            <div className="flex-1 flex items-center justify-between gap-4">
-              <h4 className="font-extrabold text-slate-800 text-sm">Berhasil Upload</h4>
-              <button
-                onClick={() => setSuccessPopup(null)}
-                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                aria-label="Tutup notifikasi"
-              >
-                <XCircle className="w-4 h-4" />
-              </button>
+
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black text-slate-900">
+                Dokumen berhasil diunggah
+              </p>
             </div>
+
+            <button
+              onClick={() => setSuccessPopup(null)}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              aria-label="Tutup notifikasi"
+            >
+              <XCircle className="h-4 w-4" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
