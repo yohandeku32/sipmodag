@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
   Check,
-  ExternalLink,
-  FileUp,
   Lock,
   Mail,
   Search,
@@ -14,8 +12,6 @@ import {
 } from 'lucide-react';
 import { OPDData } from '../types';
 
-const GOOGLE_FORM_UPLOAD_URL =
-  'https://docs.google.com/forms/d/e/1FAIpQLSe9HHoDTWwMIQZbuA2VWL1612Jfq7VUv-Y9Ct8p9vxIFapOeQ/viewform';
 
 type Props = {
   apiUrl: string;
@@ -361,6 +357,12 @@ export default function OPDLoginScreen({
                           }}
                           placeholder="Masukkan kata sandi..."
                           autoComplete="current-password"
+                          onKeyDown={event => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault();
+                              event.currentTarget.form?.requestSubmit();
+                            }
+                          }}
                           className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                         />
                       </div>
@@ -473,6 +475,12 @@ export default function OPDLoginScreen({
                           }}
                           placeholder="Ulangi kata sandi"
                           autoComplete="new-password"
+                          onKeyDown={event => {
+                            if (event.key === 'Enter') {
+                              event.preventDefault();
+                              event.currentTarget.form?.requestSubmit();
+                            }
+                          }}
                           className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                         />
                       </div>
@@ -513,25 +521,6 @@ export default function OPDLoginScreen({
                   </form>
                 </>
               )}
-
-              <div className="my-5 flex items-center gap-3">
-                <span className="h-px flex-1 bg-slate-200" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Alternatif
-                </span>
-                <span className="h-px flex-1 bg-slate-200" />
-              </div>
-
-              <a
-                href={GOOGLE_FORM_UPLOAD_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-extrabold text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800"
-              >
-                <FileUp className="h-4 w-4" />
-                Upload lewat Google Form
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
             </div>
           </motion.section>
         </div>
