@@ -761,7 +761,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   return (
     <main className="min-h-screen bg-slate-100 text-slate-800">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white">
               <ShieldCheck className="h-5 w-5" />
@@ -796,7 +796,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1680px] space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-2">
             <button
@@ -966,7 +966,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7 xl:p-8">
                 <div>
                   <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
                     Persentase Upload OPD
@@ -1274,7 +1274,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           })}
         </section>
 
-        <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(440px,1.08fr)]">
+        <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(420px,0.72fr)_minmax(0,1.28fr)]">
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-100 p-5">
               <div className="flex flex-col gap-3 sm:flex-row">
