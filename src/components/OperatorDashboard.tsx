@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   CalendarDays,
   CheckCircle2,
@@ -65,6 +65,22 @@ type OPDOverviewRaw = {
 type OPDOverviewResponse = {
   count: number;
   items: OPDOverviewRaw[];
+};
+
+type OPDBudgetRecord = {
+  ANGGARAN_ID?: string;
+  OPD_ID?: string;
+  NAMA_OPD?: string;
+  TAHUN?: string;
+  PAGU_ARG?: number | string;
+  TANGGAL_PAGU?: string | null;
+  REALISASI_ARG?: number | string;
+  TANGGAL_REALISASI?: string | null;
+  UPDATED_AT?: string | null;
+};
+
+type OPDBudgetResponse = {
+  budget: OPDBudgetRecord | null;
 };
 
 type ResetOPDResponse = {
@@ -273,6 +289,19 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   const [resettingKey, setResettingKey] = useState<string | null>(null);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
 
+  const [budgetPopover, setBudgetPopover] = useState<{
+    opdName: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const [budgetPopoverData, setBudgetPopoverData] =
+    useState<OPDBudgetRecord | null>(null);
+  const [budgetPopoverLoading, setBudgetPopoverLoading] =
+    useState(false);
+  const [budgetPopoverError, setBudgetPopoverError] =
+    useState<string | null>(null);
+  const budgetRequestRef = useRef(0);
+
   const loadQueue = async (manual = false) => {
     manual ? setRefreshing(true) : setLoading(true);
     setLoadError(null);
@@ -458,6 +487,92 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       empty: OFFICIAL_42_OPDS.length - uploaded,
     };
   }, [opdDashboardRows]);
+
+  useEffect(() => {
+    budgetRequestRef.current += 1;
+    setBudgetPopover(null);
+    setBudgetPopoverData(null);
+    setBudgetPopoverError(null);
+    setBudgetPopoverLoading(false);
+  }, [overviewYear]);
+
+  const closeBudgetPopover = () => {
+    budgetRequestRef.current += 1;
+    setBudgetPopover(null);
+    setBudgetPopoverData(null);
+    setBudgetPopoverError(null);
+    setBudgetPopoverLoading(false);
+  };
+
+  const openBudgetPopover = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+    item: DashboardOPDRow,
+  ) => {
+    event.stopPropagation();
+
+    if (budgetPopover?.opdName === item.namaOPD) {
+      closeBudgetPopover();
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const popoverWidth = 300;
+    const estimatedHeight = 190;
+    const padding = 12;
+
+    const left = Math.max(
+      padding,
+      Math.min(
+        rect.left,
+        window.innerWidth - popoverWidth - padding,
+      ),
+    );
+
+    const openAbove =
+      rect.bottom + estimatedHeight + padding > window.innerHeight;
+
+    const top = openAbove
+      ? Math.max(padding, rect.top - estimatedHeight - 8)
+      : rect.bottom + 8;
+
+    setBudgetPopover({
+      opdName: item.namaOPD,
+      top,
+      left,
+    });
+    setBudgetPopoverData(null);
+    setBudgetPopoverError(null);
+    setBudgetPopoverLoading(true);
+
+    const requestId = budgetRequestRef.current + 1;
+    budgetRequestRef.current = requestId;
+
+    try {
+      const result = await getReviewAction<OPDBudgetResponse>(
+        apiUrl,
+        'getOPDBudget',
+        {
+          token: session.token,
+          opdName: item.namaOPD,
+          tahun: overviewYear,
+        },
+      );
+
+      if (requestId !== budgetRequestRef.current) return;
+      setBudgetPopoverData(result.budget || null);
+    } catch (error) {
+      if (requestId !== budgetRequestRef.current) return;
+      setBudgetPopoverError(
+        error instanceof Error
+          ? error.message
+          : 'Data pagu gagal dimuat.',
+      );
+    } finally {
+      if (requestId === budgetRequestRef.current) {
+        setBudgetPopoverLoading(false);
+      }
+    }
+  };
 
   const handleResetOPD = async (item: DashboardOPDRow) => {
     const hasAnyData =
@@ -816,11 +931,24 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                               <p className="text-xs font-extrabold text-slate-800">
                                 {item.namaOPD}
                               </p>
-                              <p className="mt-1 text-[9px] text-slate-400">
-                                {item.uploadCount > 0
-                                  ? `${item.uploadCount} upload`
-                                  : 'Belum ada data'}
-                              </p>
+                              <div className="mt-1 flex flex-wrap items-center gap-2">
+                                <span className="text-[9px] text-slate-400">
+                                  {item.uploadCount > 0
+                                    ? `${item.uploadCount} upload`
+                                    : 'Belum ada data'}
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={event =>
+                                    void openBudgetPopover(event, item)
+                                  }
+                                  className="inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-[8px] font-extrabold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
+                                >
+                                  <WalletCards className="h-3 w-3" />
+                                  Pagu Anggaran
+                                </button>
+                              </div>
                             </td>
                             <td className="px-3 py-3 text-center">{renderFlag(item.gap)}</td>
                             <td className="px-3 py-3 text-center">{renderFlag(item.gbs)}</td>
@@ -1166,6 +1294,78 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           </>
         )}
       </div>
+
+      {budgetPopover && (
+        <>
+          <button
+            type="button"
+            aria-label="Tutup pagu anggaran"
+            onClick={closeBudgetPopover}
+            className="fixed inset-0 z-[80] cursor-default bg-transparent"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.16 }}
+            className="fixed z-[90] w-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/20"
+            style={{
+              top: budgetPopover.top,
+              left: budgetPopover.left,
+            }}
+          >
+            <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                <WalletCards className="h-4 w-4" />
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-xs font-black text-slate-900">
+                  Pagu Anggaran
+                </p>
+                <p className="mt-0.5 text-[9px] font-semibold text-slate-400">
+                  Tahun {overviewYear}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4">
+              {budgetPopoverLoading ? (
+                <div className="flex min-h-20 items-center justify-center gap-2 text-xs font-semibold text-slate-400">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Memuat...
+                </div>
+              ) : budgetPopoverError ? (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-3 text-[10px] font-semibold text-red-700">
+                  {budgetPopoverError}
+                </div>
+              ) : budgetPopoverData &&
+                Number(budgetPopoverData.PAGU_ARG || 0) > 0 ? (
+                <>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                    Pagu ARG
+                  </p>
+
+                  <p className="mt-2 text-xl font-black tracking-tight text-slate-950">
+                    {formatRupiah(budgetPopoverData.PAGU_ARG)}
+                  </p>
+
+                  <div className="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-3 text-[9px] font-semibold text-slate-400">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {budgetPopoverData.TANGGAL_PAGU || 'Tanggal belum diisi'}
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-xl bg-slate-50 px-3 py-4 text-center">
+                  <p className="text-xs font-bold text-slate-500">
+                    Pagu belum diisi
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
     </main>
   );
 }
