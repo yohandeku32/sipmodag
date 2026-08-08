@@ -6,6 +6,7 @@ import {
   Eye,
   EyeOff,
   Lock,
+  Loader2,
   Mail,
   Search,
   ShieldCheck,
@@ -63,6 +64,9 @@ export default function OPDLoginScreen({
     useState('');
 
   const [showLoginPassword, setShowLoginPassword] =
+    useState(false);
+
+  const [loginLoading, setLoginLoading] =
     useState(false);
 
   const [
@@ -151,6 +155,29 @@ export default function OPDLoginScreen({
     setPassword('');
     setRegisterPassword('');
     setConfirmPassword('');
+  };
+
+  const handleLogin = async (
+    event: React.FormEvent
+  ) => {
+    event.preventDefault();
+
+    if (loginLoading) return;
+
+    setLoginLoading(true);
+    setLoginError(null);
+
+    // Beri browser 1 frame untuk menampilkan status "Memeriksa..."
+    // sebelum proses autentikasi dijalankan.
+    await new Promise<void>(resolve => {
+      window.requestAnimationFrame(() => resolve());
+    });
+
+    try {
+      await handleLoginSubmit(event);
+    } finally {
+      setLoginLoading(false);
+    }
   };
 
   const handleRegister = async (
@@ -263,6 +290,7 @@ export default function OPDLoginScreen({
 
         <input
           type="text"
+          disabled={mode === 'login' && loginLoading}
           value={searchOPDQuery}
           onChange={event => {
             setSearchOPDQuery(event.target.value);
@@ -302,6 +330,9 @@ export default function OPDLoginScreen({
             focus:bg-white
             focus:ring-4
             focus:ring-blue-100
+            disabled:cursor-not-allowed
+            disabled:bg-slate-100
+            disabled:text-slate-400
           "
         />
 
@@ -704,7 +735,7 @@ export default function OPDLoginScreen({
                   </div>
 
                   <form
-                    onSubmit={handleLoginSubmit}
+                    onSubmit={handleLogin}
                     className="mt-7 space-y-5"
                   >
                     {renderOPDSelector()}
@@ -760,11 +791,15 @@ export default function OPDLoginScreen({
                             focus:bg-white
                             focus:ring-4
                             focus:ring-blue-100
+                            disabled:cursor-not-allowed
+                            disabled:bg-slate-100
+                            disabled:text-slate-400
                           "
                         />
 
                         <button
                           type="button"
+                          disabled={loginLoading}
                           onClick={() =>
                             setShowLoginPassword(
                               value => !value
@@ -834,6 +869,8 @@ export default function OPDLoginScreen({
                     {/* LOGIN BUTTON */}
                     <button
                       type="submit"
+                      disabled={loginLoading}
+                      aria-busy={loginLoading}
                       className="
                         flex
                         w-full
@@ -854,11 +891,19 @@ export default function OPDLoginScreen({
                         hover:-translate-y-0.5
                         hover:bg-blue-900
                         hover:shadow-xl
+                        disabled:cursor-not-allowed
+                        disabled:opacity-70
                       "
                     >
-                      <Unlock className="h-4 w-4" />
+                      {loginLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Unlock className="h-4 w-4" />
+                      )}
 
-                      Masuk
+                      {loginLoading
+                        ? 'Memeriksa...'
+                        : 'Masuk'}
                     </button>
 
                     <p className="text-center text-xs text-slate-500">
