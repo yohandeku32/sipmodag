@@ -338,8 +338,13 @@ export default function OPDDashboard({
           <aside className="border-b border-slate-200 bg-white px-4 py-5 lg:border-b-0 lg:border-r lg:px-5 lg:py-6">
             <div className="flex items-center justify-between gap-3 lg:block">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-sm shadow-violet-900/20">
-                  <ShieldCheck className="h-5 w-5" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                    alt="Logo Pemerintah Provinsi Nusa Tenggara Timur"
+                    className="h-full w-full object-contain"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
                 <div>
                   <p className="text-sm font-black tracking-tight text-slate-950">SIPMODAG</p>
