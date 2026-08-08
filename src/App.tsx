@@ -1988,38 +1988,45 @@ export default function App() {
 
 
       {/* MONITORING DASHBOARD WORKSPACE */}
-      <section id="dashboard" className="py-16 bg-slate-50 relative z-10 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 space-y-12">
-          
-          {/* Dashboard Header */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div>
-              <span className="text-secondary font-extrabold tracking-wider text-xs uppercase flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                Sistem Monitoring Progress
-              </span>
-              <h2 className="text-3xl font-black text-primary mt-2">Dashboard Progres OPD Tahun {dashboardYear}</h2>
-              <p className="text-slate-500 text-sm mt-1 max-w-xl">
-                Memantau progres pengunggahan dokumen analisis gender seluruh OPD berdasarkan tahun yang dipilih.
-              </p>
-            </div>
+      <section
+        id="dashboard"
+        className="relative z-10 overflow-hidden border-t border-blue-100/80 bg-[#EAF2FF] py-14 sm:py-20"
+      >
+        {/* Decorative background, terinspirasi dashboard referensi */}
+        <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 top-10 h-80 w-80 rounded-full bg-indigo-400/15 blur-3xl" />
 
-            {/* Kontrol Dashboard: Dropdown Tahun, Waktu Update, dan Segarkan */}
-            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
-              <label
-                htmlFor="dashboard-year-select"
-                className="block text-[10px] font-extrabold text-blue-700 uppercase tracking-wider mb-2"
-              >
-                Pilih Tahun Dashboard
-              </label>
+        <div className="relative mx-auto max-w-[1400px] px-4 sm:px-6">
+          <div className="overflow-hidden rounded-[32px] border border-white/80 bg-[#F7F9FE] shadow-[0_32px_90px_-48px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60">
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="relative w-full sm:w-48">
+            {/* Dashboard top bar */}
+            <div className="flex flex-col gap-5 border-b border-slate-200/80 bg-white/80 px-5 py-5 backdrop-blur-sm sm:px-7 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-700 text-white shadow-sm shadow-blue-900/15">
+                    <TrendingUp className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-blue-600">
+                      Monitoring SIPMODAG
+                    </p>
+                    <h2 className="mt-0.5 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+                      Dashboard Progres OPD
+                    </h2>
+                  </div>
+                </div>
+                <p className="mt-2 max-w-2xl text-xs font-medium leading-5 text-slate-500">
+                  Ringkasan progres pengunggahan dokumen analisis gender seluruh OPD Provinsi Nusa Tenggara Timur.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="relative">
                   <select
                     id="dashboard-year-select"
                     value={dashboardYear}
                     onChange={(e) => setDashboardYear(e.target.value)}
-                    className="w-full appearance-none bg-blue-50 border-2 border-blue-300 text-blue-900 text-sm font-extrabold py-3 pl-4 pr-10 rounded-xl hover:border-blue-500 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 cursor-pointer transition-all"
+                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-xs font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 sm:w-40"
                     aria-label="Pilih tahun dashboard"
                   >
                     {availableDashboardYears.map(year => (
@@ -2028,91 +2035,239 @@ export default function App() {
                       </option>
                     ))}
                   </select>
-                  <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rotate-90 text-blue-600 pointer-events-none" />
+                  <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
                 </div>
 
-                <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50 px-3 py-2.5 rounded-xl border border-slate-200 whitespace-nowrap">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Update: {lastUpdated.toLocaleTimeString('id-ID')}
-                </span>
+                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-[10px] font-semibold text-slate-500 shadow-sm">
+                  <Clock className="h-3.5 w-3.5 text-slate-400" />
+                  <span className="whitespace-nowrap">
+                    {lastUpdated.toLocaleTimeString('id-ID')}
+                  </span>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => fetchData(true)}
                   disabled={isRefreshing}
-                  className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-sm transition-all disabled:opacity-50 whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-xs font-extrabold text-white shadow-sm shadow-blue-900/15 transition hover:bg-blue-800 disabled:opacity-50"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                   <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* CARD METRICS BENTO GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Target Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-slate-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-slate-500 font-bold tracking-wider uppercase">Total Target OPD</p>
-                <p className="text-3xl font-black text-primary font-mono">{stats.targetOPD}</p>
-                <p className="text-[10px] text-slate-400 font-medium">OPD Terdaftar Provinsi NTT</p>
-              </div>
-              <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center shrink-0">
-                <Layers className="w-6 h-6" />
-              </div>
-            </div>
+            <div className="space-y-5 p-4 sm:p-6">
+              {/* Compact metric strip */}
+              <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+                  {[
+                    {
+                      label: 'Total Target OPD',
+                      value: stats.targetOPD,
+                      caption: `Tahun ${dashboardYear}`,
+                      icon: Layers,
+                      iconClass: 'bg-orange-50 text-orange-500',
+                      valueClass: 'text-slate-950',
+                    },
+                    {
+                      label: 'Sudah Upload',
+                      value: stats.sudahCount,
+                      caption: 'Minimal 1 dokumen',
+                      icon: CheckCircle,
+                      iconClass: 'bg-violet-50 text-violet-600',
+                      valueClass: 'text-violet-700',
+                    },
+                    {
+                      label: 'Belum Upload',
+                      value: stats.belumCount,
+                      caption: 'Perlu tindak lanjut',
+                      icon: XCircle,
+                      iconClass: 'bg-cyan-50 text-cyan-600',
+                      valueClass: 'text-cyan-700',
+                    },
+                    {
+                      label: 'Tingkat Partisipasi',
+                      value: `${stats.percentageSudah.toFixed(1)}%`,
+                      caption: `${stats.sudahCount} dari ${stats.targetOPD} OPD`,
+                      icon: TrendingUp,
+                      iconClass: 'bg-rose-50 text-rose-600',
+                      valueClass: 'text-rose-600',
+                    },
+                  ].map(item => {
+                    const Icon = item.icon;
 
-            {/* Sudah Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-green-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-green-600 font-bold tracking-wider uppercase">Sudah Upload</p>
-                <p className="text-3xl font-black text-green-700 font-mono">{stats.sudahCount}</p>
-                <p className="text-[10px] text-green-600/80 font-bold">Telah mengunggah dokumen</p>
-              </div>
-              <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center shrink-0">
-                <CheckCircle className="w-6 h-6" />
-              </div>
-            </div>
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex min-h-[118px] items-center gap-4 px-5 py-5 transition hover:bg-slate-50/70"
+                      >
+                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${item.iconClass}`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
 
-            {/* Belum Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-red-600 font-bold tracking-wider uppercase">Belum Upload</p>
-                <p className="text-3xl font-black text-red-600 font-mono">{stats.belumCount}</p>
-                <p className="text-[10px] text-red-500 font-bold">Membutuhkan tindak lanjut</p>
-              </div>
-              <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center shrink-0">
-                <XCircle className="w-6 h-6" />
-              </div>
-            </div>
-
-            {/* Percentage Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-300 transition-colors">
-              <div className="space-y-1">
-                <p className="text-xs text-secondary font-bold tracking-wider uppercase">Tingkat Partisipasi</p>
-                <p className="text-3xl font-black text-secondary font-mono">{stats.percentageSudah.toFixed(1)}%</p>
-                <div className="w-24 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1.5">
-                  <div 
-                    className="bg-secondary h-full rounded-full transition-all duration-500" 
-                    style={{ width: `${stats.percentageSudah}%` }}
-                  />
+                        <div className="min-w-0">
+                          <p className="text-[9px] font-extrabold uppercase tracking-[0.13em] text-slate-400">
+                            {item.label}
+                          </p>
+                          <p className={`mt-1 text-2xl font-black tracking-tight ${item.valueClass}`}>
+                            {item.value}
+                          </p>
+                          <p className="mt-1 text-[9px] font-semibold text-slate-400">
+                            {item.caption}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-              <div className="w-12 h-12 bg-blue-50 text-secondary rounded-xl flex items-center justify-center shrink-0">
-                <TrendingUp className="w-6 h-6" />
-              </div>
+              </section>
+
+              {/* Main analytics area */}
+              <section className="grid gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.68fr)]">
+                <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                  <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <div>
+                      <p className="text-sm font-black tracking-tight text-slate-950">
+                        Visualisasi Progres
+                      </p>
+                      <p className="mt-1 text-[10px] font-medium text-slate-400">
+                        Distribusi status pengunggahan dokumen OPD Tahun {dashboardYear}
+                      </p>
+                    </div>
+
+                    <span className="rounded-xl bg-violet-50 px-3 py-2 text-[9px] font-extrabold text-violet-700">
+                      Data Monitoring
+                    </span>
+                  </div>
+
+                  <div className="p-4 sm:p-5">
+                    <VisualCharts data={displayData} stats={stats} />
+                  </div>
+                </div>
+
+                <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div>
+                    <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                      Partisipasi OPD
+                    </p>
+                    <h3 className="mt-1 text-lg font-black tracking-tight text-slate-950">
+                      Status Tahun {dashboardYear}
+                    </h3>
+                    <p className="mt-1 text-[10px] font-medium leading-4 text-slate-400">
+                      Persentase OPD yang sudah mengunggah minimal satu dokumen.
+                    </p>
+                  </div>
+
+                  <div className="mt-6 flex justify-center">
+                    <div
+                      className="relative flex h-48 w-48 items-center justify-center rounded-full p-[16px]"
+                      style={{
+                        background: `conic-gradient(#5B5CE2 0 ${stats.percentageSudah}%, #E8EAF3 ${stats.percentageSudah}% 100%)`,
+                      }}
+                    >
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-inner">
+                        <span className="text-3xl font-black tracking-tight text-slate-950">
+                          {stats.percentageSudah.toFixed(1)}%
+                        </span>
+                        <span className="mt-1 text-[9px] font-extrabold uppercase tracking-wider text-slate-400">
+                          Partisipasi
+                        </span>
+                        <span className="mt-2 rounded-lg bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold text-violet-700">
+                          {stats.sudahCount}/{stats.targetOPD} OPD
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between gap-3 text-[10px] font-bold">
+                        <span className="flex items-center gap-2 text-slate-600">
+                          <span className="h-2 w-2 rounded-full bg-violet-500" />
+                          Sudah Upload
+                        </span>
+                        <span className="text-violet-700">
+                          {stats.percentageSudah.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${stats.percentageSudah}%` }}
+                          transition={{ duration: 0.55, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-violet-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between gap-3 text-[10px] font-bold">
+                        <span className="flex items-center gap-2 text-slate-600">
+                          <span className="h-2 w-2 rounded-full bg-rose-500" />
+                          Belum Upload
+                        </span>
+                        <span className="text-rose-600">
+                          {(100 - stats.percentageSudah).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.max(0, 100 - stats.percentageSudah)}%` }}
+                          transition={{ duration: 0.55, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-rose-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-inset ring-slate-100">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <Database className="h-4 w-4 text-blue-600" />
+                          <span className="text-[10px] font-extrabold text-slate-600">
+                            Status Data
+                          </span>
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[8px] font-extrabold text-emerald-700">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          LIVE
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[9px] font-medium leading-4 text-slate-400">
+                        Terakhir diperbarui pukul {lastUpdated.toLocaleTimeString('id-ID')}.
+                      </p>
+                    </div>
+                  </div>
+                </aside>
+              </section>
+
+              {/* OPD list */}
+              <section
+                id="daftar-opd"
+                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+              >
+                <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                  <div>
+                    <p className="text-sm font-black tracking-tight text-slate-950">
+                      Daftar Monitoring OPD
+                    </p>
+                    <p className="mt-1 text-[10px] font-medium text-slate-400">
+                      Rincian kelengkapan dokumen seluruh OPD Tahun {dashboardYear}
+                    </p>
+                  </div>
+
+                  <span className="w-fit rounded-xl bg-blue-50 px-3 py-2 text-[9px] font-extrabold text-blue-700">
+                    {stats.targetOPD} OPD
+                  </span>
+                </div>
+
+                <div className="p-4 sm:p-5">
+                  <OPDList data={displayData} />
+                </div>
+              </section>
             </div>
-
           </div>
-
-          {/* VISUAL CHARTS SECTION */}
-          <VisualCharts data={displayData} stats={stats} />
-
-          {/* OPD LIST SEARCHABLE TABLE */}
-          <OPDList data={displayData} />
-
         </div>
       </section>
 
