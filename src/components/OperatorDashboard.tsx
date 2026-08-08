@@ -23,11 +23,13 @@ import {
   ShieldCheck,
   UploadCloud,
   WalletCards,
+  UsersRound,
   XCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { fileToBase64, getReviewAction, postReviewAction } from '../reviewApi';
 import { OperatorSession, ReviewStatus, ReviewUpload } from '../reviewTypes';
+import OperatorAccountManager from './OperatorAccountManager';
 
 type Props = {
   apiUrl: string;
@@ -46,7 +48,7 @@ type SubmitReviewResponse = {
   statusReview: ReviewStatus;
 };
 
-type OperatorTab = 'review' | 'opd-dashboard';
+type OperatorTab = 'review' | 'opd-dashboard' | 'accounts';
 
 type OPDOverviewRaw = {
   OPD_ID: string;
@@ -636,6 +638,19 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               <LayoutDashboard className="h-4 w-4" />
               Dashboard 42 OPD
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('accounts')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
+                activeTab === 'accounts'
+                  ? 'bg-emerald-700 text-white shadow-sm'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              }`}
+            >
+              <UsersRound className="h-4 w-4" />
+              Kelola Akun OPD
+            </button>
           </div>
 
           <p className="px-2 text-[10px] font-semibold text-slate-400">
@@ -643,7 +658,9 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           </p>
         </section>
 
-        {activeTab === 'opd-dashboard' ? (
+        {activeTab === 'accounts' ? (
+          <OperatorAccountManager session={session} />
+        ) : activeTab === 'opd-dashboard' ? (
           <>
             <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
