@@ -1680,8 +1680,17 @@ export default function App() {
 
       {/* HERO SECTION */}
       <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
-        {/* Background dibuat sama seperti halaman login */}
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
+        {/* Grid hitam tipis */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(15, 23, 42, 0.10) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(15, 23, 42, 0.10) 1px, transparent 1px)
+            `,
+            backgroundSize: '30px 30px',
+          }}
+        />
         <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
         
@@ -1950,7 +1959,7 @@ export default function App() {
             </div>
 
             {/* Kontrol Dashboard: Dropdown Tahun, Waktu Update, dan Segarkan */}
-            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
+            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-lg shadow-slate-300/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
               <label
                 htmlFor="dashboard-year-select"
                 className="block text-[10px] font-extrabold text-blue-700 uppercase tracking-wider mb-2"
@@ -1998,7 +2007,7 @@ export default function App() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Target Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-slate-300 transition-colors">
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center justify-between group shadow-xl shadow-slate-300/55 transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-400/45">
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-bold tracking-wider uppercase">Total Target OPD</p>
                 <p className="text-3xl font-black text-primary font-mono">{stats.targetOPD}</p>
@@ -2010,7 +2019,7 @@ export default function App() {
             </div>
 
             {/* Sudah Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-green-300 transition-colors">
+            <div className="bg-white p-6 rounded-2xl border border-green-100 flex items-center justify-between group shadow-xl shadow-emerald-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-2xl hover:shadow-emerald-300/40">
               <div className="space-y-1">
                 <p className="text-xs text-green-600 font-bold tracking-wider uppercase">Sudah Upload</p>
                 <p className="text-3xl font-black text-green-700 font-mono">{stats.sudahCount}</p>
@@ -2022,7 +2031,7 @@ export default function App() {
             </div>
 
             {/* Belum Upload Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-300 transition-colors">
+            <div className="bg-white p-6 rounded-2xl border border-red-100 flex items-center justify-between group shadow-xl shadow-rose-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-2xl hover:shadow-rose-300/40">
               <div className="space-y-1">
                 <p className="text-xs text-red-600 font-bold tracking-wider uppercase">Belum Upload</p>
                 <p className="text-3xl font-black text-red-600 font-mono">{stats.belumCount}</p>
@@ -2034,7 +2043,7 @@ export default function App() {
             </div>
 
             {/* Percentage Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-300 transition-colors">
+            <div className="bg-white p-6 rounded-2xl border border-blue-100 flex items-center justify-between group shadow-xl shadow-blue-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-300/40">
               <div className="space-y-1">
                 <p className="text-xs text-secondary font-bold tracking-wider uppercase">Tingkat Partisipasi</p>
                 <p className="text-3xl font-black text-secondary font-mono">{stats.percentageSudah.toFixed(1)}%</p>
