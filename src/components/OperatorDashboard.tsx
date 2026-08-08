@@ -1254,20 +1254,81 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           <>
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: 'Total Antrean', value: summary.total, icon: FileSearch, className: 'bg-slate-100 text-slate-600' },
-            { label: 'Menunggu Review', value: summary.waiting, icon: FileClock, className: 'bg-amber-50 text-amber-600' },
-            { label: 'Perlu Revisi', value: summary.revision, icon: RefreshCw, className: 'bg-violet-50 text-violet-600' },
-            { label: 'Sedang Direview', value: summary.active, icon: FileCheck2, className: 'bg-blue-50 text-blue-600' },
+            {
+              label: 'Total Antrean',
+              value: summary.total,
+              icon: FileSearch,
+              cardClass:
+                'border-blue-600 bg-gradient-to-br from-blue-700 via-blue-600 to-violet-600 text-white shadow-blue-900/15',
+              labelClass: 'text-blue-100',
+              valueClass: 'text-white',
+              iconClass: 'bg-white/15 text-white ring-1 ring-white/20',
+              glowClass: 'bg-white/10',
+            },
+            {
+              label: 'Menunggu Review',
+              value: summary.waiting,
+              icon: FileClock,
+              cardClass:
+                'border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 text-amber-950 shadow-amber-900/5',
+              labelClass: 'text-amber-700',
+              valueClass: 'text-amber-950',
+              iconClass: 'bg-white/75 text-orange-600 ring-1 ring-amber-200',
+              glowClass: 'bg-amber-300/25',
+            },
+            {
+              label: 'Perlu Revisi',
+              value: summary.revision,
+              icon: RefreshCw,
+              cardClass:
+                'border-violet-200 bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-100 text-violet-950 shadow-violet-900/5',
+              labelClass: 'text-violet-700',
+              valueClass: 'text-violet-950',
+              iconClass: 'bg-white/75 text-violet-600 ring-1 ring-violet-200',
+              glowClass: 'bg-fuchsia-300/20',
+            },
+            {
+              label: 'Sedang Direview',
+              value: summary.active,
+              icon: FileCheck2,
+              cardClass:
+                'border-sky-200 bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 text-sky-950 shadow-sky-900/5',
+              labelClass: 'text-sky-700',
+              valueClass: 'text-sky-950',
+              iconClass: 'bg-white/75 text-blue-600 ring-1 ring-sky-200',
+              glowClass: 'bg-cyan-300/20',
+            },
           ].map(item => {
             const Icon = item.icon;
+
             return (
-              <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{item.label}</p>
-                  <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{item.value}</p>
-                </div>
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${item.className}`}>
-                  <Icon className="h-5 w-5" />
+              <div
+                key={item.label}
+                className={`relative overflow-hidden rounded-2xl border p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${item.cardClass}`}
+              >
+                <div
+                  className={`pointer-events-none absolute -right-7 -top-8 h-24 w-24 rounded-full blur-2xl ${item.glowClass}`}
+                />
+
+                <div className="relative flex items-center justify-between gap-4">
+                  <div>
+                    <p
+                      className={`text-[9px] font-extrabold uppercase tracking-[0.14em] ${item.labelClass}`}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      className={`mt-2 text-3xl font-black tracking-tight ${item.valueClass}`}
+                    >
+                      {item.value}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-sm backdrop-blur-sm ${item.iconClass}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
                 </div>
               </div>
             );
