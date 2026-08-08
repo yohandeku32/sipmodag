@@ -759,11 +759,13 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-800">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden bg-[#EAF2FF] text-slate-800">
+      <div className="pointer-events-none fixed -left-28 top-32 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl" />
+      <div className="pointer-events-none fixed -right-28 top-12 h-96 w-96 rounded-full bg-indigo-400/15 blur-3xl" />
+      <header className="sticky top-0 z-40 bg-[#EAF2FF]/90 px-4 pt-4 backdrop-blur-xl sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 rounded-[24px] border border-white/80 bg-white/90 px-5 py-4 shadow-[0_18px_50px_-34px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-violet-600 text-white shadow-sm shadow-blue-900/20">
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -779,7 +781,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               type="button"
               onClick={() => void loadQueue(true)}
               disabled={refreshing}
-              className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+              className="flex h-10 items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-3 text-xs font-extrabold text-blue-700 transition hover:bg-blue-100 disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Segarkan</span>
@@ -787,7 +789,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             <button
               type="button"
               onClick={onLogout}
-              className="flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-3 text-xs font-extrabold text-white hover:bg-rose-700"
+              className="flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-rose-700"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Keluar</span>
@@ -796,16 +798,16 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1680px] space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-        <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative z-10 mx-auto my-5 max-w-[1680px] space-y-5 rounded-[32px] border border-white/80 bg-[#F7F9FE] p-4 shadow-[0_32px_90px_-48px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60 sm:p-6">
+        <section className="flex flex-col gap-3 rounded-3xl border border-slate-200/80 bg-white/90 p-2 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setActiveTab('review')}
               className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
                 activeTab === 'review'
-                  ? 'bg-slate-950 text-white shadow-sm'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
+                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
               }`}
             >
               <FileSearch className="h-4 w-4" />
@@ -817,8 +819,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               onClick={() => setActiveTab('opd-dashboard')}
               className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
                 activeTab === 'opd-dashboard'
-                  ? 'bg-blue-700 text-white shadow-sm'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
+                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
               }`}
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -830,8 +832,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               onClick={() => setActiveTab('accounts')}
               className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
                 activeTab === 'accounts'
-                  ? 'bg-emerald-700 text-white shadow-sm'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
+                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
               }`}
             >
               <UsersRound className="h-4 w-4" />
@@ -848,14 +850,34 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           <>
             <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {[
-                { label: 'Total OPD', value: overviewSummary.total, tone: 'bg-slate-100 text-slate-700' },
-                { label: 'Sudah Upload', value: overviewSummary.uploaded, tone: 'bg-blue-50 text-blue-700' },
-                { label: 'Lengkap', value: overviewSummary.complete, tone: 'bg-emerald-50 text-emerald-700' },
-                { label: 'Belum Upload', value: overviewSummary.empty, tone: 'bg-amber-50 text-amber-700' },
+                {
+                  label: 'Total OPD',
+                  value: overviewSummary.total,
+                  tone: 'bg-orange-100/80 text-orange-700',
+                  card: 'border-orange-100 bg-gradient-to-br from-white to-orange-50/70',
+                },
+                {
+                  label: 'Sudah Upload',
+                  value: overviewSummary.uploaded,
+                  tone: 'bg-violet-100/80 text-violet-700',
+                  card: 'border-violet-100 bg-gradient-to-br from-white to-violet-50/70',
+                },
+                {
+                  label: 'Lengkap',
+                  value: overviewSummary.complete,
+                  tone: 'bg-emerald-100/80 text-emerald-700',
+                  card: 'border-emerald-100 bg-gradient-to-br from-white to-emerald-50/70',
+                },
+                {
+                  label: 'Belum Upload',
+                  value: overviewSummary.empty,
+                  tone: 'bg-rose-100/80 text-rose-700',
+                  card: 'border-rose-100 bg-gradient-to-br from-white to-rose-50/70',
+                },
               ].map(item => (
                 <div
                   key={item.label}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                  className={`rounded-3xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.card}`}
                 >
                   <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">
                     {item.label}
@@ -873,7 +895,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </section>
 
             <section className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(330px,0.8fr)]">
-              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
                 <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white">
@@ -966,7 +988,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7 xl:p-8">
+              <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-7 xl:p-8">
                 <div>
                   <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
                     Persentase Upload OPD
@@ -1052,8 +1074,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               </div>
             </section>
 
-            <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-              <div className="border-b border-slate-100 p-5">
+            <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
+              <div className="border-b border-slate-100 bg-gradient-to-r from-white to-violet-50/40 p-5">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="flex items-center gap-2">
@@ -1072,7 +1094,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         value={overviewSearch}
                         onChange={event => setOverviewSearch(event.target.value)}
                         placeholder="Cari nama OPD..."
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm shadow-sm outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                       />
                     </div>
 
@@ -1336,7 +1358,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </section>
 
         <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(420px,0.72fr)_minmax(0,1.28fr)]">
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
             <div className="border-b border-slate-100 p-5">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
@@ -1426,7 +1448,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-6">
             {!selected ? (
               <div className="flex min-h-[560px] flex-col items-center justify-center text-center">
                 <FileSearch className="h-12 w-12 text-slate-300" />
@@ -1437,7 +1459,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               <motion.div key={selected.UPLOAD_ID} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-700">Dokumen</p>
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-violet-700">Dokumen</p>
                     <h2 className="mt-2 break-words text-2xl font-black tracking-tight text-slate-950">{selected.NAMA_OPD}</h2>
                     <p className="mt-2 text-sm font-semibold text-slate-500">{selected.JENIS_DOKUMEN} · Tahun {selected.TAHUN} · Versi {selected.VERSI}</p>
                   </div>
@@ -1446,10 +1468,10 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   </span>
                 </div>
 
-                <section className="mt-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
+                <section className="mt-5 rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50/80 to-blue-50/60 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 text-white">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#5B5CE2] text-white shadow-sm">
                         <WalletCards className="h-5 w-5" />
                       </div>
                       <div>
@@ -1593,7 +1615,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-blue-900/15 transition hover:bg-blue-900 disabled:pointer-events-none disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#5B5CE2] px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-violet-900/15 transition hover:bg-violet-700 disabled:pointer-events-none disabled:opacity-60"
                   >
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                     {submitting ? 'Mengirim...' : 'Kirim Review'}
