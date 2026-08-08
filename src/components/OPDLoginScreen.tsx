@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
@@ -58,6 +58,28 @@ export default function OPDLoginScreen({
   const [registerLoading, setRegisterLoading] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState<string | null>(null);
+  const opdSelectorRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handlePointerDownOutside = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+
+      if (
+        showOPDDropdown &&
+        target &&
+        opdSelectorRef.current &&
+        !opdSelectorRef.current.contains(target)
+      ) {
+        setShowOPDDropdown(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDownOutside);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDownOutside);
+    };
+  }, [showOPDDropdown, setShowOPDDropdown]);
 
   const query = searchOPDQuery.toLowerCase().trim();
 
@@ -168,7 +190,7 @@ export default function OPDLoginScreen({
   };
 
   const OPDSelector = () => (
-    <div className="relative space-y-2">
+    <div ref={opdSelectorRef} className="relative space-y-2">
       <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
         Instansi / OPD
       </label>
