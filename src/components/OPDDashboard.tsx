@@ -65,7 +65,7 @@ const slots: Array<{
     key: 'file1',
     title: 'Dokumen GAP',
     documentName: 'GAP',
-    description: 'Gender Analysis Pathway atau analisis kesenjangan gender OPD.',
+    description: 'Gender Analysis Pathway.',
     accept: '.pdf,.doc,.docx,.xls,.xlsx',
     icon: FileText,
   },
@@ -73,7 +73,7 @@ const slots: Array<{
     key: 'file2',
     title: 'Dokumen GBS',
     documentName: 'GBS',
-    description: 'Gender Budget Statement atau lembar pernyataan anggaran gender.',
+    description: 'Gender Budget Statement.',
     accept: '.pdf,.doc,.docx,.xls,.xlsx',
     icon: FileSpreadsheet,
   },
@@ -81,7 +81,7 @@ const slots: Array<{
     key: 'file3',
     title: 'Dokumen KAK',
     documentName: 'KAK',
-    description: 'Kerangka Acuan Kerja responsif gender untuk tahun anggaran terpilih.',
+    description: 'Kerangka Acuan Kerja responsif gender.',
     accept: '.pdf,.doc,.docx,.xls,.xlsx',
     icon: FileText,
   },
@@ -89,7 +89,7 @@ const slots: Array<{
     key: 'file4',
     title: 'SK Focal Point',
     documentName: 'SK FOCAL POINT',
-    description: 'Surat keputusan penunjukan Focal Point Pengarusutamaan Gender OPD.',
+    description: 'SK Focal Point Pengarusutamaan Gender.',
     accept: '.pdf,.doc,.docx,.xls,.xlsx',
     icon: ShieldCheck,
   },
@@ -336,7 +336,7 @@ export default function OPDDashboard({
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-black sm:text-base">{loggedInOPD.namaPendek}</p>
-              <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Dashboard OPD SIPMODAG</p>
+              <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">Dashboard OPD</p>
             </div>
           </div>
 
@@ -382,7 +382,7 @@ export default function OPDDashboard({
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-slate-50 p-4">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Terdata</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Dokumen</p>
                 <p className="mt-1 text-2xl font-black text-slate-950">{loggedInOPD.jumlahUpload}<span className="ml-1 text-xs text-slate-400">/4</span></p>
               </div>
               <button
@@ -398,8 +398,7 @@ export default function OPDDashboard({
 
           <section className="rounded-3xl border border-blue-200 bg-blue-950 p-5 text-white shadow-lg">
             <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-300">Tahun Anggaran</p>
-            <p className="mt-2 text-xs leading-relaxed text-blue-100/70">Dokumen dan hasil review mengikuti tahun yang dipilih.</p>
-            <div className="relative mt-5">
+            <div className="relative mt-4">
               <select
                 value={selectedYear}
                 onChange={event => setSelectedYear(event.target.value)}
@@ -475,11 +474,11 @@ export default function OPDDashboard({
               <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
                 {revisionTarget ? `Upload Ulang ${revisionTarget.jenisDokumen}` : `Dokumen Tahun ${selectedYear}`}
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
-                {revisionTarget
-                  ? 'Unggah file perbaikan berdasarkan catatan operator. File lama tetap tersimpan sebagai riwayat versi.'
-                  : 'Pilih satu atau beberapa dokumen untuk dikirim ke antrean review operator pusat.'}
-              </p>
+              {revisionTarget && (
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                  File perbaikan disimpan sebagai versi baru.
+                </p>
+              )}
             </div>
             <div className="rounded-2xl bg-slate-50 px-4 py-3 text-right">
               <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Dipilih</p>
@@ -506,24 +505,28 @@ export default function OPDDashboard({
             </div>
           )}
 
-          <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/40 p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <section className="relative mt-6 overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-100 shadow-md shadow-blue-100/60">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-300/20 blur-3xl" />
+
+            <div className="relative flex flex-col gap-3 border-b border-blue-100/80 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-700 text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-blue-300 shadow-sm">
                   <WalletCards className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-black text-slate-900">Anggaran Responsif Gender</p>
-                  <p className="mt-1 text-[10px] text-slate-500">Data khusus OPD untuk Tahun {selectedYear}</p>
+                  <p className="text-sm font-black text-slate-950">Anggaran Responsif Gender</p>
+                  <p className="mt-1 text-[10px] font-semibold text-slate-500">Tahun {selectedYear}</p>
                 </div>
               </div>
-              <span className="self-start rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-[9px] font-extrabold text-rose-700 sm:self-auto">
-                Pagu wajib sebelum upload
+              <span className="self-start rounded-full border border-rose-200 bg-white/80 px-2.5 py-1 text-[9px] font-extrabold text-rose-700 shadow-sm sm:self-auto">
+                Pagu wajib
               </span>
             </div>
 
+            <div className="relative p-5 pt-0">
+
             {budgetLoading ? (
-              <div className="mt-5 flex items-center gap-2 rounded-xl bg-white px-4 py-4 text-xs font-semibold text-slate-400">
+              <div className="mt-5 flex items-center gap-2 rounded-xl border border-white/70 bg-white/75 px-4 py-4 text-xs font-semibold text-slate-400 shadow-sm">
                 <Loader2 className="h-4 w-4 animate-spin" /> Memuat data anggaran...
               </div>
             ) : (
@@ -538,7 +541,7 @@ export default function OPDDashboard({
                         onChange={event => { setPaguAnggaran(formatAmountInput(event.target.value)); setBudgetMessage(null); }}
                         inputMode="numeric"
                         placeholder="0"
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                       />
                     </div>
                   </div>
@@ -551,7 +554,7 @@ export default function OPDDashboard({
                         type="date"
                         value={tanggalPagu}
                         onChange={event => { setTanggalPagu(event.target.value); setBudgetMessage(null); }}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                       />
                     </div>
                   </div>
@@ -565,7 +568,7 @@ export default function OPDDashboard({
                         onChange={event => { setRealisasiAnggaran(formatAmountInput(event.target.value)); setBudgetMessage(null); }}
                         inputMode="numeric"
                         placeholder="Bisa diisi menyusul"
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-extrabold text-slate-800 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                       />
                     </div>
                   </div>
@@ -579,16 +582,16 @@ export default function OPDDashboard({
                         value={tanggalRealisasi}
                         disabled={!realisasiAnggaran}
                         onChange={event => { setTanggalRealisasi(event.target.value); setBudgetMessage(null); }}
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-400"
+                        className="w-full rounded-xl border border-blue-100 bg-white/90 py-3.5 pl-11 pr-4 text-sm font-semibold text-slate-700 shadow-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-400"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-blue-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 text-white shadow-lg sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ringkasan Tahun {selectedYear}</p>
-                    <p className="mt-1 text-xs font-semibold text-slate-600">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ringkasan {selectedYear}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-200">
                       Pagu {formatRupiah(parseAmountInput(paguAnggaran))} · Realisasi {formatRupiah(parseAmountInput(realisasiAnggaran))}
                     </p>
                   </div>
@@ -596,7 +599,7 @@ export default function OPDDashboard({
                     type="button"
                     onClick={() => void saveBudgetData()}
                     disabled={budgetSaving}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-950 px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-blue-900 disabled:opacity-50"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-blue-700 disabled:opacity-50"
                   >
                     {budgetSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     {budgetSaving ? 'Menyimpan...' : 'Simpan / Perbarui Anggaran'}
@@ -606,10 +609,11 @@ export default function OPDDashboard({
             )}
 
             {budgetMessage && (
-              <div className={`mt-4 rounded-xl border px-4 py-3 text-[10px] font-semibold ${budgetMessage.includes('berhasil') ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+              <div className={`mt-4 rounded-xl border px-4 py-3 text-[10px] font-semibold shadow-sm ${budgetMessage.includes('berhasil') ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
                 {budgetMessage}
               </div>
             )}
+            </div>
           </section>
 
           <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -718,38 +722,53 @@ export default function OPDDashboard({
 
       <AnimatePresence>
         {showNotifications && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex justify-end bg-slate-950/40 backdrop-blur-sm"
-            onMouseDown={() => setShowNotifications(false)}
-          >
+          <>
+            <motion.button
+              type="button"
+              aria-label="Tutup notifikasi"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowNotifications(false)}
+              className="fixed inset-0 z-[90] cursor-default bg-transparent"
+            />
+
             <motion.aside
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-              className="flex h-full w-full max-w-md flex-col bg-white shadow-2xl"
-              onMouseDown={event => event.stopPropagation()}
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="fixed right-4 top-20 z-[100] flex max-h-[calc(100vh-6rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-950/20 backdrop-blur-xl sm:right-6 sm:top-24"
             >
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-5">
-                <div>
-                  <h2 className="text-lg font-black text-slate-950">Notifikasi Review</h2>
-                  <p className="mt-1 text-[10px] text-slate-400">{unreadCount} notifikasi belum dibaca</p>
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                    <Bell className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black text-slate-950">Notifikasi</h2>
+                    {unreadCount > 0 && (
+                      <p className="mt-0.5 text-[9px] font-semibold text-slate-400">{unreadCount} belum dibaca</p>
+                    )}
+                  </div>
                 </div>
-                <button type="button" onClick={() => setShowNotifications(false)} className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-500"><X className="h-4 w-4" /></button>
+                <button
+                  type="button"
+                  onClick={() => setShowNotifications(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="overflow-y-auto p-3">
                 {notifications.length === 0 ? (
-                  <div className="flex min-h-72 flex-col items-center justify-center text-center">
-                    <Bell className="h-10 w-10 text-slate-300" />
-                    <p className="mt-4 font-black text-slate-800">Belum ada notifikasi</p>
-                    <p className="mt-1 text-xs text-slate-400">Hasil review operator akan muncul di sini.</p>
+                  <div className="flex min-h-44 flex-col items-center justify-center text-center">
+                    <Bell className="h-8 w-8 text-slate-300" />
+                    <p className="mt-3 text-xs font-black text-slate-700">Belum ada notifikasi</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {notifications.map(notification => {
                       const review = reviewById.get(notification.REVIEW_ID);
                       const unread = !toBoolean(notification.IS_READ);
@@ -758,26 +777,47 @@ export default function OPDDashboard({
                         <article
                           key={notification.NOTIFICATION_ID}
                           onClick={() => void markNotificationRead(notification)}
-                          className={`cursor-pointer rounded-2xl border p-4 transition ${unread ? 'border-blue-200 bg-blue-50' : 'border-slate-200 bg-white'}`}
+                          className={`cursor-pointer rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                            unread
+                              ? 'border-blue-200 bg-blue-50/80'
+                              : 'border-slate-200 bg-white'
+                          }`}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <p className="text-xs font-black text-slate-900">{notification.JUDUL}</p>
-                              <p className="mt-2 text-[11px] leading-relaxed text-slate-600">{notification.PESAN}</p>
+                              <p className="text-[11px] font-black text-slate-900">{notification.JUDUL}</p>
+                              <p className="mt-1.5 text-[10px] leading-relaxed text-slate-600">{notification.PESAN}</p>
                             </div>
-                            {unread && <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-600" />}
+                            {unread && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-600" />}
                           </div>
-                          <p className="mt-3 text-[9px] text-slate-400">{notification.CREATED_AT}</p>
+
+                          <p className="mt-2 text-[8px] text-slate-400">{notification.CREATED_AT}</p>
 
                           {review && (
-                            <div className="mt-3 flex flex-wrap gap-2">
+                            <div className="mt-2.5 flex flex-wrap gap-2">
                               {review.REVIEW_FILE_URL && (
-                                <a href={review.REVIEW_FILE_URL} target="_blank" rel="noopener noreferrer" onClick={event => event.stopPropagation()} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[9px] font-extrabold text-slate-600">
-                                  <Download className="h-3 w-3" /> Unduh Review
+                                <a
+                                  href={review.REVIEW_FILE_URL}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={event => event.stopPropagation()}
+                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[8px] font-extrabold text-slate-600 hover:text-blue-700"
+                                >
+                                  <Download className="h-3 w-3" /> File Review
                                 </a>
                               )}
+
                               {review.STATUS_REVIEW === 'PERLU_REVISI' && (
-                                <button type="button" onClick={event => { event.stopPropagation(); void markNotificationRead(notification); startRevisionFromReview(review); setShowNotifications(false); }} className="inline-flex items-center gap-1 rounded-lg bg-blue-700 px-2.5 py-2 text-[9px] font-extrabold text-white">
+                                <button
+                                  type="button"
+                                  onClick={event => {
+                                    event.stopPropagation();
+                                    void markNotificationRead(notification);
+                                    startRevisionFromReview(review);
+                                    setShowNotifications(false);
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-blue-700 px-2.5 py-1.5 text-[8px] font-extrabold text-white hover:bg-blue-900"
+                                >
                                   <UploadCloud className="h-3 w-3" /> Upload Ulang
                                 </button>
                               )}
@@ -790,7 +830,7 @@ export default function OPDDashboard({
                 )}
               </div>
             </motion.aside>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </main>
