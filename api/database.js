@@ -1,74 +1,175 @@
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzSq9P2_oE8MfME8HhIXMfK5lp10Kf48q0aCZUlDVwgOkFhHg4vsrtOyb3oeqirjlKbHw/exec";
+import { connect } from "@tidbcloud/serverless";
 
-const ALLOWED_ACTIONS = new Set([
-  "registerOPD",
-  "loginOPD"
-]);
+function getConnection() {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL belum diatur di Vercel.");
+  }
+
+  return connect({
+    url: databaseUrl,
+    fullResult: true
+  });
+}
+
+function normalizeForJson(value) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(normalizeForJson);
+  }
+
+  if (value && typeof value === "object") {
+    const result = {};
+    for (const [key, item] of Object.entries(value)) {
+      result[key] = normalizeForJson(item);
+    }
+    return result;
+  }
+
+  return value;
+}
+
+function getFirstSqlKeyword(sql) {
+  return String(sql || "")
+    .trim()
+    .replace(/^\/\*[\s\S]*?\*\/\s*/, "")
+    .split(/\s+/)[0]
+    .toUpperCase();
+}
 
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({
-      success: false,
-      message: "Method tidak diizinkan."
-    });
-  }
-
   try {
+    const conn = getConnection();
+
+    // GET hanya untuk health check koneksi Vercel -> TiDB.
+    if (req.method === "GET") {
+      const result = await conn.execute(
+        "SELECT DATABASE() AS DATABASE_NAME, NOW() AS SERVER_TIME"
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Vercel API berhasil terhubung ke TiDB.",
+        rows: normalizeForJson(result.rows || []),
+        rowCount: Number(result.rowCount || 0)
+      });
+    }
+
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "GET, POST");
+      return res.status(405).json({
+        success: false,
+        message: "Method tidak diizinkan."
+      });
+    }
+
+    const apiSecret = String(
+      process.env.SIPMODAG_API_SECRET || ""
+    );
+
+    const requestSecret = String(
+      req.headers["x-sipmodag-key"] || ""
+    );
+
+    if (!apiSecret) {
+      return res.status(500).json({
+        success: false,
+        message: "SIPMODAG_API_SECRET belum diatur di Vercel."
+      });
+    }
+
+    if (!requestSecret || requestSecret !== apiSecret) {
+      return res.status(401).json({
+        success: false,
+        message: "API key tidak valid."
+      });
+    }
+
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body || "{}")
         : (req.body || {});
 
-    const action = String(body.action || "").trim();
+    const sql = String(body.sql || "").trim();
+    const params = Array.isArray(body.params)
+      ? body.params
+      : [];
 
-    if (!ALLOWED_ACTIONS.has(action)) {
+    if (!sql) {
       return res.status(400).json({
         success: false,
-        message: "Action autentikasi OPD tidak valid."
+        message: "SQL belum dikirim."
       });
     }
 
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(body)
-    });
+    // SIPMODAG saat ini hanya membutuhkan satu statement per request.
+    const sqlWithoutFinalSemicolon =
+      sql.replace(/;\s*$/, "");
 
-    const text = await response.text();
+    if (sqlWithoutFinalSemicolon.includes(";")) {
+      return res.status(400).json({
+        success: false,
+        message: "Multiple SQL statements tidak diizinkan."
+      });
+    }
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.error(
-        "Respons Apps Script bukan JSON:",
-        text.slice(0, 800)
-      );
+    const keyword = getFirstSqlKeyword(sql);
 
-      return res.status(502).json({
+    // Sesuai query yang digunakan Code.gs SIPMODAG sekarang.
+    const allowed = [
+      "SELECT",
+      "INSERT",
+      "UPDATE",
+      "DELETE"
+    ];
+
+    if (!allowed.includes(keyword)) {
+      return res.status(403).json({
         success: false,
         message:
-          "Respons Apps Script tidak valid. Periksa deployment Apps Script production."
+          "Perintah SQL tidak diizinkan. Hanya SELECT, INSERT, UPDATE, dan DELETE."
       });
     }
 
-    return res.status(response.ok ? 200 : response.status).json(data);
+    const result = await conn.execute(
+      sql,
+      params
+    );
+
+    return res.status(200).json({
+      success: true,
+      command: keyword,
+      rows: normalizeForJson(result.rows || []),
+      rowCount: Number(result.rowCount || 0),
+      rowsAffected:
+        result.rowsAffected === null ||
+        result.rowsAffected === undefined
+          ? 0
+          : Number(result.rowsAffected),
+      lastInsertId:
+        result.lastInsertId === null ||
+        result.lastInsertId === undefined
+          ? null
+          : String(result.lastInsertId)
+    });
 
   } catch (error) {
-    console.error("SIPMODAG OPD AUTH PROXY ERROR:", error);
+    console.error(
+      "SIPMODAG DATABASE API ERROR:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
       message:
         error?.message ||
-        "Koneksi ke layanan akun OPD gagal."
+        "Terjadi kesalahan pada database API."
     });
   }
 }
