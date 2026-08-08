@@ -759,93 +759,259 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#EAF2FF] text-slate-800">
-      <div className="pointer-events-none fixed -left-28 top-32 h-80 w-80 rounded-full bg-cyan-300/20 blur-3xl" />
-      <div className="pointer-events-none fixed -right-28 top-12 h-96 w-96 rounded-full bg-indigo-400/15 blur-3xl" />
-      <header className="sticky top-0 z-40 bg-[#EAF2FF]/90 px-4 pt-4 backdrop-blur-xl sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 rounded-[24px] border border-white/80 bg-white/90 px-5 py-4 shadow-[0_18px_50px_-34px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-violet-600 text-white shadow-sm shadow-blue-900/20">
-              <ShieldCheck className="h-5 w-5" />
+    <main className="min-h-screen bg-[#F1F1F6] p-3 text-slate-800 sm:p-5 lg:p-7">
+      <div className="mx-auto grid max-w-[1760px] overflow-hidden rounded-[28px] border border-white/80 bg-white shadow-[0_30px_90px_-45px_rgba(47,39,93,0.38)] lg:min-h-[calc(100vh-3.5rem)] lg:grid-cols-[245px_minmax(0,1fr)]">
+
+        {/* SIDEBAR */}
+        <aside className="relative overflow-hidden bg-[#31275F] px-4 py-5 text-white lg:px-5 lg:py-6">
+          <div className="pointer-events-none absolute -left-16 top-20 h-44 w-44 rounded-full bg-violet-400/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-16 bottom-24 h-48 w-48 rounded-full bg-indigo-300/10 blur-3xl" />
+
+          <div className="relative z-10 flex h-full flex-col">
+            <div className="flex items-center gap-3 px-2">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white p-1.5 shadow-lg shadow-black/10">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                  alt="Logo Pemerintah Provinsi Nusa Tenggara Timur"
+                  className="h-full w-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-black tracking-tight text-white">
+                  SIPMODAG
+                </p>
+                <p className="mt-0.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-200/70">
+                  Portal Operator
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="truncate text-lg font-black tracking-tight text-slate-950">Dashboard Operator</h1>
-              <p className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
-                {session.user.name} · Operator Pusat
+
+            <div className="mt-9">
+              <p className="px-3 text-[8px] font-extrabold uppercase tracking-[0.17em] text-violet-200/45">
+                Workspace
               </p>
+
+              <nav className="mt-3 space-y-1.5">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('review')}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                    activeTab === 'review'
+                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
+                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                  }`}
+                >
+                  <FileSearch className="h-4 w-4" />
+                  Antrean Review
+                  {activeTab === 'review' && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('opd-dashboard')}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                    activeTab === 'opd-dashboard'
+                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
+                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                  }`}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard OPD
+                  {activeTab === 'opd-dashboard' && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('accounts')}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                    activeTab === 'accounts'
+                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
+                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                  }`}
+                >
+                  <UsersRound className="h-4 w-4" />
+                  Akun OPD
+                  {activeTab === 'accounts' && (
+                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                  )}
+                </button>
+              </nav>
+            </div>
+
+            <div className="mt-auto pt-8">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-3.5 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[10px] font-black text-white">
+                      {session.user.name}
+                    </p>
+                    <p className="mt-1 text-[8px] font-semibold text-violet-200/60">
+                      Operator Pusat
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-violet-100 transition hover:bg-rose-500/25 hover:text-white"
+                    aria-label="Keluar"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+        </aside>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void loadQueue(true)}
-              disabled={refreshing}
-              className="flex h-10 items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-3 text-xs font-extrabold text-blue-700 transition hover:bg-blue-100 disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Segarkan</span>
-            </button>
+        {/* MAIN CONTENT */}
+        <section className="min-w-0 bg-[#F8F8FC]">
+          {/* MOBILE BRAND */}
+          <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#31275F] text-white">
+                <ShieldCheck className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-xs font-black text-slate-950">SIPMODAG</p>
+                <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">
+                  Portal Operator
+                </p>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={onLogout}
-              className="flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-3 text-xs font-extrabold text-white shadow-sm transition hover:bg-rose-700"
+              className="flex h-9 items-center gap-2 rounded-xl bg-slate-950 px-3 text-[9px] font-extrabold text-white"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Keluar</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="relative z-10 mx-auto my-5 max-w-[1680px] space-y-5 rounded-[32px] border border-white/80 bg-[#F7F9FE] p-4 shadow-[0_32px_90px_-48px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60 sm:p-6">
-        <section className="flex flex-col gap-3 rounded-3xl border border-slate-200/80 bg-white/90 p-2 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab('review')}
-              className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
-                activeTab === 'review'
-                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
-                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
-              }`}
-            >
-              <FileSearch className="h-4 w-4" />
-              Antrean Review
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('opd-dashboard')}
-              className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
-                activeTab === 'opd-dashboard'
-                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
-                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
-              }`}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard OPD
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('accounts')}
-              className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-extrabold transition ${
-                activeTab === 'accounts'
-                  ? 'bg-[#5B5CE2] text-white shadow-sm shadow-violet-900/15'
-                  : 'text-slate-500 hover:bg-violet-50 hover:text-violet-700'
-              }`}
-            >
-              <UsersRound className="h-4 w-4" />
-              Akun OPD
+              <LogOut className="h-3.5 w-3.5" />
+              Keluar
             </button>
           </div>
 
+          {/* HEADER */}
+          <header className="border-b border-slate-200/80 bg-white/85 px-5 py-5 backdrop-blur-sm sm:px-7 lg:px-8">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.17em] text-[#6558D3]">
+                  Dashboard Operator
+                </p>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-[#241E4A]">
+                  {activeTab === 'review'
+                    ? 'Antrean Review Dokumen'
+                    : activeTab === 'opd-dashboard'
+                      ? 'Monitoring Progres OPD'
+                      : 'Kelola Akun OPD'}
+                </h1>
+                <p className="mt-1 text-[10px] font-medium text-slate-400">
+                  {activeTab === 'review'
+                    ? 'Periksa dokumen yang dikirim OPD dan berikan hasil review.'
+                    : activeTab === 'opd-dashboard'
+                      ? 'Pantau progres unggahan, kelengkapan dokumen, dan anggaran OPD.'
+                      : 'Kelola akun OPD yang terdaftar pada SIPMODAG.'}
+                </p>
+              </div>
 
-        </section>
+              <div className="flex items-center gap-2">
+                {activeTab !== 'accounts' && (
+                  <div className="relative hidden w-72 lg:block">
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      value={activeTab === 'review' ? search : overviewSearch}
+                      onChange={event =>
+                        activeTab === 'review'
+                          ? setSearch(event.target.value)
+                          : setOverviewSearch(event.target.value)
+                      }
+                      placeholder={activeTab === 'review' ? 'Cari OPD atau dokumen...' : 'Cari nama OPD...'}
+                      className="w-full rounded-xl border border-slate-200 bg-[#FAFAFD] py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 caret-violet-600 outline-none placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                    />
+                  </div>
+                )}
 
+                <button
+                  type="button"
+                  onClick={() =>
+                    activeTab === 'opd-dashboard'
+                      ? void loadOPDOverview(true)
+                      : void loadQueue(true)
+                  }
+                  disabled={
+                    activeTab === 'opd-dashboard'
+                      ? overviewRefreshing
+                      : refreshing
+                  }
+                  className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-[10px] font-extrabold text-slate-600 shadow-sm transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 disabled:opacity-50"
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 ${
+                      activeTab === 'opd-dashboard'
+                        ? overviewRefreshing
+                          ? 'animate-spin'
+                          : ''
+                        : refreshing
+                          ? 'animate-spin'
+                          : ''
+                    }`}
+                  />
+                  <span className="hidden sm:inline">Segarkan</span>
+                </button>
+              </div>
+            </div>
+
+            {/* MOBILE TABS */}
+            <div className="mt-4 flex gap-2 overflow-x-auto lg:hidden">
+              <button
+                type="button"
+                onClick={() => setActiveTab('review')}
+                className={`shrink-0 rounded-xl px-4 py-2.5 text-[9px] font-extrabold ${
+                  activeTab === 'review'
+                    ? 'bg-[#31275F] text-white'
+                    : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                Antrean Review
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('opd-dashboard')}
+                className={`shrink-0 rounded-xl px-4 py-2.5 text-[9px] font-extrabold ${
+                  activeTab === 'opd-dashboard'
+                    ? 'bg-[#31275F] text-white'
+                    : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                Dashboard OPD
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('accounts')}
+                className={`shrink-0 rounded-xl px-4 py-2.5 text-[9px] font-extrabold ${
+                  activeTab === 'accounts'
+                    ? 'bg-[#31275F] text-white'
+                    : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                Akun OPD
+              </button>
+            </div>
+          </header>
+
+          <div className="space-y-5 p-4 sm:p-6 lg:p-7">
         {activeTab === 'accounts' ? (
-          <OperatorAccountManager session={session} />
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <OperatorAccountManager session={session} />
+          </div>
         ) : activeTab === 'opd-dashboard' ? (
           <>
             <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -853,26 +1019,26 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 {
                   label: 'Total OPD',
                   value: overviewSummary.total,
-                  tone: 'bg-orange-100/80 text-orange-700',
-                  card: 'border-orange-100 bg-gradient-to-br from-white to-orange-50/70',
+                  tone: 'bg-white/70 text-[#596DDE]',
+                  card: 'border-[#C9D8FF] bg-[#E9F0FF]',
                 },
                 {
                   label: 'Sudah Upload',
                   value: overviewSummary.uploaded,
-                  tone: 'bg-violet-100/80 text-violet-700',
-                  card: 'border-violet-100 bg-gradient-to-br from-white to-violet-50/70',
+                  tone: 'bg-white/70 text-[#D85D66]',
+                  card: 'border-[#FFD1D1] bg-[#FFF0F0]',
                 },
                 {
                   label: 'Lengkap',
                   value: overviewSummary.complete,
-                  tone: 'bg-emerald-100/80 text-emerald-700',
-                  card: 'border-emerald-100 bg-gradient-to-br from-white to-emerald-50/70',
+                  tone: 'bg-white/70 text-[#3B9C8B]',
+                  card: 'border-[#CDEBE5] bg-[#EAF8F5]',
                 },
                 {
                   label: 'Belum Upload',
                   value: overviewSummary.empty,
-                  tone: 'bg-rose-100/80 text-rose-700',
-                  card: 'border-rose-100 bg-gradient-to-br from-white to-rose-50/70',
+                  tone: 'bg-white/70 text-[#695BD8]',
+                  card: 'border-[#DDD4FF] bg-[#F0ECFF]',
                 },
               ].map(item => (
                 <div
@@ -895,10 +1061,10 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </section>
 
             <section className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(330px,0.8fr)]">
-              <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
+              <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
                 <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-white">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#31275F] text-white">
                       <BarChart3 className="h-5 w-5" />
                     </div>
                     <div>
@@ -988,7 +1154,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-7 xl:p-8">
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-7 xl:p-8">
                 <div>
                   <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
                     Persentase Upload OPD
@@ -1002,7 +1168,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   <div
                     className="relative flex h-52 w-52 items-center justify-center rounded-full p-[18px] shadow-inner"
                     style={{
-                      background: `conic-gradient(#2563eb 0 ${overviewAnalytics.uploadPercentage}%, #e2e8f0 ${overviewAnalytics.uploadPercentage}% 100%)`,
+                      background: `conic-gradient(#6657E8 0 ${overviewAnalytics.uploadPercentage}%, #E8E5F5 ${overviewAnalytics.uploadPercentage}% 100%)`,
                     }}
                   >
                     <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-sm">
@@ -1012,7 +1178,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                         Sudah Upload
                       </span>
-                      <span className="mt-2 rounded-lg bg-blue-50 px-2.5 py-1 text-[9px] font-extrabold text-blue-700">
+                      <span className="mt-2 rounded-lg bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold text-violet-700">
                         {overviewSummary.uploaded}/{overviewSummary.total} OPD
                       </span>
                     </div>
@@ -1074,12 +1240,12 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               </div>
             </section>
 
-            <section className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
-              <div className="border-b border-slate-100 bg-gradient-to-r from-white to-violet-50/40 p-5">
+            <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+              <div className="border-b border-slate-100 bg-white p-5">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <Table2 className="h-5 w-5 text-blue-700" />
+                      <Table2 className="h-5 w-5 text-violet-700" />
                       <h2 className="text-lg font-black tracking-tight text-slate-950">
                         Monitoring Kelengkapan Dokumen OPD
                       </h2>
@@ -1216,7 +1382,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                                   onClick={event =>
                                     void openBudgetPopover(event, item)
                                   }
-                                  className="inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-[8px] font-extrabold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100"
+                                  className="inline-flex items-center gap-1 rounded-md border border-violet-100 bg-violet-50 px-2 py-1 text-[8px] font-extrabold text-violet-700 transition hover:border-violet-200 hover:bg-violet-100"
                                 >
                                   <WalletCards className="h-3 w-3" />
                                   Pagu Anggaran
@@ -1279,46 +1445,38 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             {
               label: 'Total Antrean',
               value: summary.total,
+              caption: 'Seluruh dokumen',
               icon: FileSearch,
-              cardClass:
-                'border-blue-600 bg-gradient-to-br from-blue-700 via-blue-600 to-violet-600 text-white shadow-blue-900/15',
-              labelClass: 'text-blue-100',
-              valueClass: 'text-white',
-              iconClass: 'bg-white/15 text-white ring-1 ring-white/20',
-              glowClass: 'bg-white/10',
+              cardClass: 'border-[#C9D8FF] bg-[#E9F0FF]',
+              iconClass: 'bg-white/75 text-[#596DDE]',
+              captionClass: 'text-[#596DDE]',
             },
             {
               label: 'Menunggu Review',
               value: summary.waiting,
+              caption: 'Belum diperiksa',
               icon: FileClock,
-              cardClass:
-                'border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 text-amber-950 shadow-amber-900/5',
-              labelClass: 'text-amber-700',
-              valueClass: 'text-amber-950',
-              iconClass: 'bg-white/75 text-orange-600 ring-1 ring-amber-200',
-              glowClass: 'bg-amber-300/25',
+              cardClass: 'border-[#FFD1D1] bg-[#FFF0F0]',
+              iconClass: 'bg-white/75 text-[#E56B73]',
+              captionClass: 'text-[#D85D66]',
             },
             {
               label: 'Perlu Revisi',
               value: summary.revision,
+              caption: 'Perlu tindak lanjut',
               icon: RefreshCw,
-              cardClass:
-                'border-violet-200 bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-100 text-violet-950 shadow-violet-900/5',
-              labelClass: 'text-violet-700',
-              valueClass: 'text-violet-950',
-              iconClass: 'bg-white/75 text-violet-600 ring-1 ring-violet-200',
-              glowClass: 'bg-fuchsia-300/20',
+              cardClass: 'border-[#CDEBE5] bg-[#EAF8F5]',
+              iconClass: 'bg-white/75 text-[#3B9C8B]',
+              captionClass: 'text-[#3B9C8B]',
             },
             {
               label: 'Sedang Direview',
               value: summary.active,
+              caption: 'Sedang diproses',
               icon: FileCheck2,
-              cardClass:
-                'border-sky-200 bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-100 text-sky-950 shadow-sky-900/5',
-              labelClass: 'text-sky-700',
-              valueClass: 'text-sky-950',
-              iconClass: 'bg-white/75 text-blue-600 ring-1 ring-sky-200',
-              glowClass: 'bg-cyan-300/20',
+              cardClass: 'border-[#DDD4FF] bg-[#F0ECFF]',
+              iconClass: 'bg-white/75 text-[#695BD8]',
+              captionClass: 'text-[#695BD8]',
             },
           ].map(item => {
             const Icon = item.icon;
@@ -1326,30 +1484,23 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             return (
               <div
                 key={item.label}
-                className={`relative overflow-hidden rounded-2xl border p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md ${item.cardClass}`}
+                className={`rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.cardClass}`}
               >
-                <div
-                  className={`pointer-events-none absolute -right-7 -top-8 h-24 w-24 rounded-full blur-2xl ${item.glowClass}`}
-                />
-
-                <div className="relative flex items-center justify-between gap-4">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p
-                      className={`text-[9px] font-extrabold uppercase tracking-[0.14em] ${item.labelClass}`}
-                    >
+                    <p className="text-[9px] font-extrabold text-slate-500">
                       {item.label}
                     </p>
-                    <p
-                      className={`mt-2 text-3xl font-black tracking-tight ${item.valueClass}`}
-                    >
+                    <p className="mt-2 text-2xl font-black tracking-tight text-[#241E4A]">
                       {item.value}
+                    </p>
+                    <p className={`mt-1 text-[8px] font-extrabold ${item.captionClass}`}>
+                      {item.caption}
                     </p>
                   </div>
 
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-sm backdrop-blur-sm ${item.iconClass}`}
-                  >
-                    <Icon className="h-5 w-5" />
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-sm ${item.iconClass}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
                 </div>
               </div>
@@ -1357,8 +1508,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           })}
         </section>
 
-        <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(420px,0.72fr)_minmax(0,1.28fr)]">
-          <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-sm">
+        <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(410px,0.70fr)_minmax(0,1.30fr)]">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <div className="border-b border-slate-100 p-5">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
@@ -1367,7 +1518,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     value={search}
                     onChange={event => setSearch(event.target.value)}
                     placeholder="Cari OPD atau dokumen..."
-                    className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-slate-800 caret-violet-600 outline-none placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
+                    className="w-full rounded-xl border border-slate-200 bg-[#FAFAFD] py-3 pl-11 pr-4 text-sm font-medium text-slate-800 caret-violet-600 outline-none placeholder:text-slate-400 focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
                   />
                 </div>
 
@@ -1422,7 +1573,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       onClick={() => setSelected(item)}
                       className={`w-full rounded-2xl border p-4 text-left transition ${
                         selected?.UPLOAD_ID === item.UPLOAD_ID
-                          ? 'border-blue-300 bg-blue-50 shadow-sm'
+                          ? 'border-violet-300 bg-violet-50 shadow-sm'
                           : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                       }`}
                     >
@@ -1448,7 +1599,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm sm:p-6">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
             {!selected ? (
               <div className="flex min-h-[560px] flex-col items-center justify-center text-center">
                 <FileSearch className="h-12 w-12 text-slate-300" />
@@ -1531,7 +1682,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       href={selected.FILE_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-xs font-extrabold text-white hover:bg-blue-900"
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-xs font-extrabold text-white hover:bg-[#463A83]"
                     >
                       <ExternalLink className="h-4 w-4" /> Buka File OPD
                     </a>
@@ -1553,7 +1704,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       <select
                         value={reviewStatus}
                         onChange={event => setReviewStatus(event.target.value as ReviewStatus)}
-                        className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 pr-10 text-sm font-extrabold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 pr-10 text-sm font-extrabold text-slate-700 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                       >
                         <option value="PERLU_REVISI">Perlu Revisi</option>
                         <option value="DISETUJUI">Disetujui</option>
@@ -1574,15 +1725,15 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       }}
                       rows={5}
                       placeholder="Tulis catatan review..."
-                      className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm leading-relaxed text-slate-700 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                      className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm leading-relaxed text-slate-700 outline-none focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">File Review (Opsional)</label>
-                    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-4 transition hover:border-blue-300 hover:bg-blue-50">
+                    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-4 transition hover:border-violet-300 hover:bg-violet-50">
                       <span className="flex min-w-0 items-center gap-3">
-                        <UploadCloud className="h-5 w-5 shrink-0 text-blue-600" />
+                        <UploadCloud className="h-5 w-5 shrink-0 text-violet-600" />
                         <span className="min-w-0">
                           <span className="block truncate text-xs font-extrabold text-slate-700">{reviewFile?.name || 'Pilih file review'}</span>
                           <span className="mt-1 block text-[10px] text-slate-400">PDF, DOC, DOCX, XLS, XLSX · Maks. 10 MB</span>
@@ -1627,6 +1778,9 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </section>
           </>
         )}
+
+          </div>
+        </section>
       </div>
 
       {budgetPopover && (
@@ -1649,7 +1803,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             }}
           >
             <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
                 <WalletCards className="h-4 w-4" />
               </div>
 
