@@ -48,6 +48,11 @@ export default function OperatorLogin({
 
     setLoading(true);
 
+    // Pastikan status loading sempat dirender sebelum request API dimulai.
+    await new Promise<void>(resolve => {
+      window.requestAnimationFrame(() => resolve());
+    });
+
     try {
       const result =
         await postReviewAction<OperatorSession>(
@@ -262,8 +267,9 @@ export default function OperatorLogin({
                           setError(null);
                         }}
                         autoComplete="username"
+                        disabled={loading}
                         placeholder="Masukkan username"
-                        className="w-full rounded-xl border border-slate-300 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-slate-300 bg-slate-50 py-3.5 pl-11 pr-4 text-sm font-medium text-slate-900 outline-none transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                       />
                     </div>
                   </div>
@@ -292,6 +298,7 @@ export default function OperatorLogin({
                           setError(null);
                         }}
                         autoComplete="current-password"
+                        disabled={loading}
                         onKeyDown={(event) => {
                           if (
                             event.key === 'Enter'
@@ -302,11 +309,12 @@ export default function OperatorLogin({
                           }
                         }}
                         placeholder="Masukkan kata sandi"
-                        className="w-full rounded-xl border border-slate-300 bg-slate-50 py-3.5 pl-11 pr-12 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                        className="w-full rounded-xl border border-slate-300 bg-slate-50 py-3.5 pl-11 pr-12 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                       />
 
                       <button
                         type="button"
+                        disabled={loading}
                         onClick={() =>
                           setShowPassword(
                             value => !value
@@ -349,6 +357,7 @@ export default function OperatorLogin({
                   <button
                     type="submit"
                     disabled={loading}
+                    aria-busy={loading}
                     className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#1E40AF] px-5 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-blue-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-900 hover:shadow-xl disabled:pointer-events-none disabled:opacity-60"
                   >
                     {loading ? (
@@ -358,7 +367,7 @@ export default function OperatorLogin({
                     )}
 
                     {loading
-                      ? 'Memeriksa...'
+                      ? 'Memeriksa akun...'
                       : 'Masuk'}
                   </button>
                 </form>
