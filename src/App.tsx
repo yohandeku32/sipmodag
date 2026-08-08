@@ -40,7 +40,7 @@ import { BudgetInput, OperatorSession, RevisionTarget } from './reviewTypes';
 // Masukkan URL Web App Google Apps Script Anda di bawah ini
 const GOOGLE_APPS_SCRIPT_WEB_APP_URL =
   String(import.meta.env.VITE_APPS_SCRIPT_URL || '').trim() ||
-  "https://script.google.com/macros/s/AKfycbzuktxlcWdkA7NtjbgYmU3Gsg4miqFY5HRYPl3mMjupqo4f2pqp4_uXgNTG5QdRHtAiRg/exec";
+   "https://script.google.com/macros/s/AKfycbzuktxlcWdkA7NtjbgYmU3Gsg4miqFY5HRYPl3mMjupqo4f2pqp4_uXgNTG5QdRHtAiRg/exec";
 
 
 // DAFTAR RESMI 42 OPD YANG BOLEH MASUK KE DASHBOARD.
@@ -464,6 +464,20 @@ function HeroTypewriter() {
   );
 }
 
+
+type PortalPath = '/' | '/opd' | '/operator';
+
+const normalizePortalPath = (pathname: string): PortalPath => {
+  const cleanPath =
+    ('/' + String(pathname || '').replace(/^\/+|\/+$/g, ''))
+      .replace(/\/+/g, '/');
+
+  if (cleanPath === '/opd') return '/opd';
+  if (cleanPath === '/operator') return '/operator';
+
+  return '/';
+};
+
 export default function App() {
   const [data, setData] = useState<OPDData[]>(OFFICIAL_OPDS);
   const [loading, setLoading] = useState<boolean>(true);
@@ -475,8 +489,9 @@ export default function App() {
 
   // User authentication and document upload states
   const [loggedInOPD, setLoggedInOPD] = useState<OPDData | null>(null);
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  const [showOperatorLogin, setShowOperatorLogin] = useState<boolean>(false);
+  const [portalPath, setPortalPath] = useState<PortalPath>(() =>
+    normalizePortalPath(window.location.pathname)
+  );
   const [operatorSession, setOperatorSession] = useState<OperatorSession | null>(null);
   const [revisionTarget, setRevisionTarget] = useState<RevisionTarget | null>(null);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
@@ -516,6 +531,43 @@ export default function App() {
   const [pendingUploadedDocs, setPendingUploadedDocs] = useState<
     Record<string, Record<string, PendingUploadFlags>>
   >({});
+
+  const navigatePortal = (
+    path: PortalPath,
+    options?: { replace?: boolean }
+  ) => {
+    const normalized = normalizePortalPath(path);
+
+    if (options?.replace) {
+      window.history.replaceState({}, '', normalized);
+    } else if (window.location.pathname !== normalized) {
+      window.history.pushState({}, '', normalized);
+    }
+
+    setPortalPath(normalized);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  useEffect(() => {
+    const syncRouteFromBrowser = () => {
+      const normalized = normalizePortalPath(window.location.pathname);
+
+      if (window.location.pathname !== normalized) {
+        window.history.replaceState({}, '', normalized);
+      }
+
+      setPortalPath(normalized);
+    };
+
+    syncRouteFromBrowser();
+
+    window.addEventListener('popstate', syncRouteFromBrowser);
+
+    return () => {
+      window.removeEventListener('popstate', syncRouteFromBrowser);
+    };
+  }, []);
+
 
 
   /*
@@ -1179,7 +1231,7 @@ export default function App() {
       setLoggedInOPD(selectedOPDToLogin);
       setLoginError(null);
       setPassword('');
-      setShowLoginModal(false);
+      navigatePortal('/opd', { replace: true });
     } catch (error) {
       setLoginError(
         error instanceof Error
@@ -1193,6 +1245,7 @@ export default function App() {
     setLoggedInOPD(null);
     setRevisionTarget(null);
     setShowProfileModal(false);
+    navigatePortal('/opd', { replace: true });
     setUploadedFiles({
       file1: null,
       file2: null,
@@ -1492,7 +1545,7 @@ export default function App() {
       <div className="absolute top-1/2 left-0 -translate-x-1/4 w-[400px] h-[400px] bg-indigo-100/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
       <AnimatePresence mode="wait">
-        {operatorSession ? (
+        {portalPath === '/operator' && operatorSession ? (
           <motion.div
             key="operator-dashboard"
             initial={{ opacity: 0, y: 12 }}
@@ -1504,10 +1557,13 @@ export default function App() {
             <OperatorDashboard
               apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
               session={operatorSession}
-              onLogout={() => setOperatorSession(null)}
+              onLogout={() => {
+                setOperatorSession(null);
+                navigatePortal('/operator', { replace: true });
+              }}
             />
           </motion.div>
-        ) : showOperatorLogin ? (
+        ) : portalPath === '/operator' ? (
           <motion.div
             key="operator-login"
             initial={{ opacity: 0, x: 20 }}
@@ -1520,12 +1576,12 @@ export default function App() {
               apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
               onAuthenticated={(session) => {
                 setOperatorSession(session);
-                setShowOperatorLogin(false);
+                navigatePortal('/operator', { replace: true });
               }}
-              onCancel={() => setShowOperatorLogin(false)}
+              onCancel={() => navigatePortal('/')}
             />
           </motion.div>
-        ) : showLoginModal ? (
+        ) : portalPath === '/opd' && !loggedInOPD ? (
           <motion.div
             key="login-page"
             initial={{ x: 20, opacity: 0 }}
@@ -1548,10 +1604,10 @@ export default function App() {
               loginError={loginError}
               setLoginError={setLoginError}
               handleLoginSubmit={handleLoginSubmit}
-              onCancel={() => setShowLoginModal(false)}
+              onCancel={() => navigatePortal('/')}
             />
           </motion.div>
-        ) : loggedInOPD ? (
+        ) : portalPath === '/opd' && loggedInOPD ? (
           <motion.div
             key="dashboard-page"
             initial={{ y: 15, opacity: 0 }}
@@ -1642,8 +1698,7 @@ export default function App() {
 
             <button
               onClick={() => {
-                setShowLoginModal(false);
-                setShowOperatorLogin(true);
+                navigatePortal('/operator');
               }}
               className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-100 px-3 py-2.5 text-xs font-semibold text-rose-700 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-200 hover:text-rose-800 sm:px-4"
             >
@@ -1667,7 +1722,7 @@ export default function App() {
                   setSearchOPDQuery('');
                   setPassword('');
                   setLoginError(null);
-                  setShowLoginModal(true);
+                  navigatePortal('/opd');
                 }}
                 className="bg-[#0F172A] hover:bg-slate-800 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
               >
@@ -1680,17 +1735,8 @@ export default function App() {
 
       {/* HERO SECTION */}
       <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
-        {/* Grid hitam tipis */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(15, 23, 42, 0.10) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(15, 23, 42, 0.10) 1px, transparent 1px)
-            `,
-            backgroundSize: '30px 30px',
-          }}
-        />
+        {/* Background dibuat sama seperti halaman login */}
+        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
         <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
         
@@ -1720,7 +1766,7 @@ export default function App() {
                     setSearchOPDQuery('');
                     setPassword('');
                     setLoginError(null);
-                    setShowLoginModal(true);
+                    navigatePortal('/opd');
                   }}
                   className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
                 >
@@ -1924,7 +1970,7 @@ export default function App() {
                       setSearchOPDQuery('');
                       setPassword('');
                       setLoginError(null);
-                      setShowLoginModal(true);
+                      navigatePortal('/opd');
                     }}
                     className="w-full bg-[#1E40AF] hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
                   >
@@ -1959,7 +2005,7 @@ export default function App() {
             </div>
 
             {/* Kontrol Dashboard: Dropdown Tahun, Waktu Update, dan Segarkan */}
-            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-lg shadow-slate-300/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+            <div className="w-full lg:w-auto bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
               <label
                 htmlFor="dashboard-year-select"
                 className="block text-[10px] font-extrabold text-blue-700 uppercase tracking-wider mb-2"
@@ -2007,7 +2053,7 @@ export default function App() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Target Card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center justify-between group shadow-xl shadow-slate-300/55 transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-2xl hover:shadow-slate-400/45">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-slate-300 transition-colors">
               <div className="space-y-1">
                 <p className="text-xs text-slate-500 font-bold tracking-wider uppercase">Total Target OPD</p>
                 <p className="text-3xl font-black text-primary font-mono">{stats.targetOPD}</p>
@@ -2019,7 +2065,7 @@ export default function App() {
             </div>
 
             {/* Sudah Upload Card */}
-            <div className="bg-white p-6 rounded-2xl border border-green-100 flex items-center justify-between group shadow-xl shadow-emerald-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-green-300 hover:shadow-2xl hover:shadow-emerald-300/40">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-green-300 transition-colors">
               <div className="space-y-1">
                 <p className="text-xs text-green-600 font-bold tracking-wider uppercase">Sudah Upload</p>
                 <p className="text-3xl font-black text-green-700 font-mono">{stats.sudahCount}</p>
@@ -2031,7 +2077,7 @@ export default function App() {
             </div>
 
             {/* Belum Upload Card */}
-            <div className="bg-white p-6 rounded-2xl border border-red-100 flex items-center justify-between group shadow-xl shadow-rose-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-red-300 hover:shadow-2xl hover:shadow-rose-300/40">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-300 transition-colors">
               <div className="space-y-1">
                 <p className="text-xs text-red-600 font-bold tracking-wider uppercase">Belum Upload</p>
                 <p className="text-3xl font-black text-red-600 font-mono">{stats.belumCount}</p>
@@ -2043,7 +2089,7 @@ export default function App() {
             </div>
 
             {/* Percentage Card */}
-            <div className="bg-white p-6 rounded-2xl border border-blue-100 flex items-center justify-between group shadow-xl shadow-blue-200/45 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-2xl hover:shadow-blue-300/40">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-300 transition-colors">
               <div className="space-y-1">
                 <p className="text-xs text-secondary font-bold tracking-wider uppercase">Tingkat Partisipasi</p>
                 <p className="text-3xl font-black text-secondary font-mono">{stats.percentageSudah.toFixed(1)}%</p>
@@ -2103,7 +2149,7 @@ export default function App() {
                   setSearchOPDQuery('');
                   setPassword('');
                   setLoginError(null);
-                  setShowLoginModal(true);
+                  navigatePortal('/opd');
                 }} 
                 className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
               >
