@@ -249,7 +249,7 @@ export default function OPDLoginScreen({
   /* OPD SELECTOR */
   /* ===================================================== */
 
-  const OPDSelector = () => (
+  const renderOPDSelector = () => (
     <div
       ref={opdSelectorRef}
       className="relative space-y-2"
@@ -707,7 +707,7 @@ export default function OPDLoginScreen({
                     onSubmit={handleLoginSubmit}
                     className="mt-7 space-y-5"
                   >
-                    <OPDSelector />
+                    {renderOPDSelector()}
 
                     {/* PASSWORD */}
                     <div className="space-y-2">
@@ -902,7 +902,7 @@ export default function OPDLoginScreen({
                     onSubmit={handleRegister}
                     className="mt-7 space-y-5"
                   >
-                    <OPDSelector />
+                    {renderOPDSelector()}
 
                     {/* EMAIL */}
                     <div className="space-y-2">
