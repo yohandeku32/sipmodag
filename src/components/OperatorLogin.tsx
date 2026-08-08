@@ -87,7 +87,7 @@ export default function OperatorLogin({
           <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-8">
 
             <div className="mb-8">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-rose-200 bg-rose-100 text-rose-700">
                 <ShieldCheck className="h-5 w-5" />
               </div>
 
@@ -141,6 +141,12 @@ export default function OperatorLogin({
                       setError(null);
                     }}
                     autoComplete="current-password"
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
                     placeholder="Kata sandi"
                     className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   />
@@ -156,7 +162,7 @@ export default function OperatorLogin({
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:pointer-events-none disabled:opacity-60"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-100 px-5 py-3.5 text-sm font-bold text-rose-700 shadow-sm transition hover:border-rose-300 hover:bg-rose-200 hover:text-rose-800 disabled:pointer-events-none disabled:opacity-60"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
