@@ -290,7 +290,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         return result.items?.find(item => item.UPLOAD_ID === current.UPLOAD_ID) || result.items?.[0] || null;
       });
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Antrean review gagal dimuat.');
+      setLoadError(error instanceof Error ? error.message : 'Data antrean gagal dimuat.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -350,7 +350,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       setOverviewError(
         error instanceof Error
           ? error.message
-          : 'Dashboard 42 OPD gagal dimuat.',
+          : 'Dashboard OPD gagal dimuat.',
       );
     } finally {
       setOverviewLoading(false);
@@ -361,7 +361,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   useEffect(() => {
     if (activeTab !== 'opd-dashboard') return;
 
-    // Muat sekali saat membuka Dashboard 42 OPD atau mengganti tahun.
+    // Muat sekali saat membuka Dashboard OPD atau mengganti tahun.
     // Setelah itu data hanya diperbarui saat tombol Segarkan diklik.
     void loadOPDOverview();
   }, [activeTab, overviewYear, session.token]);
@@ -476,14 +476,14 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
 
     const firstConfirm = window.confirm(
       `Reset data ${item.namaOPD} Tahun ${overviewYear}?\n\n` +
-      `Data upload, review, notifikasi, dan anggaran tahun tersebut akan ` +
-      `dihapus dari TiDB.\n\nFile fisik di Google Drive TIDAK dihapus.`,
+      `Upload, review, notifikasi, dan anggaran akan dihapus dari TiDB.\n\n` +
+      `File di Google Drive tidak dihapus.`,
     );
 
     if (!firstConfirm) return;
 
     const secondConfirm = window.confirm(
-      `Konfirmasi terakhir:\n\nHapus data TEST ${item.namaOPD} Tahun ${overviewYear}?`,
+      `Konfirmasi terakhir:\n\nHapus data ${item.namaOPD} Tahun ${overviewYear}?`,
     );
 
     if (!secondConfirm) return;
@@ -561,7 +561,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         reviewFile: reviewFilePayload,
       });
 
-      setSubmitMessage('Review berhasil dikirim ke OPD.');
+      setSubmitMessage('Review berhasil dikirim.');
       setNote('');
       setReviewFile(null);
       await loadQueue(true);
@@ -581,7 +581,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-black tracking-tight text-slate-950">Ruang Review SIPMODAG</h1>
+              <h1 className="truncate text-lg font-black tracking-tight text-slate-950">Dashboard Operator</h1>
               <p className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
                 {session.user.name} · Operator Pusat
               </p>
@@ -636,7 +636,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               }`}
             >
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard 42 OPD
+              Dashboard OPD
             </button>
 
             <button
@@ -649,13 +649,11 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               }`}
             >
               <UsersRound className="h-4 w-4" />
-              Kelola Akun OPD
+              Akun OPD
             </button>
           </div>
 
-          <p className="px-2 text-[10px] font-semibold text-slate-400">
-            Sumber data: TiDB · File tetap tersimpan di Google Drive
-          </p>
+
         </section>
 
         {activeTab === 'accounts' ? (
@@ -666,8 +664,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               {[
                 { label: 'Total OPD', value: overviewSummary.total, tone: 'bg-slate-100 text-slate-700' },
                 { label: 'Sudah Upload', value: overviewSummary.uploaded, tone: 'bg-blue-50 text-blue-700' },
-                { label: 'Lengkap 4 Dokumen', value: overviewSummary.complete, tone: 'bg-emerald-50 text-emerald-700' },
-                { label: 'Belum Ada Data', value: overviewSummary.empty, tone: 'bg-amber-50 text-amber-700' },
+                { label: 'Lengkap', value: overviewSummary.complete, tone: 'bg-emerald-50 text-emerald-700' },
+                { label: 'Belum Upload', value: overviewSummary.empty, tone: 'bg-amber-50 text-amber-700' },
               ].map(item => (
                 <div
                   key={item.label}
@@ -698,9 +696,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         Monitoring Kelengkapan Dokumen OPD
                       </h2>
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">
-                      Centang hijau berarti dokumen sudah tercatat di TiDB.
-                    </p>
+
                   </div>
 
                   <div className="flex flex-col gap-2 sm:flex-row">
@@ -775,7 +771,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         <td colSpan={9} className="px-4 py-16 text-center">
                           <span className="inline-flex items-center gap-2 text-sm font-bold text-slate-400">
                             <Loader2 className="h-5 w-5 animate-spin" />
-                            Memuat dashboard OPD...
+                            Memuat data...
                           </span>
                         </td>
                       </tr>
@@ -822,7 +818,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                               </p>
                               <p className="mt-1 text-[9px] text-slate-400">
                                 {item.uploadCount > 0
-                                  ? `${item.uploadCount} record upload`
+                                  ? `${item.uploadCount} upload`
                                   : 'Belum ada data'}
                               </p>
                             </td>
@@ -881,7 +877,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           {[
             { label: 'Total Antrean', value: summary.total, icon: FileSearch, className: 'bg-slate-100 text-slate-600' },
             { label: 'Menunggu Review', value: summary.waiting, icon: FileClock, className: 'bg-amber-50 text-amber-600' },
-            { label: 'Revisi / Upload Ulang', value: summary.revision, icon: RefreshCw, className: 'bg-violet-50 text-violet-600' },
+            { label: 'Perlu Revisi', value: summary.revision, icon: RefreshCw, className: 'bg-violet-50 text-violet-600' },
             { label: 'Sedang Direview', value: summary.active, icon: FileCheck2, className: 'bg-blue-50 text-blue-600' },
           ].map(item => {
             const Icon = item.icon;
@@ -952,8 +948,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               ) : visibleQueue.length === 0 ? (
                 <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
                   <CheckCircle2 className="h-10 w-10 text-emerald-400" />
-                  <p className="mt-4 font-black text-slate-800">Tidak ada antrean</p>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-400">Belum ada dokumen yang sesuai dengan filter saat ini.</p>
+                  <p className="mt-4 font-black text-slate-800">Antrean kosong</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400">Tidak ada dokumen.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -995,13 +991,13 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               <div className="flex min-h-[560px] flex-col items-center justify-center text-center">
                 <FileSearch className="h-12 w-12 text-slate-300" />
                 <p className="mt-4 font-black text-slate-800">Pilih dokumen</p>
-                <p className="mt-2 max-w-sm text-xs leading-relaxed text-slate-400">Pilih salah satu antrean untuk melihat file dan mengirim hasil review.</p>
+                <p className="mt-2 max-w-sm text-xs leading-relaxed text-slate-400">Pilih dokumen dari antrean.</p>
               </div>
             ) : (
               <motion.div key={selected.UPLOAD_ID} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-700">Detail Dokumen</p>
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-700">Dokumen</p>
                     <h2 className="mt-2 break-words text-2xl font-black tracking-tight text-slate-950">{selected.NAMA_OPD}</h2>
                     <p className="mt-2 text-sm font-semibold text-slate-500">{selected.JENIS_DOKUMEN} · Tahun {selected.TAHUN} · Versi {selected.VERSI}</p>
                   </div>
@@ -1031,7 +1027,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Pagu ARG</p>
                       <p className="mt-2 text-lg font-black text-slate-950">{formatRupiah(selected.PAGU_ARG)}</p>
                       <p className="mt-2 flex items-center gap-1 text-[9px] font-semibold text-slate-400">
-                        <CalendarDays className="h-3 w-3" /> {selected.TANGGAL_PAGU || 'Tanggal belum diisi'}
+                        <CalendarDays className="h-3 w-3" /> {selected.TANGGAL_PAGU || 'Belum diisi'}
                       </p>
                     </div>
 
@@ -1039,14 +1035,14 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                       <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Realisasi ARG</p>
                       <p className="mt-2 text-lg font-black text-slate-950">{formatRupiah(selected.REALISASI_ARG)}</p>
                       <p className="mt-2 flex items-center gap-1 text-[9px] font-semibold text-slate-400">
-                        <CalendarDays className="h-3 w-3" /> {selected.TANGGAL_REALISASI || 'Dapat diisi menyusul'}
+                        <CalendarDays className="h-3 w-3" /> {selected.TANGGAL_REALISASI || 'Belum diisi'}
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-3 rounded-xl bg-white p-3 ring-1 ring-blue-100">
                     <div className="flex items-center justify-between text-[10px] font-bold">
-                      <span className="text-slate-500">Realisasi terhadap pagu</span>
+                      <span className="text-slate-500">Realisasi</span>
                       <span className="text-blue-800">{getRealisasiPercentage(selected.PAGU_ARG, selected.REALISASI_ARG).toFixed(1)}%</span>
                     </div>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
@@ -1065,7 +1061,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-extrabold text-slate-900">{selected.FILE_NAME}</p>
-                      <p className="mt-1 text-[10px] text-slate-400">Diunggah {selected.UPLOADED_AT} · Sumber {selected.SOURCE || 'WEBSITE'}</p>
+                      <p className="mt-1 text-[10px] text-slate-400">Diunggah {selected.UPLOADED_AT}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex flex-col gap-2 sm:flex-row">
@@ -1115,22 +1111,22 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         setSubmitMessage(null);
                       }}
                       rows={5}
-                      placeholder="Tuliskan temuan, koreksi, dan arahan perbaikan..."
+                      placeholder="Tulis catatan review..."
                       className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm leading-relaxed text-slate-700 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">File Hasil Review (Opsional)</label>
+                    <label className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">File Review (Opsional)</label>
                     <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-4 transition hover:border-blue-300 hover:bg-blue-50">
                       <span className="flex min-w-0 items-center gap-3">
                         <UploadCloud className="h-5 w-5 shrink-0 text-blue-600" />
                         <span className="min-w-0">
-                          <span className="block truncate text-xs font-extrabold text-slate-700">{reviewFile?.name || 'Pilih file hasil review'}</span>
-                          <span className="mt-1 block text-[10px] text-slate-400">PDF, DOC, DOCX, XLS, XLSX · Maksimal 10 MB</span>
+                          <span className="block truncate text-xs font-extrabold text-slate-700">{reviewFile?.name || 'Pilih file review'}</span>
+                          <span className="mt-1 block text-[10px] text-slate-400">PDF, DOC, DOCX, XLS, XLSX · Maks. 10 MB</span>
                         </span>
                       </span>
-                      <span className="shrink-0 rounded-lg bg-white px-3 py-2 text-[10px] font-extrabold text-slate-600 shadow-sm">Browse</span>
+                      <span className="shrink-0 rounded-lg bg-white px-3 py-2 text-[10px] font-extrabold text-slate-600 shadow-sm">Pilih File</span>
                       <input
                         type="file"
                         className="hidden"
@@ -1160,7 +1156,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 py-4 text-sm font-extrabold text-white shadow-lg shadow-blue-900/15 transition hover:bg-blue-900 disabled:pointer-events-none disabled:opacity-60"
                   >
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                    {submitting ? 'Mengirim review...' : 'Kirim Hasil Review ke OPD'}
+                    {submitting ? 'Mengirim...' : 'Kirim Review'}
                   </button>
                 </form>
               </motion.div>
