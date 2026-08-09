@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
-import { 
-  RefreshCw, 
-  ExternalLink, 
-  Layers, 
-  CheckCircle2, 
-  AlertTriangle, 
-  FileText, 
-  HelpCircle, 
-  Home,
-  ArrowRight, 
-  TrendingUp, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  RefreshCw,
+  ExternalLink,
+  Layers,
+  CheckCircle2,
+  AlertTriangle,
+  FileText,
+  HelpCircle,
+  ArrowRight,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
+  Clock,
   Info,
   ChevronRight,
   Database,
@@ -41,7 +40,7 @@ import { BudgetInput, OperatorSession, RevisionTarget } from './reviewTypes';
 // Masukkan URL Web App Google Apps Script Anda di bawah ini
 const GOOGLE_APPS_SCRIPT_WEB_APP_URL =
   String(import.meta.env.VITE_APPS_SCRIPT_URL || '').trim() ||
-   "https://script.google.com/macros/s/AKfycbzuktxlcWdkA7NtjbgYmU3Gsg4miqFY5HRYPl3mMjupqo4f2pqp4_uXgNTG5QdRHtAiRg/exec";
+  "https://script.google.com/macros/s/AKfycbzuktxlcWdkA7NtjbgYmU3Gsg4miqFY5HRYPl3mMjupqo4f2pqp4_uXgNTG5QdRHtAiRg/exec";
 
 
 // DAFTAR RESMI 42 OPD YANG BOLEH MASUK KE DASHBOARD.
@@ -222,7 +221,7 @@ const getOPDNameSimilarity = (left: string, right: string): number => {
 
   const containsBonus =
     normalizedLeft.includes(normalizedRight) ||
-    normalizedRight.includes(normalizedLeft)
+      normalizedRight.includes(normalizedLeft)
       ? 0.15
       : 0;
 
@@ -232,7 +231,7 @@ const getOPDNameSimilarity = (left: string, right: string): number => {
 const findBestOPDMatchIndex = (
   sourceName: string,
   opdList: OPDData[]
-): { index: number; score: number } => {
+): { index: number; score: number; } => {
   let bestIndex = -1;
   let bestScore = 0;
 
@@ -443,15 +442,15 @@ function HeroTypewriter() {
         className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary leading-[1.1] tracking-tight"
         aria-label="Sistem Pengelolaan dan Monitoring Dokumen Analisis Gender"
       >
-      {lines.map((line, index) => (
-        <React.Fragment key={index}>
-          <span className={index === 1 ? "text-[#1E40AF]" : undefined}>
-            {line}
-          </span>
+        {lines.map((line, index) => (
+          <React.Fragment key={index}>
+            <span className={index === 1 ? "text-[#1E40AF]" : undefined}>
+              {line}
+            </span>
 
-          {index < lines.length - 1 && <br />}
-        </React.Fragment>
-      ))}
+            {index < lines.length - 1 && <br />}
+          </React.Fragment>
+        ))}
 
         <span
           aria-hidden="true"
@@ -556,8 +555,8 @@ export default function App() {
   const [revisionTarget, setRevisionTarget] = useState<RevisionTarget | null>(null);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [allResponseRows, setAllResponseRows] = useState<string[][]>([]);
-  const [successPopup, setSuccessPopup] = useState<{ show: boolean } | null>(null);
-  
+  const [successPopup, setSuccessPopup] = useState<{ show: boolean; } | null>(null);
+
   const [searchOPDQuery, setSearchOPDQuery] = useState<string>('');
   const [selectedOPDToLogin, setSelectedOPDToLogin] = useState<OPDData | null>(null);
   const [password, setPassword] = useState<string>('');
@@ -573,17 +572,17 @@ export default function App() {
   const [availableDashboardYears, setAvailableDashboardYears] = useState<string[]>(['2025', '2026', '2027']);
   const [sheetUploadedCount, setSheetUploadedCount] = useState<number>(0);
   const [uploadedFiles, setUploadedFiles] = useState<{
-    file1: { name: string; size: string; fileObj: File | null } | null;
-    file2: { name: string; size: string; fileObj: File | null } | null;
-    file3: { name: string; size: string; fileObj: File | null } | null;
-    file4: { name: string; size: string; fileObj: File | null } | null;
+    file1: { name: string; size: string; fileObj: File | null; } | null;
+    file2: { name: string; size: string; fileObj: File | null; } | null;
+    file3: { name: string; size: string; fileObj: File | null; } | null;
+    file4: { name: string; size: string; fileObj: File | null; } | null;
   }>({
     file1: null,
     file2: null,
     file3: null,
     file4: null,
   });
-  
+
   const [uploadStatus, setUploadStatus] = useState<'IDLE' | 'UPLOADING' | 'SUCCESS'>('IDLE');
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
@@ -598,7 +597,7 @@ export default function App() {
 
   const navigatePortal = (
     path: PortalPath,
-    options?: { replace?: boolean }
+    options?: { replace?: boolean; }
   ) => {
     const normalized = normalizePortalPath(path);
 
@@ -631,7 +630,6 @@ export default function App() {
       window.removeEventListener('popstate', syncRouteFromBrowser);
     };
   }, []);
-
 
 
   // Pertahankan login OPD selama tab browser yang sama masih terbuka.
@@ -807,10 +805,10 @@ export default function App() {
 
     return match
       ? {
-          ...loggedInOPD,
-          jumlahUpload: match.jumlahUpload,
-          status: match.status,
-        }
+        ...loggedInOPD,
+        jumlahUpload: match.jumlahUpload,
+        status: match.status,
+      }
       : loggedInOPD;
   }, [loggedInOPD, displayData]);
 
@@ -848,7 +846,7 @@ export default function App() {
   const buildDashboardDataFromRows = (
     responseRows: string[][],
     year: string
-  ): { parsedOPDs: OPDData[]; uploadedCount: number } => {
+  ): { parsedOPDs: OPDData[]; uploadedCount: number; } => {
     const flagsByIdentity = new Map<string, DocumentFlags>();
 
     responseRows.forEach(row => {
@@ -1259,7 +1257,7 @@ export default function App() {
             const previousCandidate = pendingRegressionRef.current;
             const confirmations =
               previousCandidate?.year === requestedYear &&
-              previousCandidate.signature === snapshotSignature
+                previousCandidate.signature === snapshotSignature
                 ? previousCandidate.confirmations + 1
                 : 1;
 
@@ -1645,9 +1643,9 @@ export default function App() {
         const payload = {
           ...(revisionTarget
             ? {
-                action: 'uploadRevision',
-                parentUploadId: revisionTarget.uploadId,
-              }
+              action: 'uploadRevision',
+              parentUploadId: revisionTarget.uploadId,
+            }
             : { action: 'uploadOriginal' }),
           opdName: loggedInOPD.namaOPD,
           tahun: selectedYear,
@@ -1961,844 +1959,780 @@ export default function App() {
             transition={{ duration: 0.3 }}
             className="flex-grow flex flex-col"
           >
-            {/* NAVIGATION BAR — LIQUID GLASS */}
-            <nav className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
-              <div
-                className="relative mx-auto flex w-full max-w-6xl items-center justify-between overflow-hidden rounded-[30px] border border-white/20 px-2.5 py-2.5 sm:px-4 sm:py-3"
-                style={{
-                  background:
-                    'linear-gradient(118deg, rgba(24,38,115,0.76) 0%, rgba(20,31,91,0.62) 42%, rgba(77,70,180,0.46) 72%, rgba(31,49,133,0.64) 100%)',
-                  backdropFilter: 'blur(26px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(26px) saturate(180%)',
-                  boxShadow:
-                    'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(255,255,255,0.08), 0 18px 48px rgba(30,41,120,0.20), 0 3px 10px rgba(15,23,42,0.10)',
-                }}
-              >
-                {/* Lapisan cahaya liquid */}
-                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[30px]">
-                  <div className="absolute -left-12 -top-20 h-40 w-52 rotate-[-12deg] rounded-full bg-blue-400/30 blur-3xl" />
-                  <div className="absolute left-[42%] top-[-90px] h-44 w-64 rounded-full bg-violet-300/25 blur-3xl" />
-                  <div className="absolute -right-12 -bottom-24 h-48 w-56 rounded-full bg-indigo-300/30 blur-3xl" />
-                  <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+            {/* NAVIGATION BAR */}
+            <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 sm:py-6 transition-all duration-300">
+              <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-md border border-slate-200/60 shadow-sm rounded-2xl px-6 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                    alt="Logo Provinsi NTT"
+                    className="h-10 w-auto hover:scale-105 transition-transform duration-300"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="border-l-2 border-slate-200 h-8"></div>
+                  <div>
+                    <h1 className="font-bold text-primary tracking-tight leading-none text-lg">SIPMODAG</h1>
+                    <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-1">DP3AP2KB PROVINSI NTT</p>
+                  </div>
                 </div>
 
-                {/* BRAND */}
-                <button
-                  type="button"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-2xl px-2 py-1.5 text-left transition hover:bg-white/[0.08] sm:px-3"
-                  aria-label="Kembali ke beranda SIPMODAG"
-                >
-                  <span
-                    className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/25 bg-white/15 p-1.5 shadow-inner"
-                    style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)' }}
-                  >
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
-                      alt="Logo Provinsi NTT"
-                      className="h-full w-full object-contain"
-                      referrerPolicy="no-referrer"
-                    />
-                  </span>
-
-                  <span className="hidden min-w-0 lg:block">
-                    <span className="block text-[13px] font-black leading-none tracking-tight text-white">
-                      SIPMODAG
-                    </span>
-                    <span className="mt-1 block text-[7px] font-extrabold uppercase tracking-[0.14em] text-white/55">
-                      DP3AP2KB Provinsi NTT
-                    </span>
-                  </span>
-                </button>
-
-                {/* MENU */}
-                <div className="relative z-10 ml-1 flex min-w-0 flex-1 items-center justify-end gap-0.5 sm:ml-3 sm:gap-1">
+                <div className="flex items-center gap-4">
                   <button
-                    type="button"
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] sm:min-w-[66px] sm:px-3"
-                    aria-label="Beranda"
-                  >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/[0.13] ring-1 ring-inset ring-white/10 transition group-hover:bg-white/[0.18]">
-                      <Home className="h-4 w-4" />
-                    </span>
-                    <span className="hidden text-[9px] font-semibold text-white/85 sm:block">Beranda</span>
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => {
                       const el = document.getElementById('dashboard');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
-                    aria-label="Lihat dashboard"
+                    className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors cursor-pointer"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
-                      <TrendingUp className="h-4 w-4" />
-                    </span>
-                    <span className="hidden text-[9px] font-semibold sm:block">Dashboard</span>
+                    Lihat Dashboard
                   </button>
-
                   <button
-                    type="button"
                     onClick={() => setShowFAQ(true)}
-                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
-                    aria-label="Panduan"
+                    className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
-                      <HelpCircle className="h-4 w-4" />
-                    </span>
-                    <span className="hidden text-[9px] font-semibold sm:block">Panduan</span>
+                    <HelpCircle className="w-4 h-4" />
+                    <span>Panduan</span>
                   </button>
 
                   <button
-                    type="button"
-                    onClick={() => navigatePortal('/operator')}
-                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
-                    aria-label="Login operator"
-                  >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
-                      <ShieldCheck className="h-4 w-4" />
-                    </span>
-                    <span className="hidden text-[9px] font-semibold sm:block">Operator</span>
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => {
-                      if (loggedInOPD) {
-                        setShowProfileModal(true);
-                        return;
-                      }
-
-                      setSelectedOPDToLogin(null);
-                      setSearchOPDQuery('');
-                      setPassword('');
-                      setLoginError(null);
-                      navigatePortal('/opd');
+                      navigatePortal('/operator');
                     }}
-                    className={`group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 transition-all duration-200 hover:-translate-y-0.5 sm:min-w-[66px] sm:px-3 ${
-                      loggedInOPD
-                        ? 'bg-emerald-400/20 text-emerald-50 ring-1 ring-inset ring-emerald-200/20 hover:bg-emerald-400/25'
-                        : 'text-white/80 hover:bg-white/[0.12] hover:text-white'
-                    }`}
-                    aria-label={loggedInOPD ? 'Buka profil OPD' : 'Login OPD'}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-100 px-3 py-2.5 text-xs font-semibold text-rose-700 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-200 hover:text-rose-800 sm:px-4"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
-                      <User className="h-4 w-4" />
-                    </span>
-                    <span className="hidden max-w-[72px] truncate text-[9px] font-semibold sm:block">
-                      {loggedInOPD ? 'Profil OPD' : 'OPD'}
-                    </span>
+                    <ShieldCheck className="h-4 w-4" />
+                    <span className="hidden sm:inline">LOGIN OPERATOR</span>
+                    <span className="sm:hidden">OPERATOR</span>
                   </button>
+
+                  {loggedInOPD ? (
+                    <button
+                      onClick={() => setShowProfileModal(true)}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>{loggedInOPD.namaPendek}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setSelectedOPDToLogin(null);
+                        setSearchOPDQuery('');
+                        setPassword('');
+                        setLoginError(null);
+                        navigatePortal('/opd');
+                      }}
+                      className="bg-[#0F172A] hover:bg-slate-800 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
+                    >
+                      LOGIN OPD
+                    </button>
+                  )}
                 </div>
               </div>
             </nav>
 
-      {/* HERO SECTION */}
-      <main className="flex-grow pt-28 pb-16 sm:pt-32 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
-        {/* Background dibuat sama seperti halaman login */}
-        <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
-        <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
-        
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
-          <div className="space-y-8 relative z-10">
-            <HeroTypewriter />
-            
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
-              Digitalisasi pengumpulan dokumen analisis gender pada Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
-            </p>
+            {/* HERO SECTION */}
+            <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
+              {/* Background dibuat sama seperti halaman login */}
+              <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
+              <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-52 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-100/40 blur-3xl" />
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              {loggedInOPD ? (
-                <button
-                  onClick={() => setShowProfileModal(true)}
-                  className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
-                >
-                  <User className="w-5 h-5" />
-                  <span>Profil & Upload ({loggedInOPD.namaPendek})</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setSelectedOPDToLogin(null);
-                    setSearchOPDQuery('');
-                    setPassword('');
-                    setLoginError(null);
-                    navigatePortal('/opd');
-                  }}
-                  className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
-                >
-                  LOGIN OPD
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                  </svg>
-                </button>
-              )}
-            </div>
+              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-          </div>
+                <div className="space-y-8 relative z-10">
+                  <HeroTypewriter />
 
-          {/* Visual Side Graphics (Matched Exactly to screenshot!) */}
-          <div className="relative hidden lg:block z-10 h-[500px] w-full">
-            {/* Radial Glow Background */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/40 to-indigo-50/40 rounded-full scale-90 blur-2xl"></div>
-            
-            {/* Back Card (Yellow Icon on the left) */}
-            <div className="absolute left-[10%] top-[10%] w-[270px] h-[330px] bg-white rounded-2xl shadow-lg border border-slate-100 transform -rotate-[5deg] flex flex-col p-6 z-10">
-              <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-5.5 h-5.5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
-              </div>
-              <div className="h-3 w-1/3 bg-slate-100 rounded-full mb-3.5"></div>
-              <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-5/6 bg-slate-100 rounded-full"></div>
-            </div>
+                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+                    Digitalisasi pengumpulan dokumen analisis gender pada Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & Keluarga Berencana Provinsi Nusa Tenggara Timur.
+                  </p>
 
-            {/* Front Card (Blue Icon on the right) */}
-            <div className="absolute left-[34%] top-[15%] w-[270px] h-[330px] bg-white rounded-2xl shadow-2xl border border-slate-100/80 transform rotate-[3deg] flex flex-col p-6 z-20">
-              <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-5.5 h-5.5 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-              </div>
-              <div className="h-3 w-2/3 bg-slate-100 rounded-full mb-3.5"></div>
-              <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-11/12 bg-slate-100 rounded-full mb-2.5"></div>
-              <div className="h-3 w-4/5 bg-slate-100 rounded-full mb-2.5"></div>
-              
-              <div className="mt-auto h-12 w-full bg-slate-50/50 rounded-xl border border-slate-200/80 border-dashed"></div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* QUICK VALUE PROPOSITIONS */}
-      <section className="relative z-10 border-y border-slate-200/70 bg-white py-10 sm:py-12">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-slate-200 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <TrendingUp className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Mendorong Partisipasi
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <CheckCircle className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Data Real-Time & Valid
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-              <Clock className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
-                Efisiensi Administrasi
-              </h3>
-              <p className="text-sm leading-6 text-slate-500">
-                Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ / GUIDELINES SIDE PANEL */}
-      <AnimatePresence>
-        {showFAQ && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-primary/20 backdrop-blur-xs z-50 flex justify-end"
-            onClick={() => setShowFAQ(false)}
-          >
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-white w-full max-w-lg h-full p-8 shadow-2xl overflow-y-auto flex flex-col justify-between"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                  <h3 className="font-extrabold text-primary text-xl flex items-center gap-2">
-                    <HelpCircle className="w-5.5 h-5.5 text-secondary" />
-                    Panduan & Informasi
-                  </h3>
-                  <button 
-                    onClick={() => setShowFAQ(false)}
-                    className="text-slate-400 hover:text-slate-700 text-sm font-bold bg-slate-100 px-3 py-1.5 rounded-lg"
-                  >
-                    Tutup
-                  </button>
-                </div>
-
-                <div className="space-y-5 text-sm">
-                  <div className="bg-secondary/5 p-4 rounded-xl border border-secondary/15">
-                    <h4 className="font-bold text-secondary mb-1">Apa itu Analisis Gender?</h4>
-                    <p className="text-slate-600 leading-relaxed text-xs">
-                      Proses menganalisis data dan informasi untuk mengidentifikasi kesenjangan gender, kebutuhan, serta aspirasi laki-laki dan perempuan dalam pembangunan daerah.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-primary">Dokumen yang Wajib Dikumpulkan:</h4>
-                    
-                    <div className="flex gap-3 items-start">
-                      <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
-                      <div>
-                        <p className="font-semibold text-slate-800 text-xs">Gender Analysis Pathway (GAP)</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Langkah sistematis analisis gender untuk merumuskan kebijakan yang responsif gender.</p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3 items-start">
-                      <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
-                      <div>
-                        <p className="font-semibold text-slate-800 text-xs">Gender Budget Statement (GBS)</p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Dokumen anggaran yang menerangkan alokasi dana khusus untuk mengatasi kesenjangan gender.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-slate-100 pt-4 space-y-3">
-                    <h4 className="font-bold text-primary">Langkah Pengunggahan:</h4>
-                    <ol className="list-decimal list-inside text-xs text-slate-600 space-y-2">
-                      <li>Persiapkan berkas Surat Keputusan (SK) atau berkas analisis gender OPD Anda.</li>
-                      <li>Klik tombol <strong>LOGIN OPD</strong>.</li>
-                      <li>Pilih nama instansi/OPD Anda dan masukkan kata sandi Anda.</li>
-                      <li>Pilih tahun anggaran (2025 / 2026 / 2027) lalu unggah 4 berkas SK yang diminta.</li>
-                    </ol>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-slate-100 pt-6 mt-8 space-y-3">
-                <button
-                  onClick={() => {
-                    setShowFAQ(false);
-                    const el = document.getElementById('dashboard');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
-                >
-                  <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Lihat Dashboard Monitoring
-                </button>
-
-                {loggedInOPD ? (
-                  <button
-                    onClick={() => {
-                      setShowFAQ(false);
-                      setShowProfileModal(true);
-                    }}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
-                  >
-                    <User className="w-4 h-4" />
-                    Profil & Upload ({loggedInOPD.namaPendek})
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setShowFAQ(false);
-                      setSelectedOPDToLogin(null);
-                      setSearchOPDQuery('');
-                      setPassword('');
-                      setLoginError(null);
-                      navigatePortal('/opd');
-                    }}
-                    className="w-full bg-[#1E40AF] hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
-                  >
-                    <Lock className="w-4 h-4" />
-                    Login & Isi Dokumen
-                  </button>
-                )}
-                <p className="text-[10px] text-slate-400 text-center mt-2 font-medium">DP3AP2KB Nusa Tenggara Timur &copy; 2026</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-
-
-      {/* MONITORING DASHBOARD WORKSPACE */}
-      <section
-        id="dashboard"
-        className="relative z-10 overflow-hidden border-t border-blue-100/80 bg-[#EAF2FF] py-14 sm:py-20"
-      >
-        {/* Decorative background, terinspirasi dashboard referensi */}
-        <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-24 top-10 h-80 w-80 rounded-full bg-indigo-400/15 blur-3xl" />
-
-        <div className="relative mx-auto max-w-[1400px] px-4 sm:px-6">
-          <div className="overflow-hidden rounded-[32px] border border-white/80 bg-[#F7F9FE] shadow-[0_32px_90px_-48px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60">
-
-            {/* Dashboard top bar */}
-            <div className="flex flex-col gap-5 border-b border-slate-200/80 bg-white/80 px-5 py-5 backdrop-blur-sm sm:px-7 lg:flex-row lg:items-center lg:justify-between">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-700 text-white shadow-sm shadow-blue-900/15">
-                    <TrendingUp className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-blue-600">
-                      Monitoring SIPMODAG
-                    </p>
-                    <h2 className="mt-0.5 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
-                      Dashboard Progres OPD
-                    </h2>
-                  </div>
-                </div>
-                <p className="mt-2 max-w-2xl text-xs font-medium leading-5 text-slate-500">
-                  Ringkasan progres pengunggahan dokumen analisis gender seluruh OPD Provinsi Nusa Tenggara Timur.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <div className="relative">
-                  <select
-                    id="dashboard-year-select"
-                    value={dashboardYear}
-                    onChange={(e) => handleDashboardYearChange(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-xs font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 sm:w-40"
-                    aria-label="Pilih tahun dashboard"
-                    aria-busy={isRefreshing}
-                  >
-                    {availableDashboardYears.map(year => (
-                      <option key={year} value={year}>
-                        Tahun {year}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
-                </div>
-
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-[10px] font-semibold text-slate-500 shadow-sm">
-                  <Clock className="h-3.5 w-3.5 text-slate-400" />
-                  <span className="whitespace-nowrap">
-                    {lastUpdated.toLocaleTimeString('id-ID')}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleDashboardRefresh}
-                  disabled={isRefreshing}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-xs font-extrabold text-white shadow-sm shadow-blue-900/15 transition hover:bg-blue-800 disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                  <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-5 p-4 sm:p-6">
-              {/* Compact metric strip */}
-              <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
-                  {[
-                    {
-                      label: 'Total Target OPD',
-                      value: stats.targetOPD,
-                      caption: `Tahun ${dashboardYear}`,
-                      icon: Layers,
-                      iconClass: 'bg-orange-50 text-orange-500',
-                      valueClass: 'text-slate-950',
-                    },
-                    {
-                      label: 'Sudah Upload',
-                      value: stats.sudahCount,
-                      caption: 'Minimal 1 dokumen',
-                      icon: CheckCircle,
-                      iconClass: 'bg-violet-50 text-violet-600',
-                      valueClass: 'text-violet-700',
-                    },
-                    {
-                      label: 'Belum Upload',
-                      value: stats.belumCount,
-                      caption: 'Perlu tindak lanjut',
-                      icon: XCircle,
-                      iconClass: 'bg-cyan-50 text-cyan-600',
-                      valueClass: 'text-cyan-700',
-                    },
-                    {
-                      label: 'Tingkat Partisipasi',
-                      value: `${stats.percentageSudah.toFixed(1)}%`,
-                      caption: `${stats.sudahCount} dari ${stats.targetOPD} OPD`,
-                      icon: TrendingUp,
-                      iconClass: 'bg-rose-50 text-rose-600',
-                      valueClass: 'text-rose-600',
-                    },
-                  ].map(item => {
-                    const Icon = item.icon;
-
-                    return (
-                      <div
-                        key={item.label}
-                        className="flex min-h-[118px] items-center gap-4 px-5 py-5 transition hover:bg-slate-50/70"
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    {loggedInOPD ? (
+                      <button
+                        onClick={() => setShowProfileModal(true)}
+                        className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
                       >
-                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${item.iconClass}`}>
-                          <Icon className="h-5 w-5" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <p className="text-[9px] font-extrabold uppercase tracking-[0.13em] text-slate-400">
-                            {item.label}
-                          </p>
-                          <p className={`mt-1 text-2xl font-black tracking-tight ${item.valueClass}`}>
-                            {item.value}
-                          </p>
-                          <p className="mt-1 text-[9px] font-semibold text-slate-400">
-                            {item.caption}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* Main analytics area */}
-              <section className="grid gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.68fr)]">
-                <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
-                    <div>
-                      <p className="text-sm font-black tracking-tight text-slate-950">
-                        Visualisasi Progres
-                      </p>
-                      <p className="mt-1 text-[10px] font-medium text-slate-400">
-                        Distribusi status pengunggahan dokumen OPD Tahun {dashboardYear}
-                      </p>
-                    </div>
-
-                    <span className="rounded-xl bg-violet-50 px-3 py-2 text-[9px] font-extrabold text-violet-700">
-                      Data Monitoring
-                    </span>
-                  </div>
-
-                  <div className="p-4 sm:p-5">
-                    <VisualCharts data={displayData} stats={stats} />
-                  </div>
-                </div>
-
-                <aside className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-4 px-5 pb-2 pt-5 sm:px-6 sm:pt-6">
-                    <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
-                        Partisipasi OPD
-                      </p>
-                      <h3 className="mt-1 text-lg font-black tracking-tight text-slate-950">
-                        Statistik OPD
-                      </h3>
-                    </div>
-
-                    <span className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-[9px] font-extrabold text-slate-500">
-                      {dashboardYear}
-                    </span>
-                  </div>
-
-                  {/* Radial chart ala referensi */}
-                  <div className="px-4 pb-2 sm:px-5">
-                    <div className="grid grid-cols-[minmax(0,1fr)_104px] items-center gap-1">
-                      <div className="relative mx-auto h-[205px] w-[205px]">
-                        <svg
-                          viewBox="0 0 180 180"
-                          className="h-full w-full overflow-visible"
-                          aria-label={`Partisipasi OPD Tahun ${dashboardYear}`}
-                        >
-                          {/* Track luar */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="68"
-                            fill="none"
-                            stroke="#ECECF4"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray="78 22"
-                            transform="rotate(128 90 90)"
-                          />
-                          {/* Sudah Upload */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="68"
-                            fill="none"
-                            stroke="#4F46E5"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray={`${Math.max(
-                              0,
-                              Math.min(78, stats.percentageSudah * 0.78)
-                            )} 100`}
-                            transform="rotate(128 90 90)"
-                            className="transition-all duration-700 ease-out"
-                          />
-
-                          {/* Track tengah */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="52"
-                            fill="none"
-                            stroke="#ECECF4"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray="78 22"
-                            transform="rotate(128 90 90)"
-                          />
-                          {/* Lengkap 4 Dokumen */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="52"
-                            fill="none"
-                            stroke="#6D5DFB"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray={`${Math.max(
-                              0,
-                              Math.min(
-                                78,
-                                participationCompletePercentage * 0.78
-                              )
-                            )} 100`}
-                            transform="rotate(128 90 90)"
-                            className="transition-all duration-700 ease-out"
-                          />
-
-                          {/* Track dalam */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="36"
-                            fill="none"
-                            stroke="#ECECF4"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray="78 22"
-                            transform="rotate(128 90 90)"
-                          />
-                          {/* Belum Upload */}
-                          <circle
-                            cx="90"
-                            cy="90"
-                            r="36"
-                            fill="none"
-                            stroke="#FF4D5A"
-                            strokeWidth="9"
-                            strokeLinecap="round"
-                            pathLength={100}
-                            strokeDasharray={`${Math.max(
-                              0,
-                              Math.min(
-                                78,
-                                participationNotUploadedPercentage * 0.78
-                              )
-                            )} 100`}
-                            transform="rotate(128 90 90)"
-                            className="transition-all duration-700 ease-out"
-                          />
+                        <User className="w-5 h-5" />
+                        <span>Profil & Upload ({loggedInOPD.namaPendek})</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setSelectedOPDToLogin(null);
+                          setSearchOPDQuery('');
+                          setPassword('');
+                          setLoginError(null);
+                          navigatePortal('/opd');
+                        }}
+                        className="flex items-center justify-center gap-2 bg-[#1E40AF] hover:bg-blue-900 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+                      >
+                        LOGIN OPD
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
+                      </button>
+                    )}
+                  </div>
+
+                </div>
+
+                {/* Visual Side Graphics (Matched Exactly to screenshot!) */}
+                <div className="relative hidden lg:block z-10 h-[500px] w-full">
+                  {/* Radial Glow Background */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/40 to-indigo-50/40 rounded-full scale-90 blur-2xl"></div>
+
+                  {/* Back Card (Yellow Icon on the left) */}
+                  <div className="absolute left-[10%] top-[10%] w-[270px] h-[330px] bg-white rounded-2xl shadow-lg border border-slate-100 transform -rotate-[5deg] flex flex-col p-6 z-10">
+                    <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center mb-6">
+                      <svg className="w-5.5 h-5.5 text-[#F59E0B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </div>
+                    <div className="h-3 w-1/3 bg-slate-100 rounded-full mb-3.5"></div>
+                    <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
+                    <div className="h-3 w-5/6 bg-slate-100 rounded-full"></div>
+                  </div>
+
+                  {/* Front Card (Blue Icon on the right) */}
+                  <div className="absolute left-[34%] top-[15%] w-[270px] h-[330px] bg-white rounded-2xl shadow-2xl border border-slate-100/80 transform rotate-[3deg] flex flex-col p-6 z-20">
+                    <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center mb-6">
+                      <svg className="w-5.5 h-5.5 text-[#1E40AF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                    </div>
+                    <div className="h-3 w-2/3 bg-slate-100 rounded-full mb-3.5"></div>
+                    <div className="h-3 w-full bg-slate-100 rounded-full mb-2.5"></div>
+                    <div className="h-3 w-11/12 bg-slate-100 rounded-full mb-2.5"></div>
+                    <div className="h-3 w-4/5 bg-slate-100 rounded-full mb-2.5"></div>
+
+                    <div className="mt-auto h-12 w-full bg-slate-50/50 rounded-xl border border-slate-200/80 border-dashed"></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+
+            {/* QUICK VALUE PROPOSITIONS */}
+            <section className="relative z-10 border-y border-slate-200/70 bg-white py-10 sm:py-12">
+              <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-slate-200 px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
+                <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                      Mendorong Partisipasi
+                    </h3>
+                    <p className="text-sm leading-6 text-slate-500">
+                      Meningkatkan keikutsertaan seluruh OPD NTT dalam integrasi kebijakan berbasis analisis gender.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <CheckCircle className="h-6 w-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                      Data Real-Time & Valid
+                    </h3>
+                    <p className="text-sm leading-6 text-slate-500">
+                      Seluruh berkas dipantau secara transparan dan diverifikasi langsung secara digital.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 py-6 md:px-8 md:py-0">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="mb-1.5 text-base font-extrabold leading-snug text-primary">
+                      Efisiensi Administrasi
+                    </h3>
+                    <p className="text-sm leading-6 text-slate-500">
+                      Menghilangkan hambatan manual dalam pengumpulan laporan analisis gender daerah.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* FAQ / GUIDELINES SIDE PANEL */}
+            <AnimatePresence>
+              {showFAQ && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-primary/20 backdrop-blur-xs z-50 flex justify-end"
+                  onClick={() => setShowFAQ(false)}
+                >
+                  <motion.div
+                    initial={{ x: '100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    className="bg-white w-full max-w-lg h-full p-8 shadow-2xl overflow-y-auto flex flex-col justify-between"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <h3 className="font-extrabold text-primary text-xl flex items-center gap-2">
+                          <HelpCircle className="w-5.5 h-5.5 text-secondary" />
+                          Panduan & Informasi
+                        </h3>
+                        <button
+                          onClick={() => setShowFAQ(false)}
+                          className="text-slate-400 hover:text-slate-700 text-sm font-bold bg-slate-100 px-3 py-1.5 rounded-lg"
+                        >
+                          Tutup
+                        </button>
                       </div>
 
-                      <div className="-ml-2 self-center">
-                        <p className="text-3xl font-black leading-none tracking-tight text-slate-950">
-                          {stats.sudahCount}
-                        </p>
-                        <p className="mt-2 text-[9px] font-bold leading-4 text-slate-400">
-                          OPD sudah
-                          <br />
-                          berpartisipasi
-                        </p>
-                        <span className="mt-3 inline-flex rounded-lg bg-emerald-100 px-2 py-1 text-[8px] font-black text-emerald-700">
-                          {stats.percentageSudah.toFixed(1)}%
-                        </span>
+                      <div className="space-y-5 text-sm">
+                        <div className="bg-secondary/5 p-4 rounded-xl border border-secondary/15">
+                          <h4 className="font-bold text-secondary mb-1">Apa itu Analisis Gender?</h4>
+                          <p className="text-slate-600 leading-relaxed text-xs">
+                            Proses menganalisis data dan informasi untuk mengidentifikasi kesenjangan gender, kebutuhan, serta aspirasi laki-laki dan perempuan dalam pembangunan daerah.
+                          </p>
+                        </div>
+
+                        <div className="space-y-3">
+                          <h4 className="font-bold text-primary">Dokumen yang Wajib Dikumpulkan:</h4>
+
+                          <div className="flex gap-3 items-start">
+                            <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                            <div>
+                              <p className="font-semibold text-slate-800 text-xs">Gender Analysis Pathway (GAP)</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">Langkah sistematis analisis gender untuk merumuskan kebijakan yang responsif gender.</p>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3 items-start">
+                            <span className="w-5 h-5 rounded-md bg-secondary/10 text-secondary flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                            <div>
+                              <p className="font-semibold text-slate-800 text-xs">Gender Budget Statement (GBS)</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">Dokumen anggaran yang menerangkan alokasi dana khusus untuk mengatasi kesenjangan gender.</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-slate-100 pt-4 space-y-3">
+                          <h4 className="font-bold text-primary">Langkah Pengunggahan:</h4>
+                          <ol className="list-decimal list-inside text-xs text-slate-600 space-y-2">
+                            <li>Persiapkan berkas Surat Keputusan (SK) atau berkas analisis gender OPD Anda.</li>
+                            <li>Klik tombol <strong>LOGIN OPD</strong>.</li>
+                            <li>Pilih nama instansi/OPD Anda dan masukkan kata sandi Anda.</li>
+                            <li>Pilih tahun anggaran (2025 / 2026 / 2027) lalu unggah 4 berkas SK yang diminta.</li>
+                          </ol>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Legend/stat rows ala referensi */}
-                    <div className="-mt-1 space-y-2.5 px-1">
-                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
-                        <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                            <FileText className="h-3.5 w-3.5" />
-                          </span>
-                          <span className="truncate text-[10px] font-extrabold text-slate-700">
-                            Sudah Upload
-                          </span>
-                        </div>
-                        <span className="text-right text-[10px] font-black text-slate-800">
-                          {stats.sudahCount}
+                    <div className="border-t border-slate-100 pt-6 mt-8 space-y-3">
+                      <button
+                        onClick={() => {
+                          setShowFAQ(false);
+                          const el = document.getElementById('dashboard');
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors cursor-pointer"
+                      >
+                        <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Lihat Dashboard Monitoring
+                      </button>
+
+                      {loggedInOPD ? (
+                        <button
+                          onClick={() => {
+                            setShowFAQ(false);
+                            setShowProfileModal(true);
+                          }}
+                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
+                        >
+                          <User className="w-4 h-4" />
+                          Profil & Upload ({loggedInOPD.namaPendek})
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setShowFAQ(false);
+                            setSelectedOPDToLogin(null);
+                            setSearchOPDQuery('');
+                            setPassword('');
+                            setLoginError(null);
+                            navigatePortal('/opd');
+                          }}
+                          className="w-full bg-[#1E40AF] hover:bg-blue-950 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm cursor-pointer"
+                        >
+                          <Lock className="w-4 h-4" />
+                          Login & Isi Dokumen
+                        </button>
+                      )}
+                      <p className="text-[10px] text-slate-400 text-center mt-2 font-medium">DP3AP2KB Nusa Tenggara Timur &copy; 2026</p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+
+            {/* MONITORING DASHBOARD WORKSPACE */}
+            <section
+              id="dashboard"
+              className="relative z-10 overflow-hidden border-t border-blue-100/80 bg-[#EAF2FF] py-14 sm:py-20"
+            >
+              {/* Decorative background, terinspirasi dashboard referensi */}
+              <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
+              <div className="pointer-events-none absolute -right-24 top-10 h-80 w-80 rounded-full bg-indigo-400/15 blur-3xl" />
+
+              <div className="relative mx-auto max-w-[1400px] px-4 sm:px-6">
+                <div className="overflow-hidden rounded-[32px] border border-white/80 bg-[#F7F9FE] shadow-[0_32px_90px_-48px_rgba(30,64,175,0.45)] ring-1 ring-blue-100/60">
+
+                  {/* Dashboard top bar */}
+                  <div className="flex flex-col gap-5 border-b border-slate-200/80 bg-white/80 px-5 py-5 backdrop-blur-sm sm:px-7 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-700 text-white shadow-sm shadow-blue-900/15">
+                          <TrendingUp className="h-4 w-4" />
                         </span>
-                        <span className="rounded-md bg-indigo-50 px-1.5 py-1 text-center text-[7px] font-black text-indigo-600">
-                          {stats.percentageSudah.toFixed(1)}%
+                        <div>
+                          <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-blue-600">
+                            Monitoring SIPMODAG
+                          </p>
+                          <h2 className="mt-0.5 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+                            Dashboard Progres OPD
+                          </h2>
+                        </div>
+                      </div>
+                      <p className="mt-2 max-w-2xl text-xs font-medium leading-5 text-slate-500">
+                        Ringkasan progres pengunggahan dokumen analisis gender seluruh OPD Provinsi Nusa Tenggara Timur.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="relative">
+                        <select
+                          id="dashboard-year-select"
+                          value={dashboardYear}
+                          onChange={(e) => handleDashboardYearChange(e.target.value)}
+                          className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-10 text-xs font-extrabold text-slate-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 sm:w-40"
+                          aria-label="Pilih tahun dashboard"
+                          aria-busy={isRefreshing}
+                        >
+                          {availableDashboardYears.map(year => (
+                            <option key={year} value={year}>
+                              Tahun {year}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
+                      </div>
+
+                      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-[10px] font-semibold text-slate-500 shadow-sm">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="whitespace-nowrap">
+                          {lastUpdated.toLocaleTimeString('id-ID')}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
-                        <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                          </span>
-                          <span className="truncate text-[10px] font-extrabold text-slate-700">
-                            Lengkap 4 Dokumen
-                          </span>
-                        </div>
-                        <span className="text-right text-[10px] font-black text-slate-800">
-                          {participationCompleteCount}
-                        </span>
-                        <span className="rounded-md bg-violet-50 px-1.5 py-1 text-center text-[7px] font-black text-violet-600">
-                          {participationCompletePercentage.toFixed(1)}%
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
-                        <div className="flex min-w-0 items-center gap-2.5">
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
-                            <Clock className="h-3.5 w-3.5" />
-                          </span>
-                          <span className="truncate text-[10px] font-extrabold text-slate-700">
-                            Belum Upload
-                          </span>
-                        </div>
-                        <span className="text-right text-[10px] font-black text-slate-800">
-                          {stats.belumCount}
-                        </span>
-                        <span className="rounded-md bg-rose-50 px-1.5 py-1 text-center text-[7px] font-black text-rose-500">
-                          {participationNotUploadedPercentage.toFixed(1)}%
-                        </span>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDashboardRefresh}
+                        disabled={isRefreshing}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-3 text-xs font-extrabold text-white shadow-sm shadow-blue-900/15 transition hover:bg-blue-800 disabled:opacity-50"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span>{isRefreshing ? 'Memuat...' : 'Segarkan'}</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Footer data tetap dipertahankan, dibuat lebih ringan */}
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-[8px] font-extrabold uppercase tracking-wider text-slate-500">
-                        Data Monitoring
-                      </span>
-                    </div>
-                    <span className="text-[8px] font-semibold text-slate-400">
-                      {lastUpdated.toLocaleTimeString('id-ID')}
-                    </span>
-                  </div>
-                </aside>
-              </section>
+                  <div className="space-y-5 p-4 sm:p-6">
+                    {/* Compact metric strip */}
+                    <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                      <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 xl:grid-cols-4">
+                        {[
+                          {
+                            label: 'Total Target OPD',
+                            value: stats.targetOPD,
+                            caption: `Tahun ${dashboardYear}`,
+                            icon: Layers,
+                            iconClass: 'bg-orange-50 text-orange-500',
+                            valueClass: 'text-slate-950',
+                          },
+                          {
+                            label: 'Sudah Upload',
+                            value: stats.sudahCount,
+                            caption: 'Minimal 1 dokumen',
+                            icon: CheckCircle,
+                            iconClass: 'bg-violet-50 text-violet-600',
+                            valueClass: 'text-violet-700',
+                          },
+                          {
+                            label: 'Belum Upload',
+                            value: stats.belumCount,
+                            caption: 'Perlu tindak lanjut',
+                            icon: XCircle,
+                            iconClass: 'bg-cyan-50 text-cyan-600',
+                            valueClass: 'text-cyan-700',
+                          },
+                          {
+                            label: 'Tingkat Partisipasi',
+                            value: `${stats.percentageSudah.toFixed(1)}%`,
+                            caption: `${stats.sudahCount} dari ${stats.targetOPD} OPD`,
+                            icon: TrendingUp,
+                            iconClass: 'bg-rose-50 text-rose-600',
+                            valueClass: 'text-rose-600',
+                          },
+                        ].map(item => {
+                          const Icon = item.icon;
 
-              {/* OPD list */}
-              <section
-                id="daftar-opd"
-                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
-              >
-                <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                          return (
+                            <div
+                              key={item.label}
+                              className="flex min-h-[118px] items-center gap-4 px-5 py-5 transition hover:bg-slate-50/70"
+                            >
+                              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${item.iconClass}`}>
+                                <Icon className="h-5 w-5" />
+                              </div>
+
+                              <div className="min-w-0">
+                                <p className="text-[9px] font-extrabold uppercase tracking-[0.13em] text-slate-400">
+                                  {item.label}
+                                </p>
+                                <p className={`mt-1 text-2xl font-black tracking-tight ${item.valueClass}`}>
+                                  {item.value}
+                                </p>
+                                <p className="mt-1 text-[9px] font-semibold text-slate-400">
+                                  {item.caption}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    {/* Main analytics area */}
+                    <section className="grid gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.68fr)]">
+                      <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                          <div>
+                            <p className="text-sm font-black tracking-tight text-slate-950">
+                              Visualisasi Progres
+                            </p>
+                            <p className="mt-1 text-[10px] font-medium text-slate-400">
+                              Distribusi status pengunggahan dokumen OPD Tahun {dashboardYear}
+                            </p>
+                          </div>
+
+                          <span className="rounded-xl bg-violet-50 px-3 py-2 text-[9px] font-extrabold text-violet-700">
+                            Data Monitoring
+                          </span>
+                        </div>
+
+                        <div className="p-4 sm:p-5">
+                          <VisualCharts data={displayData} stats={stats} />
+                        </div>
+                      </div>
+
+                      <aside className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-4 px-5 pb-2 pt-5 sm:px-6 sm:pt-6">
+                          <div>
+                            <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                              Partisipasi OPD
+                            </p>
+                            <h3 className="mt-1 text-lg font-black tracking-tight text-slate-950">
+                              Statistik OPD
+                            </h3>
+                          </div>
+
+                          <span className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-[9px] font-extrabold text-slate-500">
+                            {dashboardYear}
+                          </span>
+                        </div>
+
+                        {/* Radial chart ala referensi */}
+                        <div className="px-4 pb-2 sm:px-5">
+                          <div className="grid grid-cols-[minmax(0,1fr)_104px] items-center gap-1">
+                            <div className="relative mx-auto h-[205px] w-[205px]">
+                              <svg
+                                viewBox="0 0 180 180"
+                                className="h-full w-full overflow-visible"
+                                aria-label={`Partisipasi OPD Tahun ${dashboardYear}`}
+                              >
+                                {/* Track luar */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="68"
+                                  fill="none"
+                                  stroke="#ECECF4"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray="78 22"
+                                  transform="rotate(128 90 90)"
+                                />
+                                {/* Sudah Upload */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="68"
+                                  fill="none"
+                                  stroke="#4F46E5"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray={`${Math.max(
+                                    0,
+                                    Math.min(78, stats.percentageSudah * 0.78)
+                                  )} 100`}
+                                  transform="rotate(128 90 90)"
+                                  className="transition-all duration-700 ease-out"
+                                />
+
+                                {/* Track tengah */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="52"
+                                  fill="none"
+                                  stroke="#ECECF4"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray="78 22"
+                                  transform="rotate(128 90 90)"
+                                />
+                                {/* Lengkap 4 Dokumen */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="52"
+                                  fill="none"
+                                  stroke="#6D5DFB"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray={`${Math.max(
+                                    0,
+                                    Math.min(
+                                      78,
+                                      participationCompletePercentage * 0.78
+                                    )
+                                  )} 100`}
+                                  transform="rotate(128 90 90)"
+                                  className="transition-all duration-700 ease-out"
+                                />
+
+                                {/* Track dalam */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="36"
+                                  fill="none"
+                                  stroke="#ECECF4"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray="78 22"
+                                  transform="rotate(128 90 90)"
+                                />
+                                {/* Belum Upload */}
+                                <circle
+                                  cx="90"
+                                  cy="90"
+                                  r="36"
+                                  fill="none"
+                                  stroke="#FF4D5A"
+                                  strokeWidth="9"
+                                  strokeLinecap="round"
+                                  pathLength={100}
+                                  strokeDasharray={`${Math.max(
+                                    0,
+                                    Math.min(
+                                      78,
+                                      participationNotUploadedPercentage * 0.78
+                                    )
+                                  )} 100`}
+                                  transform="rotate(128 90 90)"
+                                  className="transition-all duration-700 ease-out"
+                                />
+                              </svg>
+                            </div>
+
+                            <div className="-ml-2 self-center">
+                              <p className="text-3xl font-black leading-none tracking-tight text-slate-950">
+                                {stats.sudahCount}
+                              </p>
+                              <p className="mt-2 text-[9px] font-bold leading-4 text-slate-400">
+                                OPD sudah
+                                <br />
+                                berpartisipasi
+                              </p>
+                              <span className="mt-3 inline-flex rounded-lg bg-emerald-100 px-2 py-1 text-[8px] font-black text-emerald-700">
+                                {stats.percentageSudah.toFixed(1)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Legend/stat rows ala referensi */}
+                          <div className="-mt-1 space-y-2.5 px-1">
+                            <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                                  <FileText className="h-3.5 w-3.5" />
+                                </span>
+                                <span className="truncate text-[10px] font-extrabold text-slate-700">
+                                  Sudah Upload
+                                </span>
+                              </div>
+                              <span className="text-right text-[10px] font-black text-slate-800">
+                                {stats.sudahCount}
+                              </span>
+                              <span className="rounded-md bg-indigo-50 px-1.5 py-1 text-center text-[7px] font-black text-indigo-600">
+                                {stats.percentageSudah.toFixed(1)}%
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
+                                </span>
+                                <span className="truncate text-[10px] font-extrabold text-slate-700">
+                                  Lengkap 4 Dokumen
+                                </span>
+                              </div>
+                              <span className="text-right text-[10px] font-black text-slate-800">
+                                {participationCompleteCount}
+                              </span>
+                              <span className="rounded-md bg-violet-50 px-1.5 py-1 text-center text-[7px] font-black text-violet-600">
+                                {participationCompletePercentage.toFixed(1)}%
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
+                                  <Clock className="h-3.5 w-3.5" />
+                                </span>
+                                <span className="truncate text-[10px] font-extrabold text-slate-700">
+                                  Belum Upload
+                                </span>
+                              </div>
+                              <span className="text-right text-[10px] font-black text-slate-800">
+                                {stats.belumCount}
+                              </span>
+                              <span className="rounded-md bg-rose-50 px-1.5 py-1 text-center text-[7px] font-black text-rose-500">
+                                {participationNotUploadedPercentage.toFixed(1)}%
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Footer data tetap dipertahankan, dibuat lebih ringan */}
+                        <div className="mt-4 flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
+                          <div className="flex items-center gap-2">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[8px] font-extrabold uppercase tracking-wider text-slate-500">
+                              Data Monitoring
+                            </span>
+                          </div>
+                          <span className="text-[8px] font-semibold text-slate-400">
+                            {lastUpdated.toLocaleTimeString('id-ID')}
+                          </span>
+                        </div>
+                      </aside>
+                    </section>
+
+                    {/* OPD list */}
+                    <section
+                      id="daftar-opd"
+                      className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+                    >
+                      <div className="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                        <div>
+                          <p className="text-sm font-black tracking-tight text-slate-950">
+                            Daftar Monitoring OPD
+                          </p>
+                          <p className="mt-1 text-[10px] font-medium text-slate-400">
+                            Rincian kelengkapan dokumen seluruh OPD Tahun {dashboardYear}
+                          </p>
+                        </div>
+
+                        <span className="w-fit rounded-xl bg-blue-50 px-3 py-2 text-[9px] font-extrabold text-blue-700">
+                          {stats.targetOPD} OPD
+                        </span>
+                      </div>
+
+                      <div className="p-4 sm:p-5">
+                        <OPDList data={displayData} />
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* FOOTER */}
+            <footer className="bg-primary text-slate-400 py-12 relative z-10 border-t border-slate-800">
+              <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                    alt="Logo NTT"
+                    className="h-8 w-auto grayscale opacity-80"
+                    referrerPolicy="no-referrer"
+                  />
                   <div>
-                    <p className="text-sm font-black tracking-tight text-slate-950">
-                      Daftar Monitoring OPD
-                    </p>
-                    <p className="mt-1 text-[10px] font-medium text-slate-400">
-                      Rincian kelengkapan dokumen seluruh OPD Tahun {dashboardYear}
-                    </p>
+                    <p className="text-white font-extrabold text-sm tracking-tight">SIPMODAG</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide mt-0.5">DP3AP2KB PROVINSI NTT</p>
                   </div>
-
-                  <span className="w-fit rounded-xl bg-blue-50 px-3 py-2 text-[9px] font-extrabold text-blue-700">
-                    {stats.targetOPD} OPD
-                  </span>
                 </div>
 
-                <div className="p-4 sm:p-5">
-                  <OPDList data={displayData} />
+                <div className="flex flex-wrap gap-6 text-xs font-semibold text-slate-500">
+                  <a href="#dashboard" className="hover:text-white transition-colors">Dashboard</a>
+                  <a href="#daftar-opd" className="hover:text-white transition-colors">Daftar OPD</a>
+                  {loggedInOPD ? (
+                    <button
+                      onClick={() => setShowProfileModal(true)}
+                      className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      Upload Dokumen ({loggedInOPD.namaPendek})
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setSelectedOPDToLogin(null);
+                        setSearchOPDQuery('');
+                        setPassword('');
+                        setLoginError(null);
+                        navigatePortal('/opd');
+                      }}
+                      className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      Login & Upload <Lock className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* FOOTER */}
-      <footer className="bg-primary text-slate-400 py-12 relative z-10 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" 
-              alt="Logo NTT" 
-              className="h-8 w-auto grayscale opacity-80"
-              referrerPolicy="no-referrer"
-            />
-            <div>
-              <p className="text-white font-extrabold text-sm tracking-tight">SIPMODAG</p>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide mt-0.5">DP3AP2KB PROVINSI NTT</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-6 text-xs font-semibold text-slate-500">
-            <a href="#dashboard" className="hover:text-white transition-colors">Dashboard</a>
-            <a href="#daftar-opd" className="hover:text-white transition-colors">Daftar OPD</a>
-            {loggedInOPD ? (
-              <button 
-                onClick={() => setShowProfileModal(true)} 
-                className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-              >
-                Upload Dokumen ({loggedInOPD.namaPendek})
-              </button>
-            ) : (
-              <button 
-                onClick={() => {
-                  setSelectedOPDToLogin(null);
-                  setSearchOPDQuery('');
-                  setPassword('');
-                  setLoginError(null);
-                  navigatePortal('/opd');
-                }} 
-                className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-              >
-                Login & Upload <Lock className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-
-          <div className="text-center md:text-right space-y-1">
-            <p className="text-xs">&copy; 2026 Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & KB</p>
-            <p className="text-[10px] text-slate-600 font-medium">Pemerintah Provinsi Nusa Tenggara Timur</p>
-          </div>
-        </div>
-      </footer>
+                <div className="text-center md:text-right space-y-1">
+                  <p className="text-xs">&copy; 2026 Dinas Pemberdayaan Perempuan, Perlindungan Anak, Pengendalian Penduduk & KB</p>
+                  <p className="text-[10px] text-slate-600 font-medium">Pemerintah Provinsi Nusa Tenggara Timur</p>
+                </div>
+              </div>
+            </footer>
           </motion.div>
         )}
       </AnimatePresence>
