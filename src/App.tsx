@@ -1964,18 +1964,18 @@ export default function App() {
             {/* NAVIGATION BAR — LIQUID GLASS */}
             <nav className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
               <div
-                className="relative mx-auto flex w-full max-w-6xl items-center justify-between overflow-hidden rounded-full border border-white/35 px-2.5 py-2.5 sm:px-4 sm:py-3"
+                className="relative mx-auto flex w-full max-w-6xl items-center justify-between overflow-hidden rounded-[30px] border border-white/20 px-2.5 py-2.5 sm:px-4 sm:py-3"
                 style={{
                   background:
                     'linear-gradient(118deg, rgba(24,38,115,0.76) 0%, rgba(20,31,91,0.62) 42%, rgba(77,70,180,0.46) 72%, rgba(31,49,133,0.64) 100%)',
                   backdropFilter: 'blur(26px) saturate(180%)',
                   WebkitBackdropFilter: 'blur(26px) saturate(180%)',
                   boxShadow:
-                    'inset 0 1px 0 rgba(255,255,255,0.52), inset 0 -1px 0 rgba(255,255,255,0.12), 0 18px 48px rgba(30,41,120,0.20), 0 3px 10px rgba(15,23,42,0.10)',
+                    'inset 0 1px 0 rgba(255,255,255,0.34), inset 0 -1px 0 rgba(255,255,255,0.08), 0 18px 48px rgba(30,41,120,0.20), 0 3px 10px rgba(15,23,42,0.10)',
                 }}
               >
                 {/* Lapisan cahaya liquid */}
-                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-full">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[30px]">
                   <div className="absolute -left-12 -top-20 h-40 w-52 rotate-[-12deg] rounded-full bg-blue-400/30 blur-3xl" />
                   <div className="absolute left-[42%] top-[-90px] h-44 w-64 rounded-full bg-violet-300/25 blur-3xl" />
                   <div className="absolute -right-12 -bottom-24 h-48 w-56 rounded-full bg-indigo-300/30 blur-3xl" />
@@ -1986,7 +1986,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-full px-2 py-1.5 text-left transition hover:bg-white/[0.08] sm:px-3"
+                  className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-2xl px-2 py-1.5 text-left transition hover:bg-white/[0.08] sm:px-3"
                   aria-label="Kembali ke beranda SIPMODAG"
                 >
                   <span
