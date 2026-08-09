@@ -8,6 +8,7 @@ import {
   AlertTriangle, 
   FileText, 
   HelpCircle, 
+  Home,
   ArrowRight, 
   TrendingUp, 
   CheckCircle, 
@@ -1960,80 +1961,143 @@ export default function App() {
             transition={{ duration: 0.3 }}
             className="flex-grow flex flex-col"
           >
-            {/* NAVIGATION BAR */}
-            <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 sm:py-6 transition-all duration-300">
-        <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-md border border-slate-200/60 shadow-sm rounded-2xl px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png" 
-              alt="Logo Provinsi NTT" 
-              className="h-10 w-auto hover:scale-105 transition-transform duration-300"
-              referrerPolicy="no-referrer"
-            />
-            <div className="border-l-2 border-slate-200 h-8"></div>
-            <div>
-              <h1 className="font-bold text-primary tracking-tight leading-none text-lg">SIPMODAG</h1>
-              <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-1">DP3AP2KB PROVINSI NTT</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                const el = document.getElementById('dashboard');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors cursor-pointer"
-            >
-              Lihat Dashboard
-            </button>
-            <button
-              onClick={() => setShowFAQ(true)}
-              className="text-xs font-semibold text-slate-600 hover:text-[#1E40AF] transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              <HelpCircle className="w-4 h-4" />
-              <span>Panduan</span>
-            </button>
-
-            <button
-              onClick={() => {
-                navigatePortal('/operator');
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-100 px-3 py-2.5 text-xs font-semibold text-rose-700 shadow-sm transition-all hover:border-rose-300 hover:bg-rose-200 hover:text-rose-800 sm:px-4"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              <span className="hidden sm:inline">LOGIN OPERATOR</span>
-              <span className="sm:hidden">OPERATOR</span>
-            </button>
-            
-            {loggedInOPD ? (
-              <button
-                onClick={() => setShowProfileModal(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md flex items-center gap-1.5 cursor-pointer"
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>{loggedInOPD.namaPendek}</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setSelectedOPDToLogin(null);
-                  setSearchOPDQuery('');
-                  setPassword('');
-                  setLoginError(null);
-                  navigatePortal('/opd');
+            {/* NAVIGATION BAR — LIQUID GLASS */}
+            <nav className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
+              <div
+                className="relative mx-auto flex w-full max-w-6xl items-center justify-between overflow-hidden rounded-full border border-white/35 px-2.5 py-2.5 sm:px-4 sm:py-3"
+                style={{
+                  background:
+                    'linear-gradient(118deg, rgba(24,38,115,0.76) 0%, rgba(20,31,91,0.62) 42%, rgba(77,70,180,0.46) 72%, rgba(31,49,133,0.64) 100%)',
+                  backdropFilter: 'blur(26px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(26px) saturate(180%)',
+                  boxShadow:
+                    'inset 0 1px 0 rgba(255,255,255,0.52), inset 0 -1px 0 rgba(255,255,255,0.12), 0 18px 48px rgba(30,41,120,0.20), 0 3px 10px rgba(15,23,42,0.10)',
                 }}
-                className="bg-[#0F172A] hover:bg-slate-800 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
               >
-                LOGIN OPD
-              </button>
-            )}
-          </div>
-        </div>
-      </nav>
+                {/* Lapisan cahaya liquid */}
+                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-full">
+                  <div className="absolute -left-12 -top-20 h-40 w-52 rotate-[-12deg] rounded-full bg-blue-400/30 blur-3xl" />
+                  <div className="absolute left-[42%] top-[-90px] h-44 w-64 rounded-full bg-violet-300/25 blur-3xl" />
+                  <div className="absolute -right-12 -bottom-24 h-48 w-56 rounded-full bg-indigo-300/30 blur-3xl" />
+                  <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+                </div>
+
+                {/* BRAND */}
+                <button
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-full px-2 py-1.5 text-left transition hover:bg-white/[0.08] sm:px-3"
+                  aria-label="Kembali ke beranda SIPMODAG"
+                >
+                  <span
+                    className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/25 bg-white/15 p-1.5 shadow-inner"
+                    style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)' }}
+                  >
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png/500px-Coat_of_Arms_of_East_Nusa_Tenggara_NEW.png"
+                      alt="Logo Provinsi NTT"
+                      className="h-full w-full object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </span>
+
+                  <span className="hidden min-w-0 lg:block">
+                    <span className="block text-[13px] font-black leading-none tracking-tight text-white">
+                      SIPMODAG
+                    </span>
+                    <span className="mt-1 block text-[7px] font-extrabold uppercase tracking-[0.14em] text-white/55">
+                      DP3AP2KB Provinsi NTT
+                    </span>
+                  </span>
+                </button>
+
+                {/* MENU */}
+                <div className="relative z-10 ml-1 flex min-w-0 flex-1 items-center justify-end gap-0.5 sm:ml-3 sm:gap-1">
+                  <button
+                    type="button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] sm:min-w-[66px] sm:px-3"
+                    aria-label="Beranda"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-white/[0.13] ring-1 ring-inset ring-white/10 transition group-hover:bg-white/[0.18]">
+                      <Home className="h-4 w-4" />
+                    </span>
+                    <span className="hidden text-[9px] font-semibold text-white/85 sm:block">Beranda</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = document.getElementById('dashboard');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
+                    aria-label="Lihat dashboard"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
+                      <TrendingUp className="h-4 w-4" />
+                    </span>
+                    <span className="hidden text-[9px] font-semibold sm:block">Dashboard</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowFAQ(true)}
+                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
+                    aria-label="Panduan"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
+                      <HelpCircle className="h-4 w-4" />
+                    </span>
+                    <span className="hidden text-[9px] font-semibold sm:block">Panduan</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => navigatePortal('/operator')}
+                    className="group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-white/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:text-white sm:min-w-[66px] sm:px-3"
+                    aria-label="Login operator"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
+                      <ShieldCheck className="h-4 w-4" />
+                    </span>
+                    <span className="hidden text-[9px] font-semibold sm:block">Operator</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (loggedInOPD) {
+                        setShowProfileModal(true);
+                        return;
+                      }
+
+                      setSelectedOPDToLogin(null);
+                      setSearchOPDQuery('');
+                      setPassword('');
+                      setLoginError(null);
+                      navigatePortal('/opd');
+                    }}
+                    className={`group flex min-w-[52px] flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 transition-all duration-200 hover:-translate-y-0.5 sm:min-w-[66px] sm:px-3 ${
+                      loggedInOPD
+                        ? 'bg-emerald-400/20 text-emerald-50 ring-1 ring-inset ring-emerald-200/20 hover:bg-emerald-400/25'
+                        : 'text-white/80 hover:bg-white/[0.12] hover:text-white'
+                    }`}
+                    aria-label={loggedInOPD ? 'Buka profil OPD' : 'Login OPD'}
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl transition group-hover:bg-white/[0.12]">
+                      <User className="h-4 w-4" />
+                    </span>
+                    <span className="hidden max-w-[72px] truncate text-[9px] font-semibold sm:block">
+                      {loggedInOPD ? 'Profil OPD' : 'OPD'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </nav>
 
       {/* HERO SECTION */}
-      <main className="flex-grow pt-32 pb-16 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
+      <main className="flex-grow pt-28 pb-16 sm:pt-32 lg:pt-40 lg:pb-24 px-4 overflow-hidden relative">
         {/* Background dibuat sama seperti halaman login */}
         <div className="pointer-events-none absolute inset-0 bg-grid-pattern opacity-40" />
         <div className="pointer-events-none absolute -right-48 -top-48 h-[620px] w-[620px] rounded-full bg-blue-100/60 blur-3xl" />
