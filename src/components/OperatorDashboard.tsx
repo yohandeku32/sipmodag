@@ -892,53 +892,110 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 Workspace
               </p>
 
-              <nav className="mt-3 space-y-1.5">
+              <nav className="mt-3 space-y-2">
                 <button
                   type="button"
                   onClick={() => setActiveTab('review')}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                  className={`relative flex items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-all duration-200 ease-out ${
                     activeTab === 'review'
-                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                      ? 'z-20 w-[calc(100%+1.25rem)] rounded-l-[22px] rounded-r-none bg-[#F8F8FC] pr-5 text-[#31275F] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]'
+                      : 'w-full rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <FileSearch className="h-4 w-4" />
-                  Antrean Review
                   {activeTab === 'review' && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                    <>
+                      <span
+                        className="pointer-events-none absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
+                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
+                      />
+                      <span
+                        className="pointer-events-none absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
+                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
+                      />
+                    </>
                   )}
+
+                  <span
+                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition ${
+                      activeTab === 'review'
+                        ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
+                        : 'text-violet-100/70'
+                    }`}
+                  >
+                    <FileSearch className="h-3.5 w-3.5" />
+                  </span>
+
+                  <span className="relative z-10">Antrean Review</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab('opd-dashboard')}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                  className={`relative flex items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-all duration-200 ease-out ${
                     activeTab === 'opd-dashboard'
-                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                      ? 'z-20 w-[calc(100%+1.25rem)] rounded-l-[22px] rounded-r-none bg-[#F8F8FC] pr-5 text-[#31275F] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]'
+                      : 'w-full rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard OPD
                   {activeTab === 'opd-dashboard' && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                    <>
+                      <span
+                        className="pointer-events-none absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
+                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
+                      />
+                      <span
+                        className="pointer-events-none absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
+                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
+                      />
+                    </>
                   )}
+
+                  <span
+                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition ${
+                      activeTab === 'opd-dashboard'
+                        ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
+                        : 'text-violet-100/70'
+                    }`}
+                  >
+                    <LayoutDashboard className="h-3.5 w-3.5" />
+                  </span>
+
+                  <span className="relative z-10">Dashboard OPD</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab('accounts')}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                  className={`relative flex items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-all duration-200 ease-out ${
                     activeTab === 'accounts'
-                      ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
-                      : 'text-violet-100/70 hover:bg-white/8 hover:text-white'
+                      ? 'z-20 w-[calc(100%+1.25rem)] rounded-l-[22px] rounded-r-none bg-[#F8F8FC] pr-5 text-[#31275F] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]'
+                      : 'w-full rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <UsersRound className="h-4 w-4" />
-                  Akun OPD
                   {activeTab === 'accounts' && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                    <>
+                      <span
+                        className="pointer-events-none absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
+                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
+                      />
+                      <span
+                        className="pointer-events-none absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
+                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
+                      />
+                    </>
                   )}
+
+                  <span
+                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition ${
+                      activeTab === 'accounts'
+                        ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
+                        : 'text-violet-100/70'
+                    }`}
+                  >
+                    <UsersRound className="h-3.5 w-3.5" />
+                  </span>
+
+                  <span className="relative z-10">Akun OPD</span>
                 </button>
               </nav>
             </div>
