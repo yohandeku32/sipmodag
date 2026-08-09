@@ -38,6 +38,18 @@ type UploadedFile = {
 
 type UploadedFiles = Record<UploadSlotKey, UploadedFile>;
 
+type UploadHistoryItem = {
+  UPLOAD_ID?: string;
+  TAHUN?: string;
+  JENIS_DOKUMEN?: string;
+  UPLOADED_AT?: string;
+};
+
+type UploadHistoryResponse = {
+  count: number;
+  uploads: UploadHistoryItem[];
+};
+
 type Props = {
   apiUrl: string;
   loggedInOPD: OPDData;
@@ -168,7 +180,51 @@ export default function OPDDashboard({
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [budgetMessage, setBudgetMessage] = useState<string | null>(null);
 
+  const [uploadedKeysForYear, setUploadedKeysForYear] = useState<UploadSlotKey[]>([]);
+  const [uploadHistoryLoading, setUploadHistoryLoading] = useState(false);
+
   const unreadCount = notifications.filter(item => !toBoolean(item.IS_READ)).length;
+
+  const loadUploadedStatusForYear = async (silent = false) => {
+    if (!silent) {
+      setUploadHistoryLoading(true);
+    }
+
+    // Saat ganti tahun, kosongkan dulu supaya status tahun sebelumnya
+    // tidak ikut terbawa ke tahun yang baru dipilih.
+    setUploadedKeysForYear([]);
+
+    try {
+      const result = await getReviewAction<UploadHistoryResponse>(
+        apiUrl,
+        'getUploadHistory',
+        {
+          opdName: loggedInOPD.namaOPD,
+          tahun: selectedYear,
+        },
+      );
+
+      const uploadedDocumentNames = new Set(
+        (result.uploads || [])
+          .map(item => String(item.JENIS_DOKUMEN || '').trim().toUpperCase())
+          .filter(Boolean),
+      );
+
+      const keys = slots
+        .filter(slot => uploadedDocumentNames.has(slot.documentName.toUpperCase()))
+        .map(slot => slot.key);
+
+      setUploadedKeysForYear(keys);
+    } catch (error) {
+      console.error(
+        `Gagal memuat status upload Tahun ${selectedYear}:`,
+        error,
+      );
+      setUploadedKeysForYear([]);
+    } finally {
+      setUploadHistoryLoading(false);
+    }
+  };
 
   const loadBudgetData = async () => {
     setBudgetLoading(true);
@@ -280,6 +336,7 @@ export default function OPDDashboard({
 
   useEffect(() => {
     void loadBudgetData();
+    void loadUploadedStatusForYear();
   }, [loggedInOPD.namaOPD, selectedYear]);
 
   useEffect(() => {
@@ -287,6 +344,14 @@ export default function OPDDashboard({
     const timer = window.setInterval(() => void loadReviewData(true), 30000);
     return () => window.clearInterval(timer);
   }, [loggedInOPD.namaOPD, selectedYear]);
+
+  useEffect(() => {
+    if (uploadStatus !== 'SUCCESS') return;
+
+    // Upload sudah selesai disimpan ke database.
+    // Ambil ulang status tahun aktif agar kartu langsung berubah hijau.
+    void loadUploadedStatusForYear(true);
+  }, [uploadStatus]);
 
   const reviewById = useMemo(
     () => new Map(reviews.map(item => [item.REVIEW_ID, item])),
@@ -498,7 +563,15 @@ export default function OPDDashboard({
                 <div className="relative mt-3">
                   <select
                     value={selectedYear}
-                    onChange={event => setSelectedYear(event.target.value)}
+                    onChange={event => {
+                      setSelectedYear(event.target.value);
+                      setUploadedFiles({
+                        file1: null,
+                        file2: null,
+                        file3: null,
+                        file4: null,
+                      });
+                    }}
                     className="w-full appearance-none rounded-xl border border-white/10 bg-white px-3 py-3 pr-9 text-xs font-extrabold text-[#31275F] outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-white/10"
                   >
                     <option value="2025">Tahun 2025</option>
@@ -647,7 +720,9 @@ export default function OPDDashboard({
                 {[
                   {
                     label: 'Dokumen',
-                    value: `${loggedInOPD.jumlahUpload}/4`,
+                    value: uploadHistoryLoading
+                      ? '...'
+                      : `${uploadedKeysForYear.length}/4`,
                     caption: 'Dokumen terkirim',
                     icon: FileText,
                     cardClass: 'border-[#C9D8FF] bg-[#E9F0FF]',
@@ -740,7 +815,7 @@ export default function OPDDashboard({
 
                       <div className="mt-5 grid gap-3 sm:grid-cols-2">
                         {slots.map(slot => {
-                          const uploaded = uploadedSuccessKeys.includes(slot.key);
+                          const uploaded = uploadedKeysForYear.includes(slot.key);
 
                           return (
                             <div
@@ -1130,7 +1205,7 @@ export default function OPDDashboard({
                       {slots.map((slot, index) => {
                         const Icon = slot.icon;
                         const file = uploadedFiles[slot.key];
-                        const isUploaded = uploadedSuccessKeys.includes(slot.key);
+                        const isUploaded = uploadedKeysForYear.includes(slot.key);
                         const inputId = `upload-${slot.key}`;
                         const disabledByRevision = Boolean(
                           revisionTarget && matchingRevisionSlot !== slot.key,
