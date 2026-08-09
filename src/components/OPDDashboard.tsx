@@ -15,6 +15,7 @@ import {
   LogOut,
   RefreshCw,
   ShieldCheck,
+  Trash2,
   UploadCloud,
   User,
   WalletCards,
@@ -156,6 +157,7 @@ export default function OPDDashboard({
   const [showNotifications, setShowNotifications] = useState(false);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [clearingNotifications, setClearingNotifications] = useState(false);
 
   const [paguAnggaran, setPaguAnggaran] = useState('');
   const [tanggalPagu, setTanggalPagu] = useState('');
@@ -308,6 +310,38 @@ export default function OPDDashboard({
       });
     } catch (error) {
       console.error('Gagal menandai notifikasi:', error);
+    }
+  };
+
+  const clearNotifications = async () => {
+    if (notifications.length === 0 || clearingNotifications) return;
+
+    const confirmed = window.confirm(
+      `Hapus semua notifikasi ${loggedInOPD.namaPendek}?\n\n` +
+        'Hanya daftar notifikasi yang akan dibersihkan. ' +
+        'Hasil review, dokumen upload, dan file Google Drive tidak dihapus.',
+    );
+
+    if (!confirmed) return;
+
+    setClearingNotifications(true);
+    setReviewError(null);
+
+    try {
+      await postReviewAction<{ deleted: number }>(apiUrl, {
+        action: 'clearOPDNotifications',
+        opdName: loggedInOPD.namaOPD,
+      });
+
+      setNotifications([]);
+    } catch (error) {
+      setReviewError(
+        error instanceof Error
+          ? error.message
+          : 'Notifikasi gagal dibersihkan.',
+      );
+    } finally {
+      setClearingNotifications(false);
     }
   };
 
@@ -1296,13 +1330,35 @@ export default function OPDDashboard({
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowNotifications(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  {notifications.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => void clearNotifications()}
+                      disabled={clearingNotifications}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2.5 text-[8px] font-extrabold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      title="Hapus semua notifikasi"
+                    >
+                      {clearingNotifications ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {clearingNotifications ? 'Menghapus...' : 'Bersihkan'}
+                      </span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                    aria-label="Tutup notifikasi"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-y-auto p-3">
@@ -1310,6 +1366,9 @@ export default function OPDDashboard({
                   <div className="flex min-h-44 flex-col items-center justify-center text-center">
                     <Bell className="h-8 w-8 text-slate-300" />
                     <p className="mt-3 text-xs font-black text-slate-700">Belum ada notifikasi</p>
+                    <p className="mt-1 max-w-[220px] text-[9px] leading-relaxed text-slate-400">
+                      Notifikasi yang sudah dibersihkan tidak akan menumpuk di sini.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2.5">
