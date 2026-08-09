@@ -62,6 +62,10 @@ type OPDOverviewRaw = {
   HAS_GBS: number | string;
   HAS_KAK: number | string;
   HAS_SK: number | string;
+  GAP_FILE_URL?: string | null;
+  GBS_FILE_URL?: string | null;
+  KAK_FILE_URL?: string | null;
+  SK_FILE_URL?: string | null;
   UPLOAD_COUNT: number | string;
   LAST_UPLOADED_AT?: string | null;
 };
@@ -122,6 +126,10 @@ type DashboardOPDRow = {
   gbs: boolean;
   kak: boolean;
   sk: boolean;
+  gapFileUrl: string;
+  gbsFileUrl: string;
+  kakFileUrl: string;
+  skFileUrl: string;
   uploadCount: number;
   lastUploadedAt: string;
 };
@@ -425,6 +433,10 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       gbs: false,
       kak: false,
       sk: false,
+      gapFileUrl: '',
+      gbsFileUrl: '',
+      kakFileUrl: '',
+      skFileUrl: '',
       uploadCount: 0,
       lastUploadedAt: '',
     }));
@@ -471,6 +483,20 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       target.gbs = target.gbs || hasFlag(raw.HAS_GBS);
       target.kak = target.kak || hasFlag(raw.HAS_KAK);
       target.sk = target.sk || hasFlag(raw.HAS_SK);
+
+      if (!target.gapFileUrl && raw.GAP_FILE_URL) {
+        target.gapFileUrl = String(raw.GAP_FILE_URL);
+      }
+      if (!target.gbsFileUrl && raw.GBS_FILE_URL) {
+        target.gbsFileUrl = String(raw.GBS_FILE_URL);
+      }
+      if (!target.kakFileUrl && raw.KAK_FILE_URL) {
+        target.kakFileUrl = String(raw.KAK_FILE_URL);
+      }
+      if (!target.skFileUrl && raw.SK_FILE_URL) {
+        target.skFileUrl = String(raw.SK_FILE_URL);
+      }
+
       target.uploadCount += Number(raw.UPLOAD_COUNT || 0);
 
       const uploadedAt = String(raw.LAST_UPLOADED_AT || '');
@@ -1580,22 +1606,47 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         const resetKey = `${item.no}-${overviewYear}`;
                         const resetting = resettingKey === resetKey;
 
-                        const renderFlag = (checked: boolean) => (
-                          <span
-                            className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full ${
-                              checked
-                                ? 'bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200'
-                                : 'bg-slate-100 text-slate-300'
-                            }`}
-                            title={checked ? 'Sudah upload' : 'Belum upload'}
-                          >
-                            {checked ? (
-                              <Check className="h-4 w-4 stroke-[3]" />
-                            ) : (
-                              <Minus className="h-4 w-4" />
-                            )}
-                          </span>
-                        );
+                        const renderFlag = (
+                          checked: boolean,
+                          fileUrl: string,
+                          documentLabel: string,
+                        ) => {
+                          if (!checked) {
+                            return (
+                              <span
+                                className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-300"
+                                title={`${documentLabel} belum diupload`}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </span>
+                            );
+                          }
+
+                          if (!fileUrl) {
+                            return (
+                              <span
+                                className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200"
+                                title={`${documentLabel} sudah upload · URL file belum tersedia`}
+                              >
+                                <Check className="h-4 w-4 stroke-[3]" />
+                              </span>
+                            );
+                          }
+
+                          return (
+                            <a
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={event => event.stopPropagation()}
+                              className="group mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200 transition-all duration-150 hover:scale-110 hover:bg-emerald-500 hover:text-white hover:ring-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                              title={`Buka dokumen ${documentLabel} di Google Drive`}
+                              aria-label={`Buka dokumen ${documentLabel} ${item.namaOPD}`}
+                            >
+                              <Check className="h-4 w-4 stroke-[3] transition-transform duration-150 group-hover:scale-105" />
+                            </a>
+                          );
+                        };
 
                         return (
                           <tr
@@ -1628,10 +1679,18 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                                 </button>
                               </div>
                             </td>
-                            <td className="px-3 py-3 text-center">{renderFlag(item.gap)}</td>
-                            <td className="px-3 py-3 text-center">{renderFlag(item.gbs)}</td>
-                            <td className="px-3 py-3 text-center">{renderFlag(item.kak)}</td>
-                            <td className="px-3 py-3 text-center">{renderFlag(item.sk)}</td>
+                            <td className="px-3 py-3 text-center">
+                              {renderFlag(item.gap, item.gapFileUrl, 'GAP')}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              {renderFlag(item.gbs, item.gbsFileUrl, 'GBS')}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              {renderFlag(item.kak, item.kakFileUrl, 'KAK')}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              {renderFlag(item.sk, item.skFileUrl, 'SK Focal Point')}
+                            </td>
                             <td className="px-3 py-3 text-center">
                               <span
                                 className={`inline-flex rounded-full px-2.5 py-1 text-[9px] font-extrabold ${
