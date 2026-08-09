@@ -158,6 +158,7 @@ export default function OPDDashboard({
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [clearingNotifications, setClearingNotifications] = useState(false);
+  const [showClearNotificationConfirm, setShowClearNotificationConfirm] = useState(false);
 
   const [paguAnggaran, setPaguAnggaran] = useState('');
   const [tanggalPagu, setTanggalPagu] = useState('');
@@ -313,16 +314,16 @@ export default function OPDDashboard({
     }
   };
 
-  const clearNotifications = async () => {
+  const clearNotifications = () => {
     if (notifications.length === 0 || clearingNotifications) return;
+    setShowClearNotificationConfirm(true);
+  };
 
-    const confirmed = window.confirm(
-      `Hapus semua notifikasi ${loggedInOPD.namaPendek}?\n\n` +
-        'Hanya daftar notifikasi yang akan dibersihkan. ' +
-        'Hasil review, dokumen upload, dan file Google Drive tidak dihapus.',
-    );
-
-    if (!confirmed) return;
+  const confirmClearNotifications = async () => {
+    if (notifications.length === 0 || clearingNotifications) {
+      setShowClearNotificationConfirm(false);
+      return;
+    }
 
     setClearingNotifications(true);
     setReviewError(null);
@@ -334,12 +335,14 @@ export default function OPDDashboard({
       });
 
       setNotifications([]);
+      setShowClearNotificationConfirm(false);
     } catch (error) {
       setReviewError(
         error instanceof Error
           ? error.message
           : 'Notifikasi gagal dibersihkan.',
       );
+      setShowClearNotificationConfirm(false);
     } finally {
       setClearingNotifications(false);
     }
@@ -393,7 +396,7 @@ export default function OPDDashboard({
                     <p className="truncate text-[15px] font-black tracking-tight text-white">
                       SIPMODAG
                     </p>
-                    <p className="mt-0.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-200/70">
+                    <p className="mt-0.5 text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-200/70">
                       Portal OPD
                     </p>
                   </div>
@@ -407,7 +410,7 @@ export default function OPDDashboard({
                 >
                   <Bell className="h-4 w-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white ring-2 ring-[#31275F]">
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white ring-2 ring-[#31275F]">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -415,7 +418,7 @@ export default function OPDDashboard({
               </div>
 
               <div className="mt-9 hidden lg:block">
-                <p className="px-3 text-[8px] font-extrabold uppercase tracking-[0.17em] text-violet-200/45">
+                <p className="px-3 text-[9px] font-extrabold uppercase tracking-[0.17em] text-violet-200/45">
                   Workspace
                 </p>
 
@@ -444,7 +447,7 @@ export default function OPDDashboard({
                   <button
                     type="button"
                     onClick={() => setActiveTab('dashboard')}
-                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
+                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[11px] font-extrabold transition-colors duration-150 ${
                       activeTab === 'dashboard'
                         ? 'text-[#31275F]'
                         : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
@@ -466,7 +469,7 @@ export default function OPDDashboard({
                   <button
                     type="button"
                     onClick={() => setActiveTab('upload')}
-                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
+                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[11px] font-extrabold transition-colors duration-150 ${
                       activeTab === 'upload'
                         ? 'text-[#31275F]'
                         : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
@@ -488,7 +491,7 @@ export default function OPDDashboard({
               </div>
 
               <div className="mt-7 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-                <p className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-violet-200/55">
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-200/55">
                   Tahun Anggaran
                 </p>
 
@@ -515,13 +518,13 @@ export default function OPDDashboard({
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-violet-200/45">
+                        <p className="text-[9px] font-extrabold uppercase tracking-[0.13em] text-violet-200/45">
                           Akun Aktif
                         </p>
-                        <p className="mt-1 truncate text-[10px] font-black text-white">
+                        <p className="mt-1 truncate text-[11px] font-black text-white">
                           {loggedInOPD.namaPendek}
                         </p>
-                        <p className="mt-0.5 text-[8px] font-semibold text-violet-200/60">
+                        <p className="mt-0.5 text-[9px] font-semibold text-violet-200/60">
                           OPD Provinsi NTT
                         </p>
                       </div>
@@ -541,10 +544,10 @@ export default function OPDDashboard({
                         </span>
 
                         <div>
-                          <p className="text-[10px] font-black text-white">
+                          <p className="text-[11px] font-black text-white">
                             Keluar
                           </p>
-                          <p className="mt-0.5 text-[7px] font-semibold text-rose-100/80">
+                          <p className="mt-0.5 text-[8px] font-semibold text-rose-100/80">
                             Akhiri sesi OPD
                           </p>
                         </div>
@@ -563,7 +566,7 @@ export default function OPDDashboard({
             {/* TOP BAR */}
             <header className="flex flex-col gap-4 border-b border-slate-200/80 bg-white/85 px-5 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-8">
               <div>
-                <p className="text-[9px] font-extrabold uppercase tracking-[0.17em] text-[#6558D3]">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#6558D3]">
                   Portal OPD
                 </p>
                 <h1 className="mt-1 text-2xl font-black tracking-tight text-[#241E4A]">
@@ -573,7 +576,7 @@ export default function OPDDashboard({
                       ? `Upload Ulang ${revisionTarget.jenisDokumen}`
                       : 'Upload Dokumen PUG'}
                 </h1>
-                <p className="mt-1 text-[10px] font-medium text-slate-400">
+                <p className="mt-1 text-[11px] font-medium text-slate-400">
                   {activeTab === 'dashboard'
                     ? 'Pantau progres dokumen, notifikasi, dan hasil review OPD.'
                     : 'Lengkapi data anggaran lalu unggah dokumen GAP, GBS, KAK, dan SK Focal Point.'}
@@ -581,7 +584,7 @@ export default function OPDDashboard({
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden rounded-xl border border-slate-200 bg-white px-4 py-3 text-[9px] font-extrabold text-slate-500 shadow-sm sm:block">
+                <div className="hidden rounded-xl border border-slate-200 bg-white px-4 py-3 text-[10px] font-extrabold text-slate-500 shadow-sm sm:block">
                   Tahun {selectedYear}
                 </div>
 
@@ -593,7 +596,7 @@ export default function OPDDashboard({
                 >
                   <Bell className="h-4 w-4" />
                   {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[8px] font-black text-white ring-2 ring-white">
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-black text-white ring-2 ring-white">
                       {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                   )}
@@ -602,7 +605,7 @@ export default function OPDDashboard({
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-3 text-[10px] font-extrabold text-white transition hover:bg-rose-700 lg:hidden"
+                  className="flex h-10 items-center gap-2 rounded-xl bg-slate-950 px-3 text-[11px] font-extrabold text-white transition hover:bg-rose-700 lg:hidden"
                 >
                   <LogOut className="h-4 w-4" />
                   Keluar
@@ -613,7 +616,7 @@ export default function OPDDashboard({
                 <button
                   type="button"
                   onClick={() => setActiveTab('dashboard')}
-                  className={`flex-1 rounded-xl px-4 py-2.5 text-[9px] font-extrabold transition ${
+                  className={`flex-1 rounded-xl px-4 py-2.5 text-[10px] font-extrabold transition ${
                     activeTab === 'dashboard'
                       ? 'bg-[#31275F] text-white'
                       : 'bg-slate-100 text-slate-500'
@@ -625,7 +628,7 @@ export default function OPDDashboard({
                 <button
                   type="button"
                   onClick={() => setActiveTab('upload')}
-                  className={`flex-1 rounded-xl px-4 py-2.5 text-[9px] font-extrabold transition ${
+                  className={`flex-1 rounded-xl px-4 py-2.5 text-[10px] font-extrabold transition ${
                     activeTab === 'upload'
                       ? 'bg-[#31275F] text-white'
                       : 'bg-slate-100 text-slate-500'
@@ -688,13 +691,13 @@ export default function OPDDashboard({
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-[9px] font-extrabold text-slate-500">
+                          <p className="text-[10px] font-extrabold text-slate-500">
                             {item.label}
                           </p>
                           <p className="mt-2 text-2xl font-black tracking-tight text-[#241E4A]">
                             {item.value}
                           </p>
-                          <p className={`mt-1 text-[8px] font-extrabold ${item.captionClass}`}>
+                          <p className={`mt-1 text-[9px] font-extrabold ${item.captionClass}`}>
                             {item.caption}
                           </p>
                         </div>
@@ -713,13 +716,13 @@ export default function OPDDashboard({
                     <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
+                          <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
                             Ringkasan OPD
                           </p>
                           <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
                             Progres Tahun {selectedYear}
                           </h2>
-                          <p className="mt-2 max-w-2xl text-[10px] leading-relaxed text-slate-500">
+                          <p className="mt-2 max-w-2xl text-[11px] leading-relaxed text-slate-500">
                             Dashboard hanya menampilkan ringkasan progres dan hasil review.
                             Untuk mengirim dokumen baru atau revisi, buka menu Upload Dokumen.
                           </p>
@@ -728,7 +731,7 @@ export default function OPDDashboard({
                         <button
                           type="button"
                           onClick={() => setActiveTab('upload')}
-                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[9px] font-extrabold text-white transition hover:bg-violet-700"
+                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-violet-700"
                         >
                           <UploadCloud className="h-4 w-4" />
                           Upload Dokumen
@@ -760,17 +763,17 @@ export default function OPDDashboard({
                                 </div>
 
                                 <div>
-                                  <p className="text-[10px] font-black text-slate-800">
+                                  <p className="text-[11px] font-black text-slate-800">
                                     {slot.documentName}
                                   </p>
-                                  <p className="mt-0.5 text-[8px] font-semibold text-slate-400">
+                                  <p className="mt-0.5 text-[9px] font-semibold text-slate-400">
                                     {uploaded ? 'Sudah dikirim' : 'Belum dikirim'}
                                   </p>
                                 </div>
                               </div>
 
                               <span
-                                className={`rounded-full px-2.5 py-1 text-[8px] font-extrabold ${
+                                className={`rounded-full px-2.5 py-1 text-[9px] font-extrabold ${
                                   uploaded
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-slate-100 text-slate-400'
@@ -787,13 +790,13 @@ export default function OPDDashboard({
                 <aside className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-violet-600">
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-violet-600">
                         Requests
                       </p>
                       <h3 className="mt-1 text-sm font-black text-slate-950">
                         Hasil Review
                       </h3>
-                      <p className="mt-1 text-[9px] text-slate-400">
+                      <p className="mt-1 text-[10px] text-slate-400">
                         Tahun {selectedYear}
                       </p>
                     </div>
@@ -810,7 +813,7 @@ export default function OPDDashboard({
 
                   <div className="mt-5">
                     {reviewError ? (
-                      <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-[10px] font-semibold leading-relaxed text-red-700">
+                      <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-[11px] font-semibold leading-relaxed text-red-700">
                         {reviewError}
                       </p>
                     ) : loadingReviews ? (
@@ -821,7 +824,7 @@ export default function OPDDashboard({
                     ) : reviews.length === 0 ? (
                       <div className="rounded-2xl bg-slate-50 p-5 text-center ring-1 ring-inset ring-slate-100">
                         <CheckCircle2 className="mx-auto h-7 w-7 text-slate-300" />
-                        <p className="mt-3 text-[10px] font-bold text-slate-500">
+                        <p className="mt-3 text-[11px] font-bold text-slate-500">
                           Belum ada hasil review
                         </p>
                       </div>
@@ -834,15 +837,15 @@ export default function OPDDashboard({
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0">
-                                <p className="truncate text-[10px] font-black text-slate-900">
+                                <p className="truncate text-[11px] font-black text-slate-900">
                                   {review.JENIS_DOKUMEN}
                                 </p>
-                                <p className="mt-1 text-[8px] text-slate-400">
+                                <p className="mt-1 text-[9px] text-slate-400">
                                   {review.CREATED_AT}
                                 </p>
                               </div>
                               <span
-                                className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-extrabold ${
+                                className={`shrink-0 rounded-full border px-2 py-1 text-[8px] font-extrabold ${
                                   statusClass[review.STATUS_REVIEW] ||
                                   statusClass.SEDANG_DIREVIEW
                                 }`}
@@ -852,7 +855,7 @@ export default function OPDDashboard({
                             </div>
 
                             {review.CATATAN && (
-                              <p className="mt-3 line-clamp-3 text-[9px] leading-relaxed text-slate-600">
+                              <p className="mt-3 line-clamp-3 text-[10px] leading-relaxed text-slate-600">
                                 {review.CATATAN}
                               </p>
                             )}
@@ -863,7 +866,7 @@ export default function OPDDashboard({
                                   href={review.REVIEW_FILE_URL}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[8px] font-extrabold text-slate-600 hover:text-violet-700"
+                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[9px] font-extrabold text-slate-600 hover:text-violet-700"
                                 >
                                   <Download className="h-3 w-3" />
                                   File Review
@@ -874,7 +877,7 @@ export default function OPDDashboard({
                                 <button
                                   type="button"
                                   onClick={() => startRevisionFromReview(review)}
-                                  className="inline-flex items-center gap-1 rounded-lg bg-[#31275F] px-2.5 py-2 text-[8px] font-extrabold text-white hover:bg-violet-700"
+                                  className="inline-flex items-center gap-1 rounded-lg bg-[#31275F] px-2.5 py-2 text-[9px] font-extrabold text-white hover:bg-violet-700"
                                 >
                                   <UploadCloud className="h-3 w-3" />
                                   Upload Ulang
@@ -890,7 +893,7 @@ export default function OPDDashboard({
                   <button
                     type="button"
                     onClick={() => setShowNotifications(true)}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-[9px] font-extrabold text-violet-700 transition hover:bg-violet-100"
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-[10px] font-extrabold text-violet-700 transition hover:bg-violet-100"
                   >
                     <Bell className="h-3.5 w-3.5" />
                     Lihat Notifikasi
@@ -908,7 +911,7 @@ export default function OPDDashboard({
                 >
                   <div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                     <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
                         Form Pengunggahan Dokumen PUG
                       </p>
                       <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
@@ -917,14 +920,14 @@ export default function OPDDashboard({
                           : `Dokumen Tahun ${selectedYear}`}
                       </h2>
                       {revisionTarget && (
-                        <p className="mt-1 text-[10px] font-medium text-slate-400">
+                        <p className="mt-1 text-[11px] font-medium text-slate-400">
                           File perbaikan akan disimpan sebagai versi baru.
                         </p>
                       )}
                     </div>
 
                     <div className="rounded-xl bg-violet-50 px-4 py-3 text-right ring-1 ring-violet-100">
-                      <p className="text-[8px] font-extrabold uppercase tracking-wider text-violet-500">
+                      <p className="text-[9px] font-extrabold uppercase tracking-wider text-violet-500">
                         Dipilih
                       </p>
                       <p className="mt-1 text-xl font-black text-violet-800">
@@ -941,7 +944,7 @@ export default function OPDDashboard({
                             <p className="text-xs font-black text-rose-800">
                               Dokumen memerlukan revisi
                             </p>
-                            <p className="mt-2 text-[11px] leading-relaxed text-rose-700">
+                            <p className="mt-2 text-[12px] leading-relaxed text-rose-700">
                               {revisionTarget.catatan ||
                                 'Periksa catatan operator pada bagian hasil review.'}
                             </p>
@@ -950,7 +953,7 @@ export default function OPDDashboard({
                                 href={revisionTarget.reviewFileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-3 inline-flex items-center gap-1 text-[10px] font-extrabold text-rose-800 underline"
+                                className="mt-3 inline-flex items-center gap-1 text-[11px] font-extrabold text-rose-800 underline"
                               >
                                 <ExternalLink className="h-3 w-3" />
                                 Buka {revisionTarget.reviewFileName || 'file hasil review'}
@@ -982,12 +985,12 @@ export default function OPDDashboard({
                             <p className="text-sm font-black text-slate-950">
                               Anggaran Responsif Gender
                             </p>
-                            <p className="mt-1 text-[10px] font-semibold text-slate-500">
+                            <p className="mt-1 text-[11px] font-semibold text-slate-500">
                               Tahun {selectedYear}
                             </p>
                           </div>
                         </div>
-                        <span className="self-start rounded-full border border-rose-200 bg-white/80 px-2.5 py-1 text-[9px] font-extrabold text-rose-700 shadow-sm sm:self-auto">
+                        <span className="self-start rounded-full border border-rose-200 bg-white/80 px-2.5 py-1 text-[10px] font-extrabold text-rose-700 shadow-sm sm:self-auto">
                           Pagu wajib
                         </span>
                       </div>
@@ -1002,7 +1005,7 @@ export default function OPDDashboard({
                           <>
                             <div className="mt-5 grid gap-4 md:grid-cols-2">
                               <div>
-                                <label className="mb-2 block text-[9px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
+                                <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
                                   Pagu Anggaran Responsif Gender *
                                 </label>
                                 <div className="relative">
@@ -1023,7 +1026,7 @@ export default function OPDDashboard({
                               </div>
 
                               <div>
-                                <label className="mb-2 block text-[9px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
+                                <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
                                   Tanggal Pagu *
                                 </label>
                                 <div className="relative">
@@ -1041,7 +1044,7 @@ export default function OPDDashboard({
                               </div>
 
                               <div>
-                                <label className="mb-2 block text-[9px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
+                                <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
                                   Realisasi Anggaran Responsif Gender
                                 </label>
                                 <div className="relative">
@@ -1062,7 +1065,7 @@ export default function OPDDashboard({
                               </div>
 
                               <div>
-                                <label className="mb-2 block text-[9px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
+                                <label className="mb-2 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500">
                                   Tanggal Realisasi
                                 </label>
                                 <div className="relative">
@@ -1083,7 +1086,7 @@ export default function OPDDashboard({
 
                             <div className="mt-4 flex flex-col gap-3 rounded-xl bg-slate-950 p-4 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between">
                               <div>
-                                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                   Ringkasan {selectedYear}
                                 </p>
                                 <p className="mt-1 text-xs font-semibold text-slate-200">
@@ -1095,7 +1098,7 @@ export default function OPDDashboard({
                                 type="button"
                                 onClick={() => void saveBudgetData()}
                                 disabled={budgetSaving}
-                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:opacity-50"
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[11px] font-extrabold text-white transition hover:bg-violet-700 disabled:opacity-50"
                               >
                                 {budgetSaving ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1110,7 +1113,7 @@ export default function OPDDashboard({
 
                         {budgetMessage && (
                           <div
-                            className={`mt-4 rounded-xl border px-4 py-3 text-[10px] font-semibold shadow-sm ${
+                            className={`mt-4 rounded-xl border px-4 py-3 text-[11px] font-semibold shadow-sm ${
                               budgetMessage.includes('berhasil')
                                 ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                 : 'border-amber-200 bg-amber-50 text-amber-800'
@@ -1168,18 +1171,18 @@ export default function OPDDashboard({
                                   <h3 className="text-sm font-black uppercase tracking-wide text-slate-900">
                                     {slot.title}
                                   </h3>
-                                  <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+                                  <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
                                     {slot.description}
                                   </p>
                                 </div>
                               </div>
 
                               {isUploaded && !revisionTarget ? (
-                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[8px] font-extrabold text-emerald-700">
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[9px] font-extrabold text-emerald-700">
                                   <Check className="h-3 w-3" /> Terkirim
                                 </span>
                               ) : file ? (
-                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-[8px] font-extrabold text-violet-700">
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-[9px] font-extrabold text-violet-700">
                                   <Check className="h-3 w-3" /> Terpilih
                                 </span>
                               ) : null}
@@ -1189,10 +1192,10 @@ export default function OPDDashboard({
                               {file ? (
                                 <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
                                   <div className="min-w-0">
-                                    <p className="truncate text-[11px] font-extrabold text-slate-700">
+                                    <p className="truncate text-[12px] font-extrabold text-slate-700">
                                       {file.name}
                                     </p>
-                                    <p className="mt-0.5 text-[9px] font-semibold text-slate-400">
+                                    <p className="mt-0.5 text-[10px] font-semibold text-slate-400">
                                       {file.size}
                                     </p>
                                   </div>
@@ -1204,7 +1207,7 @@ export default function OPDDashboard({
                                         [slot.key]: null,
                                       }))
                                     }
-                                    className="shrink-0 rounded-lg bg-red-50 px-2.5 py-2 text-[9px] font-extrabold text-red-600"
+                                    className="shrink-0 rounded-lg bg-red-50 px-2.5 py-2 text-[10px] font-extrabold text-red-600"
                                   >
                                     Hapus
                                   </button>
@@ -1231,7 +1234,7 @@ export default function OPDDashboard({
                                     onClick={() =>
                                       document.getElementById(inputId)?.click()
                                     }
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3.5 text-[10px] font-extrabold text-white transition hover:bg-violet-700 disabled:pointer-events-none disabled:bg-slate-300"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3.5 text-[11px] font-extrabold text-white transition hover:bg-violet-700 disabled:pointer-events-none disabled:bg-slate-300"
                                   >
                                     <UploadCloud className="h-4 w-4" />
                                     {revisionTarget && matchingRevisionSlot === slot.key
@@ -1265,7 +1268,7 @@ export default function OPDDashboard({
                     )}
 
                     <div className="mt-6 flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-[9px] font-semibold leading-relaxed text-slate-400">
+                      <p className="text-[10px] font-semibold leading-relaxed text-slate-400">
                         Format PDF, DOC, DOCX, XLS, XLSX. Maksimal 10 MB per file.
                       </p>
                       <button
@@ -1326,7 +1329,7 @@ export default function OPDDashboard({
                   <div>
                     <h2 className="text-sm font-black text-slate-950">Notifikasi</h2>
                     {unreadCount > 0 && (
-                      <p className="mt-0.5 text-[9px] font-semibold text-slate-400">{unreadCount} belum dibaca</p>
+                      <p className="mt-0.5 text-[10px] font-semibold text-slate-400">{unreadCount} belum dibaca</p>
                     )}
                   </div>
                 </div>
@@ -1336,7 +1339,7 @@ export default function OPDDashboard({
                       type="button"
                       onClick={() => void clearNotifications()}
                       disabled={clearingNotifications}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2.5 text-[8px] font-extrabold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2.5 text-[9px] font-extrabold text-rose-600 transition hover:border-rose-200 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                       title="Hapus semua notifikasi"
                     >
                       {clearingNotifications ? (
@@ -1366,7 +1369,7 @@ export default function OPDDashboard({
                   <div className="flex min-h-44 flex-col items-center justify-center text-center">
                     <Bell className="h-8 w-8 text-slate-300" />
                     <p className="mt-3 text-xs font-black text-slate-700">Belum ada notifikasi</p>
-                    <p className="mt-1 max-w-[220px] text-[9px] leading-relaxed text-slate-400">
+                    <p className="mt-1 max-w-[220px] text-[10px] leading-relaxed text-slate-400">
                       Notifikasi yang sudah dibersihkan tidak akan menumpuk di sini.
                     </p>
                   </div>
@@ -1388,13 +1391,13 @@ export default function OPDDashboard({
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <p className="text-[11px] font-black text-slate-900">{notification.JUDUL}</p>
-                              <p className="mt-1.5 text-[10px] leading-relaxed text-slate-600">{notification.PESAN}</p>
+                              <p className="text-[12px] font-black text-slate-900">{notification.JUDUL}</p>
+                              <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600">{notification.PESAN}</p>
                             </div>
                             {unread && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-violet-600" />}
                           </div>
 
-                          <p className="mt-2 text-[8px] text-slate-400">{notification.CREATED_AT}</p>
+                          <p className="mt-2 text-[9px] text-slate-400">{notification.CREATED_AT}</p>
 
                           {review && (
                             <div className="mt-2.5 flex flex-wrap gap-2">
@@ -1404,7 +1407,7 @@ export default function OPDDashboard({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={event => event.stopPropagation()}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[8px] font-extrabold text-slate-600 hover:text-blue-700"
+                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[9px] font-extrabold text-slate-600 hover:text-blue-700"
                                 >
                                   <Download className="h-3 w-3" /> File Review
                                 </a>
@@ -1419,7 +1422,7 @@ export default function OPDDashboard({
                                     startRevisionFromReview(review);
                                     setShowNotifications(false);
                                   }}
-                                  className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-1.5 text-[8px] font-extrabold text-white hover:bg-violet-700"
+                                  className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-2.5 py-1.5 text-[9px] font-extrabold text-white hover:bg-violet-700"
                                 >
                                   <UploadCloud className="h-3 w-3" /> Upload Ulang
                                 </button>
@@ -1436,6 +1439,77 @@ export default function OPDDashboard({
           </>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {showClearNotificationConfirm && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Tutup konfirmasi"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                if (!clearingNotifications) {
+                  setShowClearNotificationConfirm(false);
+                }
+              }}
+              className="fixed inset-0 z-[120] cursor-default bg-slate-950/30 backdrop-blur-[2px]"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="fixed left-1/2 top-1/2 z-[130] w-[calc(100vw-2rem)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/20"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="clear-notification-title"
+            >
+              <div className="p-5 sm:p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                  <Trash2 className="h-5 w-5" />
+                </div>
+
+                <h3
+                  id="clear-notification-title"
+                  className="mt-4 text-base font-black tracking-tight text-slate-950"
+                >
+                  Hapus notifikasi?
+                </h3>
+
+                <p className="mt-2 text-[12px] font-medium leading-relaxed text-slate-500">
+                  Semua notifikasi akan dihapus.
+                </p>
+
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowClearNotificationConfirm(false)}
+                    disabled={clearingNotifications}
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-[12px] font-extrabold text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    Tidak
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void confirmClearNotifications()}
+                    disabled={clearingNotifications}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-[12px] font-extrabold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                  >
+                    {clearingNotifications && (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    )}
+                    Ya
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </main>
   );
 }
