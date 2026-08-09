@@ -1364,66 +1364,61 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         const angle = -85 + index * 10;
                         const isActive = index < activeSegments;
 
-                        const activePalette = [
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F59E0B',
-                          '#F6A91A',
-                          '#F7B32B',
-                          '#F8BC3C',
-                          '#F9C64D',
-                          '#FAD063',
-                          '#FBD879',
-                          '#FCE08F',
-                          '#FCE5A3',
-                          '#FDEABB',
-                          '#FDEFD0',
-                          '#FEF3DF',
-                        ];
-
                         return (
                           <motion.rect
                             key={index}
-                            x="113"
+                            x="114.5"
                             y="14"
-                            width="14"
+                            width="11"
                             height="39"
-                            rx="6"
+                            rx="5.5"
                             transform={`rotate(${angle} 120 116)`}
-                            initial={{ opacity: 0.35 }}
-                            animate={{ opacity: 1 }}
-                            transition={{
-                              duration: 0.28,
-                              delay: index * 0.018,
+                            initial={false}
+                            animate={{
+                              fill: isActive ? '#10B981' : '#F1F3F7',
+                              opacity: isActive ? 1 : 0.82,
                             }}
-                            fill={
-                              isActive
-                                ? activePalette[index]
-                                : '#F1F3F7'
-                            }
+                            transition={{
+                              fill: {
+                                duration: 0.42,
+                                delay: index * 0.012,
+                                ease: [0.22, 1, 0.36, 1],
+                              },
+                              opacity: {
+                                duration: 0.28,
+                                delay: index * 0.01,
+                                ease: 'easeOut',
+                              },
+                            }}
                           />
                         );
                       })}
 
-                      <text
-                        x="120"
-                        y="104"
-                        textAnchor="middle"
-                        className="fill-slate-950"
-                        style={{
-                          fontSize: '29px',
-                          fontWeight: 900,
-                          letterSpacing: '-1px',
-                        }}
-                      >
-                        {overviewAnalytics.uploadPercentage}%
-                      </text>
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        <motion.text
+                          key={`${overviewYear}-${overviewAnalytics.uploadPercentage}`}
+                          x="120"
+                          y="104"
+                          textAnchor="middle"
+                          className="fill-slate-950"
+                          style={{
+                            fontSize: '29px',
+                            fontWeight: 900,
+                            letterSpacing: '-1px',
+                          }}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{
+                            duration: 0.22,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                        >
+                          {overviewAnalytics.uploadPercentage}%
+                        </motion.text>
+                      </AnimatePresence>
 
-                      <text
+                      <motion.text
                         x="120"
                         y="120"
                         textAnchor="middle"
@@ -1432,9 +1427,11 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                           fontSize: '8px',
                           fontWeight: 700,
                         }}
+                        animate={{ opacity: [0.72, 1] }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
                       >
                         Sudah Upload
-                      </text>
+                      </motion.text>
                     </svg>
                   </div>
 
