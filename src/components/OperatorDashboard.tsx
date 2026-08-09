@@ -1322,86 +1322,189 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-7 xl:p-8">
-                <div>
-                  <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
-                    Persentase Upload OPD
-                  </p>
-                  <h2 className="mt-1 text-lg font-black tracking-tight text-slate-950">
-                    Cakupan Tahun {overviewYear}
-                  </h2>
-                </div>
+              <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <div className="flex items-start justify-between gap-4 px-5 pb-2 pt-5 sm:px-6 sm:pt-6">
+                  <div>
+                    <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                      Persentase Upload OPD
+                    </p>
+                    <h2 className="mt-1 text-lg font-black tracking-tight text-slate-950">
+                      Cakupan Tahun {overviewYear}
+                    </h2>
+                  </div>
 
-                <div className="mt-6 flex justify-center">
-                  <div
-                    className="relative flex h-52 w-52 items-center justify-center rounded-full p-[18px] shadow-inner"
-                    style={{
-                      background: `conic-gradient(#6657E8 0 ${overviewAnalytics.uploadPercentage}%, #E8E5F5 ${overviewAnalytics.uploadPercentage}% 100%)`,
-                    }}
+                  <button
+                    type="button"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-100 bg-white text-[13px] font-black tracking-[0.08em] text-slate-400 shadow-sm"
+                    aria-label="Statistik upload OPD"
                   >
-                    <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-sm">
-                      <span className="text-4xl font-black tracking-tight text-slate-950">
-                        {overviewAnalytics.uploadPercentage}%
-                      </span>
-                      <span className="mt-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-                        Sudah Upload
-                      </span>
-                      <span className="mt-2 rounded-lg bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold text-violet-700">
-                        {overviewSummary.uploaded}/{overviewSummary.total} OPD
-                      </span>
-                    </div>
-                  </div>
+                    ···
+                  </button>
                 </div>
 
-                <div className="mt-6 space-y-3">
-                  <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                      <span className="text-[10px] font-extrabold text-emerald-800">
-                        Lengkap 4 Dokumen
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-emerald-800">
-                        {overviewSummary.complete} OPD
-                      </p>
-                      <p className="text-[9px] font-bold text-emerald-600">
-                        {overviewAnalytics.completePercentage}%
-                      </p>
-                    </div>
+                {/* Segmented semicircle gauge */}
+                <div className="px-4 pt-1 sm:px-6">
+                  <div className="relative mx-auto h-[190px] w-full max-w-[330px]">
+                    <svg
+                      viewBox="0 0 240 145"
+                      className="h-full w-full overflow-visible"
+                      role="img"
+                      aria-label={`Persentase upload OPD ${overviewAnalytics.uploadPercentage}%`}
+                    >
+                      {Array.from({ length: 18 }).map((_, index) => {
+                        const activeSegments = Math.round(
+                          (Math.max(
+                            0,
+                            Math.min(100, overviewAnalytics.uploadPercentage)
+                          ) /
+                            100) *
+                            18
+                        );
+
+                        const angle = -85 + index * 10;
+                        const isActive = index < activeSegments;
+
+                        const activePalette = [
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F59E0B',
+                          '#F6A91A',
+                          '#F7B32B',
+                          '#F8BC3C',
+                          '#F9C64D',
+                          '#FAD063',
+                          '#FBD879',
+                          '#FCE08F',
+                          '#FCE5A3',
+                          '#FDEABB',
+                          '#FDEFD0',
+                          '#FEF3DF',
+                        ];
+
+                        return (
+                          <motion.rect
+                            key={index}
+                            x="113"
+                            y="14"
+                            width="14"
+                            height="39"
+                            rx="6"
+                            transform={`rotate(${angle} 120 116)`}
+                            initial={{ opacity: 0.35 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                              duration: 0.28,
+                              delay: index * 0.018,
+                            }}
+                            fill={
+                              isActive
+                                ? activePalette[index]
+                                : '#F1F3F7'
+                            }
+                          />
+                        );
+                      })}
+
+                      <text
+                        x="120"
+                        y="104"
+                        textAnchor="middle"
+                        className="fill-slate-950"
+                        style={{
+                          fontSize: '29px',
+                          fontWeight: 900,
+                          letterSpacing: '-1px',
+                        }}
+                      >
+                        {overviewAnalytics.uploadPercentage}%
+                      </text>
+
+                      <text
+                        x="120"
+                        y="120"
+                        textAnchor="middle"
+                        className="fill-slate-400"
+                        style={{
+                          fontSize: '8px',
+                          fontWeight: 700,
+                        }}
+                      >
+                        Sudah Upload
+                      </text>
+                    </svg>
                   </div>
 
-                  <div className="flex items-center justify-between rounded-2xl bg-violet-50 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
-                      <span className="text-[10px] font-extrabold text-violet-800">
-                        Belum Lengkap
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-violet-800">
-                        {overviewAnalytics.partial} OPD
+                  {/* Dua kartu statistik seperti referensi */}
+                  <div className="-mt-2 grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50/75 p-4">
+                      <p className="text-[9px] font-bold text-slate-500">
+                        Sudah Upload
                       </p>
-                      <p className="text-[9px] font-bold text-violet-600">
-                        {overviewAnalytics.partialPercentage}%
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-                      <span className="text-[10px] font-extrabold text-amber-800">
+                      <div className="mt-4 flex items-end justify-between gap-2">
+                        <p className="text-xl font-black tracking-tight text-slate-950">
+                          {overviewSummary.uploaded}
+                        </p>
+
+                        <span className="rounded-md bg-emerald-100 px-2 py-1 text-[7px] font-black text-emerald-700">
+                          {overviewAnalytics.uploadPercentage}%
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-[8px] font-semibold text-slate-400">
+                        dari {overviewSummary.total} OPD
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-100 bg-slate-50/75 p-4">
+                      <p className="text-[9px] font-bold text-slate-500">
                         Belum Upload
+                      </p>
+
+                      <div className="mt-4 flex items-end justify-between gap-2">
+                        <p className="text-xl font-black tracking-tight text-slate-950">
+                          {overviewSummary.empty}
+                        </p>
+
+                        <span className="rounded-md bg-slate-900 px-2 py-1 text-[7px] font-black text-white">
+                          {overviewAnalytics.emptyPercentage}%
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-[8px] font-semibold text-slate-400">
+                        belum mengirim dokumen
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Detail kelengkapan tetap dipertahankan */}
+                  <div className="mt-4 grid grid-cols-2 gap-2 pb-5">
+                    <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        <span className="text-[8px] font-extrabold text-emerald-800">
+                          Lengkap 4 Dokumen
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-black text-emerald-800">
+                        {overviewSummary.complete}
                       </span>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-amber-800">
-                        {overviewSummary.empty} OPD
-                      </p>
-                      <p className="text-[9px] font-bold text-amber-600">
-                        {overviewAnalytics.emptyPercentage}%
-                      </p>
+
+                    <div className="flex items-center justify-between rounded-xl bg-violet-50 px-3 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-violet-500" />
+                        <span className="text-[8px] font-extrabold text-violet-800">
+                          Belum Lengkap
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-black text-violet-800">
+                        {overviewAnalytics.partial}
+                      </span>
                     </div>
                   </div>
                 </div>
