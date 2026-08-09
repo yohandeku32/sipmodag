@@ -19,6 +19,7 @@ import {
   Search,
   Send,
   Table2,
+  Trash2,
   Check,
   Minus,
   ShieldCheck,
@@ -92,6 +93,13 @@ type BudgetYearRow = {
 };
 
 const BUDGET_YEARS = ['2025', '2026', '2027'] as const;
+
+type DeleteBudgetResponse = {
+  message: string;
+  deleted: number;
+  tahun?: string;
+  allYears?: boolean;
+};
 
 type ResetOPDResponse = {
   message: string;
@@ -306,6 +314,12 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     useState<BudgetYearRow[]>([]);
   const [budgetModalLoading, setBudgetModalLoading] =
     useState(false);
+  const [showBudgetDeleteOptions, setShowBudgetDeleteOptions] =
+    useState(false);
+  const [deletingBudgetKey, setDeletingBudgetKey] =
+    useState<string | null>(null);
+  const [budgetDeleteMessage, setBudgetDeleteMessage] =
+    useState<string | null>(null);
   const budgetRequestRef = useRef(0);
 
   const loadQueue = async (manual = false) => {
@@ -569,19 +583,14 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     setBudgetModal(null);
     setBudgetModalRows([]);
     setBudgetModalLoading(false);
+    setShowBudgetDeleteOptions(false);
+    setDeletingBudgetKey(null);
+    setBudgetDeleteMessage(null);
   };
 
-  const openBudgetModal = async (
-    event: React.MouseEvent<HTMLButtonElement>,
-    item: DashboardOPDRow,
-  ) => {
-    event.stopPropagation();
-
-    setBudgetModal({
-      opdName: item.namaOPD,
-    });
-    setBudgetModalRows([]);
+  const loadBudgetModalRows = async (opdName: string) => {
     setBudgetModalLoading(true);
+    setBudgetDeleteMessage(null);
 
     const requestId = budgetRequestRef.current + 1;
     budgetRequestRef.current = requestId;
@@ -595,7 +604,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               'getOPDBudget',
               {
                 token: session.token,
-                opdName: item.namaOPD,
+                opdName,
                 tahun: yearValue,
               },
             );
@@ -626,6 +635,86 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       }
     }
   };
+
+  const openBudgetModal = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+    item: DashboardOPDRow,
+  ) => {
+    event.stopPropagation();
+
+    setBudgetModal({
+      opdName: item.namaOPD,
+    });
+    setBudgetModalRows([]);
+    setShowBudgetDeleteOptions(false);
+    setBudgetDeleteMessage(null);
+
+    await loadBudgetModalRows(item.namaOPD);
+  };
+
+  const handleDeleteBudget = async (
+    target: string | 'ALL',
+  ) => {
+    if (!budgetModal || deletingBudgetKey) return;
+
+    const isAllYears = target === 'ALL';
+    const targetLabel = isAllYears
+      ? 'SEMUA TAHUN (2025, 2026, dan 2027)'
+      : `Tahun ${target}`;
+
+    const firstConfirm = window.confirm(
+      `Hapus data Anggaran Responsif Gender ${budgetModal.opdName} ${targetLabel}?\n\n` +
+      `Yang dihapus HANYA data pada tabel ANGGARAN.\n` +
+      `Dokumen upload, review, notifikasi, akun OPD, dan file Google Drive TIDAK dihapus.`,
+    );
+
+    if (!firstConfirm) return;
+
+    const secondConfirm = window.confirm(
+      `Konfirmasi terakhir:\n\n` +
+      `Benar-benar hapus data anggaran ${targetLabel}?\n\n` +
+      `Tindakan ini tidak dapat dibatalkan.`,
+    );
+
+    if (!secondConfirm) return;
+
+    const deleteKey = isAllYears ? 'ALL' : target;
+    setDeletingBudgetKey(deleteKey);
+    setBudgetDeleteMessage(null);
+
+    try {
+      const result = await postReviewAction<DeleteBudgetResponse>(
+        apiUrl,
+        {
+          action: 'deleteOPDBudget',
+          token: session.token,
+          opdName: budgetModal.opdName,
+          ...(isAllYears
+            ? { allYears: true }
+            : { tahun: target }),
+        },
+      );
+
+      setBudgetDeleteMessage(
+        result.message ||
+          `Data anggaran ${targetLabel} berhasil dihapus.`,
+      );
+
+      setShowBudgetDeleteOptions(false);
+
+      // Muat ulang isi modal agar nilai yang terhapus langsung menjadi 0/belum diisi.
+      await loadBudgetModalRows(budgetModal.opdName);
+    } catch (error) {
+      setBudgetDeleteMessage(
+        error instanceof Error
+          ? error.message
+          : 'Data anggaran gagal dihapus.',
+      );
+    } finally {
+      setDeletingBudgetKey(null);
+    }
+  };
+
 
   const budgetModalSummary = useMemo(() => {
     const validRows = budgetModalRows.filter(row => row.budget);
@@ -2023,18 +2112,92 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               )}
             </div>
 
+            {budgetDeleteMessage && (
+              <div className="border-t border-slate-200 bg-emerald-50 px-5 py-3 text-[10px] font-semibold text-emerald-800 sm:px-7">
+                {budgetDeleteMessage}
+              </div>
+            )}
+
+            {showBudgetDeleteOptions && (
+              <div className="border-t border-rose-100 bg-rose-50/80 px-5 py-4 sm:px-7">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <p className="text-[10px] font-black text-rose-800">
+                      Hapus data anggaran
+                    </p>
+                    <p className="mt-1 text-[9px] font-semibold leading-4 text-rose-600">
+                      Pilih tahun yang akan dihapus. Hanya tabel ANGGARAN yang direset;
+                      dokumen dan hasil review tetap aman.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {BUDGET_YEARS.map(yearValue => (
+                      <button
+                        key={yearValue}
+                        type="button"
+                        onClick={() => void handleDeleteBudget(yearValue)}
+                        disabled={Boolean(deletingBudgetKey)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white px-3 py-2 text-[9px] font-extrabold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deletingBudgetKey === yearValue ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                        {yearValue}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => void handleDeleteBudget('ALL')}
+                      disabled={Boolean(deletingBudgetKey)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-3 py-2 text-[9px] font-extrabold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingBudgetKey === 'ALL' ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                      Semua Tahun
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <footer className="flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:px-7">
-              <p className="text-[9px] font-semibold text-slate-400">
+              <p className="hidden text-[9px] font-semibold text-slate-400 sm:block">
                 Data diambil langsung dari catatan anggaran SIPMODAG per tahun.
               </p>
 
-              <button
-                type="button"
-                onClick={closeBudgetModal}
-                className="rounded-xl bg-[#31275F] px-5 py-2.5 text-[10px] font-extrabold text-white transition hover:bg-[#463A83]"
-              >
-                Tutup
-              </button>
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowBudgetDeleteOptions(value => !value)
+                  }
+                  disabled={Boolean(deletingBudgetKey)}
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-[10px] font-extrabold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    showBudgetDeleteOptions
+                      ? 'border-rose-300 bg-rose-100 text-rose-700'
+                      : 'border-rose-200 bg-white text-rose-600 hover:bg-rose-50'
+                  }`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Hapus Data
+                </button>
+
+                <button
+                  type="button"
+                  onClick={closeBudgetModal}
+                  disabled={Boolean(deletingBudgetKey)}
+                  className="rounded-xl bg-[#31275F] px-5 py-2.5 text-[10px] font-extrabold text-white transition hover:bg-[#463A83] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Tutup
+                </button>
+              </div>
             </footer>
           </motion.section>
         </div>
