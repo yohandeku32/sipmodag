@@ -1013,11 +1013,11 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="group flex w-full items-center justify-between gap-3 rounded-xl border border-rose-300/15 bg-rose-500/10 px-3.5 py-3 text-left transition-all duration-200 hover:border-rose-300/25 hover:bg-rose-500/20 active:scale-[0.99]"
+                    className="group flex w-full items-center justify-between gap-3 rounded-xl border border-rose-600 bg-rose-600 px-3.5 py-3 text-left shadow-sm shadow-black/10 transition-all duration-200 hover:border-rose-700 hover:bg-rose-700 active:scale-[0.99]"
                     aria-label="Keluar dari akun operator"
                   >
                     <div className="flex items-center gap-2.5">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-rose-200 transition group-hover:bg-rose-500/25 group-hover:text-white">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white transition group-hover:bg-white/20">
                         <LogOut className="h-3.5 w-3.5" />
                       </span>
 
@@ -1025,13 +1025,13 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         <p className="text-[10px] font-black text-white">
                           Keluar
                         </p>
-                        <p className="mt-0.5 text-[7px] font-semibold text-violet-200/45">
+                        <p className="mt-0.5 text-[7px] font-semibold text-rose-100/80">
                           Akhiri sesi operator
                         </p>
                       </div>
                     </div>
 
-                    <ChevronRight className="h-3.5 w-3.5 text-violet-200/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-rose-200" />
+                    <ChevronRight className="h-3.5 w-3.5 text-white/70 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-white" />
                   </button>
                 </div>
               </div>
