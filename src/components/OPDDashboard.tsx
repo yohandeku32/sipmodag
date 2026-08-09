@@ -5,6 +5,7 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   Download,
   ExternalLink,
   FileSpreadsheet,
@@ -472,28 +473,50 @@ export default function OPDDashboard({
               </div>
 
               <div className="mt-auto pt-6">
-                <div className="rounded-2xl border border-white/10 bg-white/10 p-3.5 backdrop-blur-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100">
-                      <User className="h-4 w-4" />
-                    </div>
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.08] shadow-lg shadow-black/5 backdrop-blur-sm">
+                  <div className="p-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100 ring-1 ring-white/10">
+                        <User className="h-4 w-4" />
+                      </div>
 
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[10px] font-black text-white">
-                        {loggedInOPD.namaPendek}
-                      </p>
-                      <p className="mt-1 text-[8px] font-semibold text-violet-200/60">
-                        OPD Provinsi NTT
-                      </p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-violet-200/45">
+                          Akun Aktif
+                        </p>
+                        <p className="mt-1 truncate text-[10px] font-black text-white">
+                          {loggedInOPD.namaPendek}
+                        </p>
+                        <p className="mt-0.5 text-[8px] font-semibold text-violet-200/60">
+                          OPD Provinsi NTT
+                        </p>
+                      </div>
                     </div>
+                  </div>
 
+                  <div className="border-t border-white/10 p-2.5">
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-violet-100 transition hover:bg-rose-500/25 hover:text-white"
-                      aria-label="Keluar"
+                      className="group flex w-full items-center justify-between gap-3 rounded-xl border border-rose-600 bg-rose-600 px-3.5 py-3 text-left shadow-sm shadow-black/10 transition-all duration-200 hover:border-rose-700 hover:bg-rose-700 active:scale-[0.99]"
+                      aria-label="Keluar dari akun OPD"
                     >
-                      <LogOut className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white transition group-hover:bg-white/20">
+                          <LogOut className="h-3.5 w-3.5" />
+                        </span>
+
+                        <div>
+                          <p className="text-[10px] font-black text-white">
+                            Keluar
+                          </p>
+                          <p className="mt-0.5 text-[7px] font-semibold text-rose-100/80">
+                            Akhiri sesi OPD
+                          </p>
+                        </div>
+                      </div>
+
+                      <ChevronRight className="h-3.5 w-3.5 text-white/70 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-white" />
                     </button>
                   </div>
                 </div>
