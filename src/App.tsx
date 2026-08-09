@@ -1806,6 +1806,20 @@ export default function App() {
     return () => window.clearTimeout(timeout);
   }, [successPopup]);
 
+  const participationCompleteCount = displayData.filter(
+    opd => opd.jumlahUpload === 4
+  ).length;
+
+  const participationCompletePercentage =
+    stats.targetOPD > 0
+      ? (participationCompleteCount / stats.targetOPD) * 100
+      : 0;
+
+  const participationNotUploadedPercentage =
+    stats.targetOPD > 0
+      ? (stats.belumCount / stats.targetOPD) * 100
+      : 0;
+
   return (
     <div className="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen flex flex-col relative antialiased selection:bg-secondary/15 selection:text-secondary">
       {/* Background Grid Accent */}
@@ -2432,98 +2446,214 @@ export default function App() {
                   </div>
                 </div>
 
-                <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                  <div>
-                    <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
-                      Partisipasi OPD
-                    </p>
-                    <h3 className="mt-1 text-lg font-black tracking-tight text-slate-950">
-                      Status Tahun {dashboardYear}
-                    </h3>
-                    <p className="mt-1 text-[10px] font-medium leading-4 text-slate-400">
-                      Persentase OPD yang sudah mengunggah minimal satu dokumen.
-                    </p>
+                <aside className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-4 px-5 pb-2 pt-5 sm:px-6 sm:pt-6">
+                    <div>
+                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-slate-400">
+                        Partisipasi OPD
+                      </p>
+                      <h3 className="mt-1 text-lg font-black tracking-tight text-slate-950">
+                        Statistik OPD
+                      </h3>
+                    </div>
+
+                    <span className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-[9px] font-extrabold text-slate-500">
+                      {dashboardYear}
+                    </span>
                   </div>
 
-                  <div className="mt-6 flex justify-center">
-                    <div
-                      className="relative flex h-48 w-48 items-center justify-center rounded-full p-[16px]"
-                      style={{
-                        background: `conic-gradient(#5B5CE2 0 ${stats.percentageSudah}%, #E8EAF3 ${stats.percentageSudah}% 100%)`,
-                      }}
-                    >
-                      <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white shadow-inner">
-                        <span className="text-3xl font-black tracking-tight text-slate-950">
+                  {/* Radial chart ala referensi */}
+                  <div className="px-4 pb-2 sm:px-5">
+                    <div className="grid grid-cols-[minmax(0,1fr)_104px] items-center gap-1">
+                      <div className="relative mx-auto h-[205px] w-[205px]">
+                        <svg
+                          viewBox="0 0 180 180"
+                          className="h-full w-full overflow-visible"
+                          aria-label={`Partisipasi OPD Tahun ${dashboardYear}`}
+                        >
+                          {/* Track luar */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="68"
+                            fill="none"
+                            stroke="#ECECF4"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray="78 22"
+                            transform="rotate(128 90 90)"
+                          />
+                          {/* Sudah Upload */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="68"
+                            fill="none"
+                            stroke="#4F46E5"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray={`${Math.max(
+                              0,
+                              Math.min(78, stats.percentageSudah * 0.78)
+                            )} 100`}
+                            transform="rotate(128 90 90)"
+                            className="transition-all duration-700 ease-out"
+                          />
+
+                          {/* Track tengah */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="52"
+                            fill="none"
+                            stroke="#ECECF4"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray="78 22"
+                            transform="rotate(128 90 90)"
+                          />
+                          {/* Lengkap 4 Dokumen */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="52"
+                            fill="none"
+                            stroke="#6D5DFB"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray={`${Math.max(
+                              0,
+                              Math.min(
+                                78,
+                                participationCompletePercentage * 0.78
+                              )
+                            )} 100`}
+                            transform="rotate(128 90 90)"
+                            className="transition-all duration-700 ease-out"
+                          />
+
+                          {/* Track dalam */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="36"
+                            fill="none"
+                            stroke="#ECECF4"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray="78 22"
+                            transform="rotate(128 90 90)"
+                          />
+                          {/* Belum Upload */}
+                          <circle
+                            cx="90"
+                            cy="90"
+                            r="36"
+                            fill="none"
+                            stroke="#FF4D5A"
+                            strokeWidth="9"
+                            strokeLinecap="round"
+                            pathLength={100}
+                            strokeDasharray={`${Math.max(
+                              0,
+                              Math.min(
+                                78,
+                                participationNotUploadedPercentage * 0.78
+                              )
+                            )} 100`}
+                            transform="rotate(128 90 90)"
+                            className="transition-all duration-700 ease-out"
+                          />
+                        </svg>
+                      </div>
+
+                      <div className="-ml-2 self-center">
+                        <p className="text-3xl font-black leading-none tracking-tight text-slate-950">
+                          {stats.sudahCount}
+                        </p>
+                        <p className="mt-2 text-[9px] font-bold leading-4 text-slate-400">
+                          OPD sudah
+                          <br />
+                          berpartisipasi
+                        </p>
+                        <span className="mt-3 inline-flex rounded-lg bg-emerald-100 px-2 py-1 text-[8px] font-black text-emerald-700">
                           {stats.percentageSudah.toFixed(1)}%
                         </span>
-                        <span className="mt-1 text-[9px] font-extrabold uppercase tracking-wider text-slate-400">
-                          Partisipasi
-                        </span>
-                        <span className="mt-2 rounded-lg bg-violet-50 px-2.5 py-1 text-[9px] font-extrabold text-violet-700">
-                          {stats.sudahCount}/{stats.targetOPD} OPD
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between gap-3 text-[10px] font-bold">
-                        <span className="flex items-center gap-2 text-slate-600">
-                          <span className="h-2 w-2 rounded-full bg-violet-500" />
-                          Sudah Upload
-                        </span>
-                        <span className="text-violet-700">
-                          {stats.percentageSudah.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${stats.percentageSudah}%` }}
-                          transition={{ duration: 0.55, ease: 'easeOut' }}
-                          className="h-full rounded-full bg-violet-500"
-                        />
                       </div>
                     </div>
 
-                    <div>
-                      <div className="flex items-center justify-between gap-3 text-[10px] font-bold">
-                        <span className="flex items-center gap-2 text-slate-600">
-                          <span className="h-2 w-2 rounded-full bg-rose-500" />
-                          Belum Upload
-                        </span>
-                        <span className="text-rose-600">
-                          {(100 - stats.percentageSudah).toFixed(1)}%
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.max(0, 100 - stats.percentageSudah)}%` }}
-                          transition={{ duration: 0.55, ease: 'easeOut' }}
-                          className="h-full rounded-full bg-rose-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="rounded-2xl bg-slate-50 p-4 ring-1 ring-inset ring-slate-100">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <Database className="h-4 w-4 text-blue-600" />
-                          <span className="text-[10px] font-extrabold text-slate-600">
-                            Status Data
+                    {/* Legend/stat rows ala referensi */}
+                    <div className="-mt-1 space-y-2.5 px-1">
+                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                            <FileText className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="truncate text-[10px] font-extrabold text-slate-700">
+                            Sudah Upload
                           </span>
                         </div>
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[8px] font-extrabold text-emerald-700">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          LIVE
+                        <span className="text-right text-[10px] font-black text-slate-800">
+                          {stats.sudahCount}
+                        </span>
+                        <span className="rounded-md bg-indigo-50 px-1.5 py-1 text-center text-[7px] font-black text-indigo-600">
+                          {stats.percentageSudah.toFixed(1)}%
                         </span>
                       </div>
-                      <p className="mt-2 text-[9px] font-medium leading-4 text-slate-400">
-                        Terakhir diperbarui pukul {lastUpdated.toLocaleTimeString('id-ID')}.
-                      </p>
+
+                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="truncate text-[10px] font-extrabold text-slate-700">
+                            Lengkap 4 Dokumen
+                          </span>
+                        </div>
+                        <span className="text-right text-[10px] font-black text-slate-800">
+                          {participationCompleteCount}
+                        </span>
+                        <span className="rounded-md bg-violet-50 px-1.5 py-1 text-center text-[7px] font-black text-violet-600">
+                          {participationCompletePercentage.toFixed(1)}%
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-[minmax(0,1fr)_46px_52px] items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-500">
+                            <Clock className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="truncate text-[10px] font-extrabold text-slate-700">
+                            Belum Upload
+                          </span>
+                        </div>
+                        <span className="text-right text-[10px] font-black text-slate-800">
+                          {stats.belumCount}
+                        </span>
+                        <span className="rounded-md bg-rose-50 px-1.5 py-1 text-center text-[7px] font-black text-rose-500">
+                          {participationNotUploadedPercentage.toFixed(1)}%
+                        </span>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Footer data tetap dipertahankan, dibuat lebih ringan */}
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3 sm:px-6">
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-[8px] font-extrabold uppercase tracking-wider text-slate-500">
+                        Data Monitoring
+                      </span>
+                    </div>
+                    <span className="text-[8px] font-semibold text-slate-400">
+                      {lastUpdated.toLocaleTimeString('id-ID')}
+                    </span>
                   </div>
                 </aside>
               </section>
