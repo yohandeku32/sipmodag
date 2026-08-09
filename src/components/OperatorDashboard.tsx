@@ -893,39 +893,42 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
               </p>
 
               <nav className="relative mt-3 space-y-2">
+                {/* Satu highlight permanen: hanya bergeser, tidak pernah unmount. */}
+                <div
+                  className="pointer-events-none absolute left-0 right-[-1.25rem] top-0 z-0 h-12 rounded-l-[22px] bg-[#F8F8FC] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)] will-change-transform"
+                  style={{
+                    transform: `translate3d(0, ${
+                      activeTab === 'review'
+                        ? 0
+                        : activeTab === 'opd-dashboard'
+                          ? 56
+                          : 112
+                    }px, 0)`,
+                    transition:
+                      'transform 210ms cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                >
+                  <span
+                    className="absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
+                    style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
+                  />
+                  <span
+                    className="absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
+                    style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
+                  />
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setActiveTab('review')}
-                  className={`relative z-10 flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-colors duration-200 ${
+                  className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
                     activeTab === 'review'
                       ? 'text-[#31275F]'
                       : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  {activeTab === 'review' && (
-                    <motion.span
-                      layoutId="operator-sidebar-active"
-                      transition={{
-                        type: 'spring',
-                        stiffness: 430,
-                        damping: 38,
-                        mass: 0.7,
-                      }}
-                      className="pointer-events-none absolute inset-y-0 left-0 right-[-1.25rem] -z-10 rounded-l-[22px] bg-[#F8F8FC] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]"
-                    >
-                      <span
-                        className="absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
-                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
-                      />
-                      <span
-                        className="absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
-                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
-                      />
-                    </motion.span>
-                  )}
-
                   <span
-                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
                       activeTab === 'review'
                         ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
                         : 'text-violet-100/70'
@@ -934,42 +937,20 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     <FileSearch className="h-3.5 w-3.5" />
                   </span>
 
-                  <span className="relative z-10">Antrean Review</span>
+                  <span>Antrean Review</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab('opd-dashboard')}
-                  className={`relative z-10 flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-colors duration-200 ${
+                  className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
                     activeTab === 'opd-dashboard'
                       ? 'text-[#31275F]'
                       : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  {activeTab === 'opd-dashboard' && (
-                    <motion.span
-                      layoutId="operator-sidebar-active"
-                      transition={{
-                        type: 'spring',
-                        stiffness: 430,
-                        damping: 38,
-                        mass: 0.7,
-                      }}
-                      className="pointer-events-none absolute inset-y-0 left-0 right-[-1.25rem] -z-10 rounded-l-[22px] bg-[#F8F8FC] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]"
-                    >
-                      <span
-                        className="absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
-                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
-                      />
-                      <span
-                        className="absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
-                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
-                      />
-                    </motion.span>
-                  )}
-
                   <span
-                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
                       activeTab === 'opd-dashboard'
                         ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
                         : 'text-violet-100/70'
@@ -978,42 +959,20 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     <LayoutDashboard className="h-3.5 w-3.5" />
                   </span>
 
-                  <span className="relative z-10">Dashboard OPD</span>
+                  <span>Dashboard OPD</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveTab('accounts')}
-                  className={`relative z-10 flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[10px] font-extrabold transition-colors duration-200 ${
+                  className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
                     activeTab === 'accounts'
                       ? 'text-[#31275F]'
                       : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  {activeTab === 'accounts' && (
-                    <motion.span
-                      layoutId="operator-sidebar-active"
-                      transition={{
-                        type: 'spring',
-                        stiffness: 430,
-                        damping: 38,
-                        mass: 0.7,
-                      }}
-                      className="pointer-events-none absolute inset-y-0 left-0 right-[-1.25rem] -z-10 rounded-l-[22px] bg-[#F8F8FC] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)]"
-                    >
-                      <span
-                        className="absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
-                        style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
-                      />
-                      <span
-                        className="absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
-                        style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
-                      />
-                    </motion.span>
-                  )}
-
                   <span
-                    className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
                       activeTab === 'accounts'
                         ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
                         : 'text-violet-100/70'
@@ -1022,7 +981,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                     <UsersRound className="h-3.5 w-3.5" />
                   </span>
 
-                  <span className="relative z-10">Akun OPD</span>
+                  <span>Akun OPD</span>
                 </button>
               </nav>
             </div>
@@ -1191,13 +1150,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </div>
           </header>
 
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.16, ease: 'easeOut' }}
-            className="space-y-5 p-4 sm:p-6 lg:p-7"
-          >
+          <div className="space-y-5 p-4 sm:p-6 lg:p-7">
         {activeTab === 'accounts' ? (
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <OperatorAccountManager session={session} />
@@ -1959,7 +1912,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           </>
         )}
 
-          </motion.div>
+          </div>
         </section>
       </div>
 
