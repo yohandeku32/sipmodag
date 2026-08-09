@@ -4,6 +4,7 @@ import {
   CalendarDays,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   Clock3,
   Download,
   ExternalLink,
@@ -987,26 +988,50 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
             </div>
 
             <div className="mt-auto pt-8">
-              <div className="rounded-2xl border border-white/10 bg-white/10 p-3.5 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100">
-                    <ShieldCheck className="h-4 w-4" />
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.08] shadow-lg shadow-black/5 backdrop-blur-sm">
+                <div className="p-3.5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-violet-100 ring-1 ring-white/10">
+                      <ShieldCheck className="h-4 w-4" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-violet-200/45">
+                        Akun Aktif
+                      </p>
+                      <p className="mt-1 truncate text-[10px] font-black text-white">
+                        {session.user.name}
+                      </p>
+                      <p className="mt-0.5 text-[8px] font-semibold text-violet-200/60">
+                        Operator Pusat
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[10px] font-black text-white">
-                      {session.user.name}
-                    </p>
-                    <p className="mt-1 text-[8px] font-semibold text-violet-200/60">
-                      Operator Pusat
-                    </p>
-                  </div>
+                </div>
+
+                <div className="border-t border-white/10 p-2.5">
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-violet-100 transition hover:bg-rose-500/25 hover:text-white"
-                    aria-label="Keluar"
+                    className="group flex w-full items-center justify-between gap-3 rounded-xl border border-rose-300/15 bg-rose-500/10 px-3.5 py-3 text-left transition-all duration-200 hover:border-rose-300/25 hover:bg-rose-500/20 active:scale-[0.99]"
+                    aria-label="Keluar dari akun operator"
                   >
-                    <LogOut className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-rose-200 transition group-hover:bg-rose-500/25 group-hover:text-white">
+                        <LogOut className="h-3.5 w-3.5" />
+                      </span>
+
+                      <div>
+                        <p className="text-[10px] font-black text-white">
+                          Keluar
+                        </p>
+                        <p className="mt-0.5 text-[7px] font-semibold text-violet-200/45">
+                          Akhiri sesi operator
+                        </p>
+                      </div>
+                    </div>
+
+                    <ChevronRight className="h-3.5 w-3.5 text-violet-200/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-rose-200" />
                   </button>
                 </div>
               </div>
