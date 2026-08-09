@@ -1365,7 +1365,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                         const isActive = index < activeSegments;
 
                         return (
-                          <motion.rect
+                          <rect
                             key={index}
                             x="114.5"
                             y="14"
@@ -1373,66 +1373,37 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                             height="39"
                             rx="5.5"
                             transform={`rotate(${angle} 120 116)`}
-                            initial={false}
-                            animate={{
-                              fill: isActive ? '#10B981' : '#F1F3F7',
-                              opacity: isActive ? 1 : 0.82,
-                            }}
-                            transition={{
-                              fill: {
-                                duration: 0.42,
-                                delay: index * 0.012,
-                                ease: [0.22, 1, 0.36, 1],
-                              },
-                              opacity: {
-                                duration: 0.28,
-                                delay: index * 0.01,
-                                ease: 'easeOut',
-                              },
+                            fill={isActive ? '#10B981' : '#F1F3F7'}
+                            opacity={isActive ? 1 : 0.82}
+                            style={{
+                              transition: `fill 420ms cubic-bezier(0.22, 1, 0.36, 1) ${
+                                index * 12
+                              }ms, opacity 280ms ease-out ${index * 10}ms`,
                             }}
                           />
                         );
                       })}
-
-                      <AnimatePresence mode="popLayout" initial={false}>
-                        <motion.text
-                          key={`${overviewYear}-${overviewAnalytics.uploadPercentage}`}
-                          x="120"
-                          y="104"
-                          textAnchor="middle"
-                          className="fill-slate-950"
-                          style={{
-                            fontSize: '29px',
-                            fontWeight: 900,
-                            letterSpacing: '-1px',
-                          }}
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -4 }}
-                          transition={{
-                            duration: 0.22,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          {overviewAnalytics.uploadPercentage}%
-                        </motion.text>
-                      </AnimatePresence>
-
-                      <motion.text
-                        x="120"
-                        y="120"
-                        textAnchor="middle"
-                        className="fill-slate-400"
-                        style={{
-                          fontSize: '8px',
-                          fontWeight: 700,
-                        }}
-                        animate={{ opacity: [0.72, 1] }}
-                        transition={{ duration: 0.3, ease: 'easeOut' }}
-                      >
-                        Sudah Upload
-                      </motion.text>
                     </svg>
+
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <motion.div
+                        key={`${overviewYear}-${overviewAnalytics.uploadPercentage}`}
+                        initial={{ opacity: 0, y: 5, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.24,
+                          ease: 'easeOut',
+                        }}
+                        className="mt-12 text-center"
+                      >
+                        <p className="text-[29px] font-black leading-none tracking-[-1px] text-slate-950">
+                          {overviewAnalytics.uploadPercentage}%
+                        </p>
+                        <p className="mt-2 text-[8px] font-bold text-slate-400">
+                          Sudah Upload
+                        </p>
+                      </motion.div>
+                    </div>
                   </div>
 
                   {/* Dua kartu statistik seperti referensi */}
