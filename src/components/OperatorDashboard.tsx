@@ -25,6 +25,7 @@ import {
   UploadCloud,
   WalletCards,
   UsersRound,
+  X,
   XCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -83,6 +84,14 @@ type OPDBudgetRecord = {
 type OPDBudgetResponse = {
   budget: OPDBudgetRecord | null;
 };
+
+type BudgetYearRow = {
+  year: string;
+  budget: OPDBudgetRecord | null;
+  error: string | null;
+};
+
+const BUDGET_YEARS = ['2025', '2026', '2027'] as const;
 
 type ResetOPDResponse = {
   message: string;
@@ -290,17 +299,13 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   const [resettingKey, setResettingKey] = useState<string | null>(null);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
 
-  const [budgetPopover, setBudgetPopover] = useState<{
+  const [budgetModal, setBudgetModal] = useState<{
     opdName: string;
-    top: number;
-    left: number;
   } | null>(null);
-  const [budgetPopoverData, setBudgetPopoverData] =
-    useState<OPDBudgetRecord | null>(null);
-  const [budgetPopoverLoading, setBudgetPopoverLoading] =
+  const [budgetModalRows, setBudgetModalRows] =
+    useState<BudgetYearRow[]>([]);
+  const [budgetModalLoading, setBudgetModalLoading] =
     useState(false);
-  const [budgetPopoverError, setBudgetPopoverError] =
-    useState<string | null>(null);
   const budgetRequestRef = useRef(0);
 
   const loadQueue = async (manual = false) => {
@@ -559,91 +564,97 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     };
   }, [opdDashboardRows, overviewSummary]);
 
-  useEffect(() => {
+  const closeBudgetModal = () => {
     budgetRequestRef.current += 1;
-    setBudgetPopover(null);
-    setBudgetPopoverData(null);
-    setBudgetPopoverError(null);
-    setBudgetPopoverLoading(false);
-  }, [overviewYear]);
-
-  const closeBudgetPopover = () => {
-    budgetRequestRef.current += 1;
-    setBudgetPopover(null);
-    setBudgetPopoverData(null);
-    setBudgetPopoverError(null);
-    setBudgetPopoverLoading(false);
+    setBudgetModal(null);
+    setBudgetModalRows([]);
+    setBudgetModalLoading(false);
   };
 
-  const openBudgetPopover = async (
+  const openBudgetModal = async (
     event: React.MouseEvent<HTMLButtonElement>,
     item: DashboardOPDRow,
   ) => {
     event.stopPropagation();
 
-    if (budgetPopover?.opdName === item.namaOPD) {
-      closeBudgetPopover();
-      return;
-    }
-
-    const rect = event.currentTarget.getBoundingClientRect();
-    const popoverWidth = 300;
-    const estimatedHeight = 190;
-    const padding = 12;
-
-    const left = Math.max(
-      padding,
-      Math.min(
-        rect.left,
-        window.innerWidth - popoverWidth - padding,
-      ),
-    );
-
-    const openAbove =
-      rect.bottom + estimatedHeight + padding > window.innerHeight;
-
-    const top = openAbove
-      ? Math.max(padding, rect.top - estimatedHeight - 8)
-      : rect.bottom + 8;
-
-    setBudgetPopover({
+    setBudgetModal({
       opdName: item.namaOPD,
-      top,
-      left,
     });
-    setBudgetPopoverData(null);
-    setBudgetPopoverError(null);
-    setBudgetPopoverLoading(true);
+    setBudgetModalRows([]);
+    setBudgetModalLoading(true);
 
     const requestId = budgetRequestRef.current + 1;
     budgetRequestRef.current = requestId;
 
     try {
-      const result = await getReviewAction<OPDBudgetResponse>(
-        apiUrl,
-        'getOPDBudget',
-        {
-          token: session.token,
-          opdName: item.namaOPD,
-          tahun: overviewYear,
-        },
+      const rows = await Promise.all(
+        BUDGET_YEARS.map(async yearValue => {
+          try {
+            const result = await getReviewAction<OPDBudgetResponse>(
+              apiUrl,
+              'getOPDBudget',
+              {
+                token: session.token,
+                opdName: item.namaOPD,
+                tahun: yearValue,
+              },
+            );
+
+            return {
+              year: yearValue,
+              budget: result.budget || null,
+              error: null,
+            } satisfies BudgetYearRow;
+          } catch (error) {
+            return {
+              year: yearValue,
+              budget: null,
+              error:
+                error instanceof Error
+                  ? error.message
+                  : 'Data anggaran gagal dimuat.',
+            } satisfies BudgetYearRow;
+          }
+        }),
       );
 
       if (requestId !== budgetRequestRef.current) return;
-      setBudgetPopoverData(result.budget || null);
-    } catch (error) {
-      if (requestId !== budgetRequestRef.current) return;
-      setBudgetPopoverError(
-        error instanceof Error
-          ? error.message
-          : 'Data pagu gagal dimuat.',
-      );
+      setBudgetModalRows(rows);
     } finally {
       if (requestId === budgetRequestRef.current) {
-        setBudgetPopoverLoading(false);
+        setBudgetModalLoading(false);
       }
     }
   };
+
+  const budgetModalSummary = useMemo(() => {
+    const validRows = budgetModalRows.filter(row => row.budget);
+
+    const totalPagu = validRows.reduce(
+      (total, row) => total + Number(row.budget?.PAGU_ARG || 0),
+      0,
+    );
+
+    const totalRealisasi = validRows.reduce(
+      (total, row) => total + Number(row.budget?.REALISASI_ARG || 0),
+      0,
+    );
+
+    const percentage =
+      totalPagu > 0
+        ? Math.min(
+            100,
+            Math.max(0, (totalRealisasi / totalPagu) * 100),
+          )
+        : 0;
+
+    return {
+      totalPagu,
+      totalRealisasi,
+      percentage,
+    };
+  }, [budgetModalRows]);
+
 
   const handleResetOPD = async (item: DashboardOPDRow) => {
     const hasAnyData =
@@ -1380,12 +1391,12 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                                 <button
                                   type="button"
                                   onClick={event =>
-                                    void openBudgetPopover(event, item)
+                                    void openBudgetModal(event, item)
                                   }
                                   className="inline-flex items-center gap-1 rounded-md border border-violet-100 bg-violet-50 px-2 py-1 text-[8px] font-extrabold text-violet-700 transition hover:border-violet-200 hover:bg-violet-100"
                                 >
                                   <WalletCards className="h-3 w-3" />
-                                  Pagu Anggaran
+                                  Lihat Anggaran
                                 </button>
                               </div>
                             </td>
@@ -1773,76 +1784,260 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         </section>
       </div>
 
-      {budgetPopover && (
-        <>
+      {budgetModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6">
           <button
             type="button"
-            aria-label="Tutup pagu anggaran"
-            onClick={closeBudgetPopover}
-            className="fixed inset-0 z-[80] cursor-default bg-transparent"
+            aria-label="Tutup ringkasan anggaran"
+            onClick={closeBudgetModal}
+            className="absolute inset-0 cursor-default bg-slate-950/45 backdrop-blur-[2px]"
           />
 
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          <motion.section
+            initial={{ opacity: 0, y: 18, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.16 }}
-            className="fixed z-[90] w-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/20"
-            style={{
-              top: budgetPopover.top,
-              left: budgetPopover.left,
-            }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="relative z-10 flex max-h-[92vh] w-full max-w-[1080px] flex-col overflow-hidden rounded-3xl border border-white/80 bg-[#F8F8FC] shadow-2xl shadow-slate-950/25"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Anggaran ${budgetModal.opdName}`}
           >
-            <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
-                <WalletCards className="h-4 w-4" />
-              </div>
-
-              <div className="min-w-0">
-                <p className="text-xs font-black text-slate-900">
-                  Pagu Anggaran
-                </p>
-                <p className="mt-0.5 text-[9px] font-semibold text-slate-400">
-                  Tahun {overviewYear}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4">
-              {budgetPopoverLoading ? (
-                <div className="flex min-h-20 items-center justify-center gap-2 text-xs font-semibold text-slate-400">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Memuat...
+            <header className="flex items-start justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:px-7">
+              <div className="flex min-w-0 items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#31275F] text-white shadow-sm">
+                  <WalletCards className="h-5 w-5" />
                 </div>
-              ) : budgetPopoverError ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-3 text-[10px] font-semibold text-red-700">
-                  {budgetPopoverError}
-                </div>
-              ) : budgetPopoverData &&
-                Number(budgetPopoverData.PAGU_ARG || 0) > 0 ? (
-                <>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
-                    Pagu ARG
+
+                <div className="min-w-0">
+                  <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
+                    Anggaran Responsif Gender
                   </p>
 
-                  <p className="mt-2 text-xl font-black tracking-tight text-slate-950">
-                    {formatRupiah(budgetPopoverData.PAGU_ARG)}
-                  </p>
+                  <h2 className="mt-1 text-lg font-black tracking-tight text-slate-950 sm:text-xl">
+                    {budgetModal.opdName}
+                  </h2>
 
-                  <div className="mt-3 flex items-center gap-1.5 border-t border-slate-100 pt-3 text-[9px] font-semibold text-slate-400">
-                    <CalendarDays className="h-3.5 w-3.5" />
-                    {budgetPopoverData.TANGGAL_PAGU || 'Tanggal belum diisi'}
+                  <p className="mt-1 text-[10px] font-semibold text-slate-400">
+                    Ringkasan pagu dan realisasi anggaran Tahun 2025–2027
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeBudgetModal}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                aria-label="Tutup"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </header>
+
+            <div className="overflow-y-auto p-4 sm:p-6">
+              {budgetModalLoading ? (
+                <div className="flex min-h-[340px] flex-col items-center justify-center text-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
+                    <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
-                </>
-              ) : (
-                <div className="rounded-xl bg-slate-50 px-3 py-4 text-center">
-                  <p className="text-xs font-bold text-slate-500">
-                    Pagu belum diisi
+                  <p className="mt-4 text-sm font-black text-slate-700">
+                    Memuat anggaran semua tahun...
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold text-slate-400">
+                    Mengambil Pagu ARG dan Realisasi ARG Tahun 2025–2027.
                   </p>
                 </div>
+              ) : (
+                <>
+                  <section className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-[#C9D8FF] bg-[#E9F0FF] p-4 sm:p-5">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-[#596DDE]">
+                        Total Pagu 3 Tahun
+                      </p>
+                      <p className="mt-2 break-words text-lg font-black tracking-tight text-[#241E4A] sm:text-xl">
+                        {formatRupiah(budgetModalSummary.totalPagu)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-[#CDEBE5] bg-[#EAF8F5] p-4 sm:p-5">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-[#3B9C8B]">
+                        Total Realisasi
+                      </p>
+                      <p className="mt-2 break-words text-lg font-black tracking-tight text-[#241E4A] sm:text-xl">
+                        {formatRupiah(budgetModalSummary.totalRealisasi)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-[#DDD4FF] bg-[#F0ECFF] p-4 sm:p-5">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-[#695BD8]">
+                        Realisasi Keseluruhan
+                      </p>
+                      <p className="mt-2 text-lg font-black tracking-tight text-[#241E4A] sm:text-xl">
+                        {budgetModalSummary.percentage.toFixed(1)}%
+                      </p>
+                    </div>
+                  </section>
+
+                  <section className="mt-5 grid gap-4 lg:grid-cols-3">
+                    {BUDGET_YEARS.map(yearValue => {
+                      const row = budgetModalRows.find(
+                        item => item.year === yearValue,
+                      );
+
+                      const budget = row?.budget || null;
+                      const pagu = Number(budget?.PAGU_ARG || 0);
+                      const realisasi = Number(
+                        budget?.REALISASI_ARG || 0,
+                      );
+                      const percentage = getRealisasiPercentage(
+                        pagu,
+                        realisasi,
+                      );
+                      const difference = pagu - realisasi;
+
+                      return (
+                        <article
+                          key={yearValue}
+                          className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-4 py-4">
+                            <div>
+                              <p className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-slate-400">
+                                Tahun Anggaran
+                              </p>
+                              <p className="mt-1 text-xl font-black text-[#31275F]">
+                                {yearValue}
+                              </p>
+                            </div>
+
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-[8px] font-extrabold ${
+                                budget && pagu > 0
+                                  ? 'bg-emerald-50 text-emerald-700'
+                                  : 'bg-slate-100 text-slate-400'
+                              }`}
+                            >
+                              {budget && pagu > 0
+                                ? 'Data tersedia'
+                                : 'Belum diisi'}
+                            </span>
+                          </div>
+
+                          <div className="space-y-4 p-4">
+                            {row?.error ? (
+                              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-[10px] font-semibold leading-relaxed text-red-700">
+                                {row.error}
+                              </div>
+                            ) : !budget || pagu <= 0 ? (
+                              <div className="flex min-h-[245px] flex-col items-center justify-center rounded-xl bg-slate-50 p-5 text-center">
+                                <WalletCards className="h-7 w-7 text-slate-300" />
+                                <p className="mt-3 text-xs font-black text-slate-500">
+                                  Anggaran belum diisi
+                                </p>
+                                <p className="mt-1 text-[9px] font-semibold text-slate-400">
+                                  Belum ada Pagu ARG untuk Tahun {yearValue}.
+                                </p>
+                              </div>
+                            ) : (
+                              <>
+                                <div>
+                                  <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
+                                    Pagu ARG
+                                  </p>
+                                  <p className="mt-1 break-words text-lg font-black tracking-tight text-slate-950">
+                                    {formatRupiah(pagu)}
+                                  </p>
+                                  <p className="mt-1 flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                                    <CalendarDays className="h-3.5 w-3.5" />
+                                    {budget.TANGGAL_PAGU ||
+                                      'Tanggal pagu belum diisi'}
+                                  </p>
+                                </div>
+
+                                <div className="border-t border-slate-100 pt-4">
+                                  <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-slate-400">
+                                    Realisasi ARG
+                                  </p>
+                                  <p className="mt-1 break-words text-lg font-black tracking-tight text-emerald-700">
+                                    {formatRupiah(realisasi)}
+                                  </p>
+                                  <p className="mt-1 flex items-center gap-1.5 text-[9px] font-semibold text-slate-400">
+                                    <CalendarDays className="h-3.5 w-3.5" />
+                                    {budget.TANGGAL_REALISASI ||
+                                      'Tanggal realisasi belum diisi'}
+                                  </p>
+                                </div>
+
+                                <div className="rounded-xl bg-[#F8F8FC] p-3">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="text-[8px] font-extrabold uppercase tracking-[0.1em] text-slate-400">
+                                      Persentase Realisasi
+                                    </span>
+                                    <span className="text-xs font-black text-violet-700">
+                                      {percentage.toFixed(1)}%
+                                    </span>
+                                  </div>
+
+                                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                                    <div
+                                      className="h-full rounded-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all"
+                                      style={{
+                                        width: `${percentage}%`,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="rounded-xl border border-slate-100 bg-white p-3">
+                                    <p className="text-[7px] font-extrabold uppercase tracking-wider text-slate-400">
+                                      Selisih
+                                    </p>
+                                    <p
+                                      className={`mt-1 text-[10px] font-black ${
+                                        difference >= 0
+                                          ? 'text-slate-700'
+                                          : 'text-rose-600'
+                                      }`}
+                                    >
+                                      {formatRupiah(difference)}
+                                    </p>
+                                  </div>
+
+                                  <div className="rounded-xl border border-slate-100 bg-white p-3">
+                                    <p className="text-[7px] font-extrabold uppercase tracking-wider text-slate-400">
+                                      Diperbarui
+                                    </p>
+                                    <p className="mt-1 break-words text-[9px] font-bold text-slate-600">
+                                      {budget.UPDATED_AT || '-'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </section>
+                </>
               )}
             </div>
-          </motion.div>
-        </>
+
+            <footer className="flex items-center justify-between gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:px-7">
+              <p className="text-[9px] font-semibold text-slate-400">
+                Data diambil langsung dari catatan anggaran SIPMODAG per tahun.
+              </p>
+
+              <button
+                type="button"
+                onClick={closeBudgetModal}
+                className="rounded-xl bg-[#31275F] px-5 py-2.5 text-[10px] font-extrabold text-white transition hover:bg-[#463A83]"
+              >
+                Tutup
+              </button>
+            </footer>
+          </motion.section>
+        </div>
       )}
     </main>
   );
