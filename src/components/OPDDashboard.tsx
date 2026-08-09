@@ -9,7 +9,6 @@ import {
   ExternalLink,
   FileSpreadsheet,
   FileText,
-  Info,
   Loader2,
   Save,
   LogOut,
@@ -26,6 +25,8 @@ import { OPDData } from '../types';
 import { BudgetInput, BudgetRecord, ReviewNotification, ReviewRecord, RevisionTarget } from '../reviewTypes';
 
 type UploadSlotKey = 'file1' | 'file2' | 'file3' | 'file4';
+
+type OPDDashboardTab = 'dashboard' | 'upload';
 
 type UploadedFile = {
   name: string;
@@ -148,6 +149,7 @@ export default function OPDDashboard({
   onCancelRevision,
 }: Props) {
   const selectedCount = Object.values(uploadedFiles).filter(Boolean).length;
+  const [activeTab, setActiveTab] = useState<OPDDashboardTab>('dashboard');
   const [notifications, setNotifications] = useState<ReviewNotification[]>([]);
   const [reviews, setReviews] = useState<ReviewRecord[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -319,7 +321,11 @@ export default function OPDDashboard({
       reviewFileName: review.REVIEW_FILE_NAME,
     });
 
-    document.getElementById('opd-upload-form')?.scrollIntoView({ behavior: 'smooth' });
+    setActiveTab('upload');
+
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
   };
 
   const matchingRevisionSlot = revisionTarget
@@ -381,44 +387,34 @@ export default function OPDDashboard({
                 <nav className="mt-3 space-y-1.5">
                   <button
                     type="button"
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="flex w-full items-center gap-3 rounded-xl bg-white/15 px-3 py-3 text-left text-[10px] font-extrabold text-white shadow-sm ring-1 ring-white/10"
+                    onClick={() => setActiveTab('dashboard')}
+                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                      activeTab === 'dashboard'
+                        ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
+                        : 'text-violet-100/70 hover:bg-white/10 hover:text-white'
+                    }`}
                   >
                     <User className="h-4 w-4" />
                     Dashboard
-                    <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById('opd-upload-form')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
-                  >
-                    <UploadCloud className="h-4 w-4" />
-                    Upload Dokumen
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowNotifications(true)}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
-                  >
-                    <Bell className="h-4 w-4" />
-                    Notifikasi
-                    {unreadCount > 0 && (
-                      <span className="ml-auto flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 py-0.5 text-[8px] font-black text-white">
-                        {unreadCount}
-                      </span>
+                    {activeTab === 'dashboard' && (
+                      <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
                     )}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => void loadReviewData()}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold text-violet-100/70 transition hover:bg-white/10 hover:text-white"
+                    onClick={() => setActiveTab('upload')}
+                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                      activeTab === 'upload'
+                        ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
+                        : 'text-violet-100/70 hover:bg-white/10 hover:text-white'
+                    }`}
                   >
-                    <CheckCircle2 className="h-4 w-4" />
-                    Hasil Review
+                    <UploadCloud className="h-4 w-4" />
+                    Upload Dokumen
+                    {activeTab === 'upload' && (
+                      <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
+                    )}
                   </button>
                 </nav>
               </div>
@@ -478,13 +474,19 @@ export default function OPDDashboard({
             <header className="flex flex-col gap-4 border-b border-slate-200/80 bg-white/85 px-5 py-5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-8">
               <div>
                 <p className="text-[9px] font-extrabold uppercase tracking-[0.17em] text-[#6558D3]">
-                  Dashboard OPD
+                  Portal OPD
                 </p>
                 <h1 className="mt-1 text-2xl font-black tracking-tight text-[#241E4A]">
-                  Selamat Datang, {loggedInOPD.namaPendek}
+                  {activeTab === 'dashboard'
+                    ? `Selamat Datang, ${loggedInOPD.namaPendek}`
+                    : revisionTarget
+                      ? `Upload Ulang ${revisionTarget.jenisDokumen}`
+                      : 'Upload Dokumen PUG'}
                 </h1>
                 <p className="mt-1 text-[10px] font-medium text-slate-400">
-                  Kelola dokumen PUG, anggaran, dan hasil review dalam satu halaman.
+                  {activeTab === 'dashboard'
+                    ? 'Pantau progres dokumen, notifikasi, dan hasil review OPD.'
+                    : 'Lengkapi data anggaran lalu unggah dokumen GAP, GBS, KAK, dan SK Focal Point.'}
                 </p>
               </div>
 
@@ -516,9 +518,37 @@ export default function OPDDashboard({
                   Keluar
                 </button>
               </div>
+
+              <div className="mt-4 flex gap-2 lg:hidden">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`flex-1 rounded-xl px-4 py-2.5 text-[9px] font-extrabold transition ${
+                    activeTab === 'dashboard'
+                      ? 'bg-[#31275F] text-white'
+                      : 'bg-slate-100 text-slate-500'
+                  }`}
+                >
+                  Dashboard
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('upload')}
+                  className={`flex-1 rounded-xl px-4 py-2.5 text-[9px] font-extrabold transition ${
+                    activeTab === 'upload'
+                      ? 'bg-[#31275F] text-white'
+                      : 'bg-slate-100 text-slate-500'
+                  }`}
+                >
+                  Upload Dokumen
+                </button>
+              </div>
             </header>
 
             <div className="space-y-5 p-4 sm:p-6 lg:p-7">
+              {activeTab === 'dashboard' ? (
+                <>
               {/* METRIC CARDS */}
               <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
@@ -588,11 +618,203 @@ export default function OPDDashboard({
                 })}
               </section>
 
-              {/* REVIEW STRIP */}
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+                  {/* RINGKASAN DASHBOARD */}
+                  <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+                    <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
+                            Ringkasan OPD
+                          </p>
+                          <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
+                            Progres Tahun {selectedYear}
+                          </h2>
+                          <p className="mt-2 max-w-2xl text-[10px] leading-relaxed text-slate-500">
+                            Dashboard hanya menampilkan ringkasan progres dan hasil review.
+                            Untuk mengirim dokumen baru atau revisi, buka menu Upload Dokumen.
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('upload')}
+                          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#31275F] px-4 py-3 text-[9px] font-extrabold text-white transition hover:bg-violet-700"
+                        >
+                          <UploadCloud className="h-4 w-4" />
+                          Upload Dokumen
+                        </button>
+                      </div>
+
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        {slots.map(slot => {
+                          const uploaded = uploadedSuccessKeys.includes(slot.key);
+
+                          return (
+                            <div
+                              key={slot.key}
+                              className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${
+                                    uploaded
+                                      ? 'bg-emerald-100 text-emerald-700'
+                                      : 'bg-white text-slate-400'
+                                  }`}
+                                >
+                                  {uploaded ? (
+                                    <Check className="h-4 w-4" />
+                                  ) : (
+                                    <FileText className="h-4 w-4" />
+                                  )}
+                                </div>
+
+                                <div>
+                                  <p className="text-[10px] font-black text-slate-800">
+                                    {slot.documentName}
+                                  </p>
+                                  <p className="mt-0.5 text-[8px] font-semibold text-slate-400">
+                                    {uploaded ? 'Sudah dikirim' : 'Belum dikirim'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <span
+                                className={`rounded-full px-2.5 py-1 text-[8px] font-extrabold ${
+                                  uploaded
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : 'bg-slate-100 text-slate-400'
+                                }`}
+                              >
+                                {uploaded ? 'Terkirim' : 'Belum'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                {/* PANEL HASIL REVIEW */}
+                <aside className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-violet-600">
+                        Requests
+                      </p>
+                      <h3 className="mt-1 text-sm font-black text-slate-950">
+                        Hasil Review
+                      </h3>
+                      <p className="mt-1 text-[9px] text-slate-400">
+                        Tahun {selectedYear}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => void loadReviewData()}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition hover:bg-violet-50 hover:text-violet-700"
+                      aria-label="Segarkan hasil review"
+                    >
+                      <RefreshCw className={`h-4 w-4 ${loadingReviews ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+
+                  <div className="mt-5">
+                    {reviewError ? (
+                      <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-[10px] font-semibold leading-relaxed text-red-700">
+                        {reviewError}
+                      </p>
+                    ) : loadingReviews ? (
+                      <div className="flex items-center justify-center gap-2 py-8 text-xs font-semibold text-slate-400">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Memuat review...
+                      </div>
+                    ) : reviews.length === 0 ? (
+                      <div className="rounded-2xl bg-slate-50 p-5 text-center ring-1 ring-inset ring-slate-100">
+                        <CheckCircle2 className="mx-auto h-7 w-7 text-slate-300" />
+                        <p className="mt-3 text-[10px] font-bold text-slate-500">
+                          Belum ada hasil review
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {reviews.slice(0, 6).map(review => (
+                          <article
+                            key={review.REVIEW_ID}
+                            className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 transition hover:border-violet-100 hover:bg-violet-50/40"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="truncate text-[10px] font-black text-slate-900">
+                                  {review.JENIS_DOKUMEN}
+                                </p>
+                                <p className="mt-1 text-[8px] text-slate-400">
+                                  {review.CREATED_AT}
+                                </p>
+                              </div>
+                              <span
+                                className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-extrabold ${
+                                  statusClass[review.STATUS_REVIEW] ||
+                                  statusClass.SEDANG_DIREVIEW
+                                }`}
+                              >
+                                {statusLabel[review.STATUS_REVIEW] || review.STATUS_REVIEW}
+                              </span>
+                            </div>
+
+                            {review.CATATAN && (
+                              <p className="mt-3 line-clamp-3 text-[9px] leading-relaxed text-slate-600">
+                                {review.CATATAN}
+                              </p>
+                            )}
+
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {review.REVIEW_FILE_URL && (
+                                <a
+                                  href={review.REVIEW_FILE_URL}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[8px] font-extrabold text-slate-600 hover:text-violet-700"
+                                >
+                                  <Download className="h-3 w-3" />
+                                  File Review
+                                </a>
+                              )}
+
+                              {review.STATUS_REVIEW === 'PERLU_REVISI' && (
+                                <button
+                                  type="button"
+                                  onClick={() => startRevisionFromReview(review)}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-[#31275F] px-2.5 py-2 text-[8px] font-extrabold text-white hover:bg-violet-700"
+                                >
+                                  <UploadCloud className="h-3 w-3" />
+                                  Upload Ulang
+                                </button>
+                              )}
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(true)}
+                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-[9px] font-extrabold text-violet-700 transition hover:bg-violet-100"
+                  >
+                    <Bell className="h-3.5 w-3.5" />
+                    Lihat Notifikasi
+                  </button>
+                </aside>
+                  </section>
+                </>
+              ) : (
+                <>
+                  {/* FORM UPLOAD berdiri sendiri pada tab Upload Dokumen */}
+                  <section className="mx-auto w-full max-w-[1180px]">
                 <div
                   id="opd-upload-form"
-                  className="scroll-mt-24 overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm"
+                  className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm"
                 >
                   <div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                     <div>
@@ -978,121 +1200,9 @@ export default function OPDDashboard({
                     </div>
                   </div>
                 </div>
-
-                {/* PANEL HASIL REVIEW */}
-                <aside className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-violet-600">
-                        Requests
-                      </p>
-                      <h3 className="mt-1 text-sm font-black text-slate-950">
-                        Hasil Review
-                      </h3>
-                      <p className="mt-1 text-[9px] text-slate-400">
-                        Tahun {selectedYear}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => void loadReviewData()}
-                      className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-500 transition hover:bg-violet-50 hover:text-violet-700"
-                      aria-label="Segarkan hasil review"
-                    >
-                      <RefreshCw className={`h-4 w-4 ${loadingReviews ? 'animate-spin' : ''}`} />
-                    </button>
-                  </div>
-
-                  <div className="mt-5">
-                    {reviewError ? (
-                      <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-[10px] font-semibold leading-relaxed text-red-700">
-                        {reviewError}
-                      </p>
-                    ) : loadingReviews ? (
-                      <div className="flex items-center justify-center gap-2 py-8 text-xs font-semibold text-slate-400">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Memuat review...
-                      </div>
-                    ) : reviews.length === 0 ? (
-                      <div className="rounded-2xl bg-slate-50 p-5 text-center ring-1 ring-inset ring-slate-100">
-                        <CheckCircle2 className="mx-auto h-7 w-7 text-slate-300" />
-                        <p className="mt-3 text-[10px] font-bold text-slate-500">
-                          Belum ada hasil review
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {reviews.slice(0, 6).map(review => (
-                          <article
-                            key={review.REVIEW_ID}
-                            className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 transition hover:border-violet-100 hover:bg-violet-50/40"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <p className="truncate text-[10px] font-black text-slate-900">
-                                  {review.JENIS_DOKUMEN}
-                                </p>
-                                <p className="mt-1 text-[8px] text-slate-400">
-                                  {review.CREATED_AT}
-                                </p>
-                              </div>
-                              <span
-                                className={`shrink-0 rounded-full border px-2 py-1 text-[7px] font-extrabold ${
-                                  statusClass[review.STATUS_REVIEW] ||
-                                  statusClass.SEDANG_DIREVIEW
-                                }`}
-                              >
-                                {statusLabel[review.STATUS_REVIEW] || review.STATUS_REVIEW}
-                              </span>
-                            </div>
-
-                            {review.CATATAN && (
-                              <p className="mt-3 line-clamp-3 text-[9px] leading-relaxed text-slate-600">
-                                {review.CATATAN}
-                              </p>
-                            )}
-
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {review.REVIEW_FILE_URL && (
-                                <a
-                                  href={review.REVIEW_FILE_URL}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[8px] font-extrabold text-slate-600 hover:text-violet-700"
-                                >
-                                  <Download className="h-3 w-3" />
-                                  File Review
-                                </a>
-                              )}
-
-                              {review.STATUS_REVIEW === 'PERLU_REVISI' && (
-                                <button
-                                  type="button"
-                                  onClick={() => startRevisionFromReview(review)}
-                                  className="inline-flex items-center gap-1 rounded-lg bg-[#31275F] px-2.5 py-2 text-[8px] font-extrabold text-white hover:bg-violet-700"
-                                >
-                                  <UploadCloud className="h-3 w-3" />
-                                  Upload Ulang
-                                </button>
-                              )}
-                            </div>
-                          </article>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowNotifications(true)}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-[9px] font-extrabold text-violet-700 transition hover:bg-violet-100"
-                  >
-                    <Bell className="h-3.5 w-3.5" />
-                    Lihat Notifikasi
-                  </button>
-                </aside>
-              </section>
+                  </section>
+                </>
+              )}
             </div>
           </section>
         </div>
