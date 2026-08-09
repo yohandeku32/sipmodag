@@ -30,7 +30,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { fileToBase64, getReviewAction, postReviewAction } from '../reviewApi';
 import { OperatorSession, ReviewStatus, ReviewUpload } from '../reviewTypes';
 import OperatorAccountManager from './OperatorAccountManager';
@@ -133,6 +133,21 @@ type DashboardOPDRow = {
   uploadCount: number;
   lastUploadedAt: string;
 };
+
+type WebConfirmState =
+  | {
+      kind: 'delete-budget';
+      title: string;
+      message: string;
+      target: string | 'ALL';
+    }
+  | {
+      kind: 'reset-opd';
+      title: string;
+      message: string;
+      item: DashboardOPDRow;
+    }
+  | null;
 
 const OFFICIAL_42_OPDS = [
   'BIRO UMUM SETDA PROVINSI NTT',
@@ -329,6 +344,8 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     useState<string | null>(null);
   const [budgetDeleteMessage, setBudgetDeleteMessage] =
     useState<string | null>(null);
+  const [webConfirm, setWebConfirm] = useState<WebConfirmState>(null);
+  const [webConfirmLoading, setWebConfirmLoading] = useState(false);
   const budgetRequestRef = useRef(0);
 
   const loadQueue = async (manual = false) => {
@@ -679,7 +696,26 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     await loadBudgetModalRows(item.namaOPD);
   };
 
-  const handleDeleteBudget = async (
+  const handleDeleteBudget = (
+    target: string | 'ALL',
+  ) => {
+    if (!budgetModal || deletingBudgetKey || webConfirmLoading) return;
+
+    const isAllYears = target === 'ALL';
+
+    setWebConfirm({
+      kind: 'delete-budget',
+      title: isAllYears
+        ? 'Hapus semua anggaran?'
+        : 'Hapus data anggaran?',
+      message: isAllYears
+        ? 'Data anggaran Tahun 2025–2027 akan dihapus.'
+        : `Data anggaran Tahun ${target} akan dihapus.`,
+      target,
+    });
+  };
+
+  const executeDeleteBudget = async (
     target: string | 'ALL',
   ) => {
     if (!budgetModal || deletingBudgetKey) return;
@@ -688,22 +724,6 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
     const targetLabel = isAllYears
       ? 'SEMUA TAHUN (2025, 2026, dan 2027)'
       : `Tahun ${target}`;
-
-    const firstConfirm = window.confirm(
-      `Hapus data Anggaran Responsif Gender ${budgetModal.opdName} ${targetLabel}?\n\n` +
-      `Yang dihapus HANYA data pada tabel ANGGARAN.\n` +
-      `Dokumen upload, review, notifikasi, akun OPD, dan file Google Drive TIDAK dihapus.`,
-    );
-
-    if (!firstConfirm) return;
-
-    const secondConfirm = window.confirm(
-      `Konfirmasi terakhir:\n\n` +
-      `Benar-benar hapus data anggaran ${targetLabel}?\n\n` +
-      `Tindakan ini tidak dapat dibatalkan.`,
-    );
-
-    if (!secondConfirm) return;
 
     const deleteKey = isAllYears ? 'ALL' : target;
     setDeletingBudgetKey(deleteKey);
@@ -772,7 +792,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   }, [budgetModalRows]);
 
 
-  const handleResetOPD = async (item: DashboardOPDRow) => {
+  const handleResetOPD = (item: DashboardOPDRow) => {
     const hasAnyData =
       item.opdIds.length > 0 ||
       item.gap ||
@@ -787,20 +807,18 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       return;
     }
 
-    const firstConfirm = window.confirm(
-      `Reset data ${item.namaOPD} Tahun ${overviewYear}?\n\n` +
-      `Upload, review, notifikasi, dan anggaran akan dihapus dari TiDB.\n\n` +
-      `File di Google Drive tidak dihapus.`,
-    );
+    if (resettingKey || webConfirmLoading) return;
 
-    if (!firstConfirm) return;
+    setWebConfirm({
+      kind: 'reset-opd',
+      title: 'Reset data OPD?',
+      message:
+        `Upload, review, notifikasi, dan anggaran Tahun ${overviewYear} akan dihapus.`,
+      item,
+    });
+  };
 
-    const secondConfirm = window.confirm(
-      `Konfirmasi terakhir:\n\nHapus data ${item.namaOPD} Tahun ${overviewYear}?`,
-    );
-
-    if (!secondConfirm) return;
-
+  const executeResetOPD = async (item: DashboardOPDRow) => {
     const resetKey = `${item.no}-${overviewYear}`;
     setResettingKey(resetKey);
     setResetMessage(null);
@@ -835,6 +853,25 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
       );
     } finally {
       setResettingKey(null);
+    }
+  };
+
+  const confirmWebAction = async () => {
+    if (!webConfirm || webConfirmLoading) return;
+
+    const current = webConfirm;
+    setWebConfirmLoading(true);
+
+    try {
+      if (current.kind === 'delete-budget') {
+        await executeDeleteBudget(current.target);
+      } else {
+        await executeResetOPD(current.item);
+      }
+
+      setWebConfirm(null);
+    } finally {
+      setWebConfirmLoading(false);
     }
   };
 
@@ -2400,6 +2437,77 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
           </motion.section>
         </div>
       )}
+      <AnimatePresence>
+        {webConfirm && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Tutup konfirmasi"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                if (!webConfirmLoading) {
+                  setWebConfirm(null);
+                }
+              }}
+              className="fixed inset-0 z-[190] cursor-default bg-slate-950/35 backdrop-blur-[2px]"
+            />
+
+            <motion.section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="web-confirm-title"
+              initial={{ opacity: 0, y: 12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="fixed left-1/2 top-1/2 z-[200] w-[calc(100vw-2rem)] max-w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-950/20"
+            >
+              <div className="p-5 sm:p-6">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                  <Trash2 className="h-5 w-5" />
+                </div>
+
+                <h3
+                  id="web-confirm-title"
+                  className="mt-4 text-base font-black tracking-tight text-slate-950"
+                >
+                  {webConfirm.title}
+                </h3>
+
+                <p className="mt-2 text-[11px] font-medium leading-relaxed text-slate-500">
+                  {webConfirm.message}
+                </p>
+
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setWebConfirm(null)}
+                    disabled={webConfirmLoading}
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-[11px] font-extrabold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Tidak
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => void confirmWebAction()}
+                    disabled={webConfirmLoading}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-[11px] font-extrabold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {webConfirmLoading && (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    )}
+                    Ya
+                  </button>
+                </div>
+              </div>
+            </motion.section>
+          </>
+        )}
+      </AnimatePresence>
+
     </main>
   );
 }
