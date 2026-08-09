@@ -478,6 +478,60 @@ const normalizePortalPath = (pathname: string): PortalPath => {
   return '/';
 };
 
+
+const OPD_SESSION_STORAGE_KEY = 'sipmodag.opd.session';
+const OPERATOR_SESSION_STORAGE_KEY = 'sipmodag.operator.session';
+const SELECTED_YEAR_STORAGE_KEY = 'sipmodag.selected.year';
+
+const readSessionJSON = <T,>(key: string): T | null => {
+  try {
+    const raw = window.sessionStorage.getItem(key);
+    if (!raw) return null;
+
+    return JSON.parse(raw) as T;
+  } catch (error) {
+    console.warn(`Sesi ${key} tidak dapat dipulihkan:`, error);
+
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {
+      // Abaikan jika storage tidak tersedia.
+    }
+
+    return null;
+  }
+};
+
+const writeSessionJSON = (key: string, value: unknown) => {
+  try {
+    if (value === null || value === undefined) {
+      window.sessionStorage.removeItem(key);
+      return;
+    }
+
+    window.sessionStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+  } catch (error) {
+    console.warn(`Sesi ${key} tidak dapat disimpan:`, error);
+  }
+};
+
+const readStoredSelectedYear = (): string => {
+  try {
+    const stored = String(
+      window.sessionStorage.getItem(SELECTED_YEAR_STORAGE_KEY) || ''
+    ).trim();
+
+    return /^20\d{2}$/.test(stored)
+      ? stored
+      : '2025';
+  } catch {
+    return '2025';
+  }
+};
+
 export default function App() {
   const [data, setData] = useState<OPDData[]>(OFFICIAL_OPDS);
   const [loading, setLoading] = useState<boolean>(true);
@@ -487,12 +541,17 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showFAQ, setShowFAQ] = useState<boolean>(false);
 
-  // User authentication and document upload states
-  const [loggedInOPD, setLoggedInOPD] = useState<OPDData | null>(null);
+  // User authentication and document upload states.
+  // Sesi dipulihkan dari sessionStorage agar refresh halaman tidak logout.
+  const [loggedInOPD, setLoggedInOPD] = useState<OPDData | null>(() =>
+    readSessionJSON<OPDData>(OPD_SESSION_STORAGE_KEY)
+  );
   const [portalPath, setPortalPath] = useState<PortalPath>(() =>
     normalizePortalPath(window.location.pathname)
   );
-  const [operatorSession, setOperatorSession] = useState<OperatorSession | null>(null);
+  const [operatorSession, setOperatorSession] = useState<OperatorSession | null>(() =>
+    readSessionJSON<OperatorSession>(OPERATOR_SESSION_STORAGE_KEY)
+  );
   const [revisionTarget, setRevisionTarget] = useState<RevisionTarget | null>(null);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [allResponseRows, setAllResponseRows] = useState<string[][]>([]);
@@ -504,8 +563,12 @@ export default function App() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [showOPDDropdown, setShowOPDDropdown] = useState<boolean>(false);
 
-  const [selectedYear, setSelectedYear] = useState<string>('2025');
-  const [dashboardYear, setDashboardYear] = useState<string>('2025');
+  const [selectedYear, setSelectedYear] = useState<string>(() =>
+    readStoredSelectedYear()
+  );
+  const [dashboardYear, setDashboardYear] = useState<string>(() =>
+    readStoredSelectedYear()
+  );
   const [availableDashboardYears, setAvailableDashboardYears] = useState<string[]>(['2025', '2026', '2027']);
   const [sheetUploadedCount, setSheetUploadedCount] = useState<number>(0);
   const [uploadedFiles, setUploadedFiles] = useState<{
@@ -568,6 +631,35 @@ export default function App() {
     };
   }, []);
 
+
+
+  // Pertahankan login OPD selama tab browser yang sama masih terbuka.
+  useEffect(() => {
+    writeSessionJSON(
+      OPD_SESSION_STORAGE_KEY,
+      loggedInOPD
+    );
+  }, [loggedInOPD]);
+
+  // Pertahankan token/session Operator selama tab browser yang sama masih terbuka.
+  useEffect(() => {
+    writeSessionJSON(
+      OPERATOR_SESSION_STORAGE_KEY,
+      operatorSession
+    );
+  }, [operatorSession]);
+
+  // Pertahankan tahun aktif ketika halaman direfresh.
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(
+        SELECTED_YEAR_STORAGE_KEY,
+        selectedYear
+      );
+    } catch {
+      // Abaikan bila storage browser tidak tersedia.
+    }
+  }, [selectedYear]);
 
 
   /*
@@ -1394,6 +1486,10 @@ export default function App() {
         );
       }
 
+      writeSessionJSON(
+        OPD_SESSION_STORAGE_KEY,
+        selectedOPDToLogin
+      );
       setLoggedInOPD(selectedOPDToLogin);
       setLoginError(null);
       setPassword('');
@@ -1408,6 +1504,12 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    try {
+      window.sessionStorage.removeItem(OPD_SESSION_STORAGE_KEY);
+    } catch {
+      // Abaikan jika storage tidak tersedia.
+    }
+
     setLoggedInOPD(null);
     setRevisionTarget(null);
     setShowProfileModal(false);
@@ -1729,6 +1831,14 @@ export default function App() {
               apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
               session={operatorSession}
               onLogout={() => {
+                try {
+                  window.sessionStorage.removeItem(
+                    OPERATOR_SESSION_STORAGE_KEY
+                  );
+                } catch {
+                  // Abaikan jika storage tidak tersedia.
+                }
+
                 setOperatorSession(null);
                 navigatePortal('/operator', { replace: true });
               }}
@@ -1746,6 +1856,10 @@ export default function App() {
             <OperatorLogin
               apiUrl={GOOGLE_APPS_SCRIPT_WEB_APP_URL}
               onAuthenticated={(session) => {
+                writeSessionJSON(
+                  OPERATOR_SESSION_STORAGE_KEY,
+                  session
+                );
                 setOperatorSession(session);
                 navigatePortal('/operator', { replace: true });
               }}
