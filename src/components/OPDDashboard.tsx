@@ -384,37 +384,70 @@ export default function OPDDashboard({
                   Workspace
                 </p>
 
-                <nav className="mt-3 space-y-1.5">
+                <nav className="relative mt-3 space-y-2">
+                  {/* Highlight aktif permanen — sama seperti Dashboard Operator */}
+                  <div
+                    className="pointer-events-none absolute left-0 right-[-1.25rem] top-0 z-0 h-12 rounded-l-[22px] bg-[#F8F8FC] shadow-[0_8px_22px_-18px_rgba(15,23,42,0.55)] will-change-transform"
+                    style={{
+                      transform: `translate3d(0, ${
+                        activeTab === 'dashboard' ? 0 : 56
+                      }px, 0)`,
+                      transition:
+                        'transform 210ms cubic-bezier(0.22, 1, 0.36, 1)',
+                    }}
+                  >
+                    <span
+                      className="absolute right-0 -top-5 h-5 w-5 rounded-br-[18px]"
+                      style={{ boxShadow: '6px 6px 0 6px #F8F8FC' }}
+                    />
+                    <span
+                      className="absolute right-0 -bottom-5 h-5 w-5 rounded-tr-[18px]"
+                      style={{ boxShadow: '6px -6px 0 6px #F8F8FC' }}
+                    />
+                  </div>
+
                   <button
                     type="button"
                     onClick={() => setActiveTab('dashboard')}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
                       activeTab === 'dashboard'
-                        ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
-                        : 'text-violet-100/70 hover:bg-white/10 hover:text-white'
+                        ? 'text-[#31275F]'
+                        : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                     }`}
                   >
-                    <User className="h-4 w-4" />
-                    Dashboard
-                    {activeTab === 'dashboard' && (
-                      <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
-                    )}
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
+                        activeTab === 'dashboard'
+                          ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
+                          : 'text-violet-100/70'
+                      }`}
+                    >
+                      <User className="h-3.5 w-3.5" />
+                    </span>
+
+                    <span>Dashboard</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveTab('upload')}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-[10px] font-extrabold transition ${
+                    className={`relative z-10 flex h-12 w-full items-center gap-2.5 px-3 text-left text-[10px] font-extrabold transition-colors duration-150 ${
                       activeTab === 'upload'
-                        ? 'bg-white/15 text-white shadow-sm ring-1 ring-white/10'
-                        : 'text-violet-100/70 hover:bg-white/10 hover:text-white'
+                        ? 'text-[#31275F]'
+                        : 'rounded-xl text-violet-100/70 hover:bg-white/[0.08] hover:text-white'
                     }`}
                   >
-                    <UploadCloud className="h-4 w-4" />
-                    Upload Dokumen
-                    {activeTab === 'upload' && (
-                      <span className="ml-auto h-2 w-2 rounded-full bg-violet-300" />
-                    )}
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
+                        activeTab === 'upload'
+                          ? 'border border-[#31275F]/15 bg-white text-[#31275F] shadow-sm'
+                          : 'text-violet-100/70'
+                      }`}
+                    >
+                      <UploadCloud className="h-3.5 w-3.5" />
+                    </span>
+
+                    <span>Upload Dokumen</span>
                   </button>
                 </nav>
               </div>
