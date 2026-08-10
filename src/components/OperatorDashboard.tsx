@@ -53,6 +53,7 @@ type SubmitReviewResponse = {
 };
 
 type OperatorTab = 'review' | 'opd-dashboard' | 'accounts';
+type QueueSort = 'newest' | 'oldest';
 
 type OPDOverviewRaw = {
   OPD_ID: string;
@@ -261,6 +262,44 @@ const getDashboardOPDSimilarity = (left: string, right: string): number => {
 
 const hasFlag = (value: number | string | undefined) => Number(value || 0) > 0;
 
+const getUploadTimestamp = (value: unknown): number => {
+  const raw = String(value || '').trim();
+  if (!raw) return 0;
+
+  // Format ISO/MySQL, misalnya:
+  // 2026-08-10 17:30:00
+  // 2026-08-10T17:30:00
+  const normalizedIso = raw.replace(
+    /^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})/,
+    '$1T$2',
+  );
+  const direct = Date.parse(normalizedIso);
+  if (!Number.isNaN(direct)) return direct;
+
+  // Format Indonesia sederhana:
+  // 10/08/2026 17:30
+  // 10-08-2026, 17:30:00
+  const localMatch = raw.match(
+    /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})(?:[^0-9]+(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?)?/,
+  );
+
+  if (localMatch) {
+    const [, day, month, yearValue, hour = '0', minute = '0', second = '0'] =
+      localMatch;
+
+    return new Date(
+      Number(yearValue),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+      Number(second),
+    ).getTime();
+  }
+
+  return 0;
+};
+
 const STATUS_OPTIONS: Array<{ value: ReviewStatus | ''; label: string }> = [
   { value: '', label: 'Semua antrean' },
   { value: 'MENUNGGU_REVIEW', label: 'Menunggu review' },
@@ -308,6 +347,7 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
   const [selected, setSelected] = useState<ReviewUpload | null>(null);
   const [year, setYear] = useState('');
   const [statusFilter, setStatusFilter] = useState<ReviewStatus | ''>('');
+  const [queueSort, setQueueSort] = useState<QueueSort>('newest');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -388,15 +428,27 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
 
   const visibleQueue = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return queue;
 
-    return queue.filter(item =>
-      [item.NAMA_OPD, item.JENIS_DOKUMEN, item.FILE_NAME, item.STATUS]
-        .join(' ')
-        .toLowerCase()
-        .includes(query),
-    );
-  }, [queue, search]);
+    const filtered = query
+      ? queue.filter(item =>
+          [item.NAMA_OPD, item.JENIS_DOKUMEN, item.FILE_NAME, item.STATUS]
+            .join(' ')
+            .toLowerCase()
+            .includes(query),
+        )
+      : [...queue];
+
+    return filtered.sort((left, right) => {
+      const leftTime = getUploadTimestamp(left.UPLOADED_AT);
+      const rightTime = getUploadTimestamp(right.UPLOADED_AT);
+
+      if (queueSort === 'oldest') {
+        return leftTime - rightTime;
+      }
+
+      return rightTime - leftTime;
+    });
+  }, [queue, search, queueSort]);
 
   const summary = useMemo(() => ({
     total: queue.length,
@@ -1846,12 +1898,12 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
         <section className="grid min-h-[650px] gap-5 xl:grid-cols-[minmax(410px,0.70fr)_minmax(0,1.30fr)]">
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
             <div className="border-b border-slate-100 p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="relative">
                   <select
                     value={year}
                     onChange={event => setYear(event.target.value)}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-9 text-xs font-extrabold text-slate-700 outline-none sm:w-36"
+                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-9 text-xs font-extrabold text-slate-700 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
                   >
                     <option value="">Semua Tahun</option>
                     <option value="2025">2025</option>
@@ -1865,13 +1917,40 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                   <select
                     value={statusFilter}
                     onChange={event => setStatusFilter(event.target.value as ReviewStatus | '')}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-9 text-xs font-extrabold text-slate-700 outline-none sm:w-48"
+                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-4 pr-9 text-xs font-extrabold text-slate-700 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
                   >
                     {STATUS_OPTIONS.map(option => (
                       <option key={option.value || 'all'} value={option.value}>{option.label}</option>
                     ))}
                   </select>
                   <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                </div>
+
+                <div className="col-span-2 flex items-center gap-3 rounded-xl border border-violet-100 bg-violet-50/80 p-2.5">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
+                    <Clock3 className="h-4 w-4 shrink-0 text-violet-600" />
+                    <div className="min-w-0">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-violet-400">
+                        Urutkan File
+                      </p>
+                      <p className="truncate text-[10px] font-black text-violet-800">
+                        Berdasarkan waktu upload
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="relative w-[145px] shrink-0">
+                    <select
+                      value={queueSort}
+                      onChange={event => setQueueSort(event.target.value as QueueSort)}
+                      className="w-full appearance-none rounded-lg border border-violet-200 bg-white py-2.5 pl-3 pr-8 text-[10px] font-extrabold text-violet-700 outline-none transition focus:border-violet-300 focus:ring-4 focus:ring-violet-100"
+                      aria-label="Urutkan antrean review"
+                    >
+                      <option value="newest">Terbaru dulu</option>
+                      <option value="oldest">Terlama dulu</option>
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-violet-500" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1913,9 +1992,22 @@ export default function OperatorDashboard({ apiUrl, session, onLogout }: Props) 
                           {statusLabel[item.STATUS]}
                         </span>
                       </div>
-                      <div className="mt-3 flex items-center justify-between gap-3 text-[10px] text-slate-400">
-                        <span className="truncate">{item.FILE_NAME}</span>
-                        <span className="flex shrink-0 items-center gap-1"><Clock3 className="h-3 w-3" />{item.UPLOADED_AT}</span>
+                      <div className="mt-3 flex items-center justify-between gap-3 text-[10px]">
+                        <span className="truncate font-semibold text-slate-400">
+                          {item.FILE_NAME}
+                        </span>
+
+                        <span
+                          className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 font-extrabold shadow-sm ${
+                            selected?.UPLOAD_ID === item.UPLOAD_ID
+                              ? 'border-violet-300 bg-violet-100 text-violet-800'
+                              : 'border-blue-200 bg-blue-50 text-blue-700'
+                          }`}
+                          title={`Diunggah ${item.UPLOADED_AT}`}
+                        >
+                          <Clock3 className="h-3.5 w-3.5" />
+                          <span>{item.UPLOADED_AT}</span>
+                        </span>
                       </div>
                     </button>
                   ))}
