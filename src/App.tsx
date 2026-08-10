@@ -1512,13 +1512,16 @@ export default function App() {
     setLoggedInOPD(null);
     setRevisionTarget(null);
     setShowProfileModal(false);
-    navigatePortal('/opd', { replace: true });
     setUploadedFiles({
       file1: null,
       file2: null,
       file3: null,
       file4: null,
     });
+
+    // Paksa kembali ke halaman utama dan reload route dari root.
+    // Ini menghindari state route lama (/opd) masih sempat menampilkan login page.
+    window.location.replace('/');
   };
 
   const handleLocalFileChange = (slot: 'file1' | 'file2' | 'file3' | 'file4', file: File | null) => {
@@ -1853,7 +1856,9 @@ export default function App() {
                 }
 
                 setOperatorSession(null);
-                navigatePortal('/operator', { replace: true });
+
+                // Paksa keluar dari route /operator dan kembali ke halaman utama.
+                window.location.replace('/');
               }}
             />
           </motion.div>
